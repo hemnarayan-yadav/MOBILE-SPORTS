@@ -70,5 +70,93 @@
   "src/utils/format.js": {
     "source": "src/utils/format.js",
     "sha256": "8c6678341eed9aa67c4dc8812df31158a3638f4ab3ebf8e1932c5ecadd401027"
+  },
+  "src/api/auth.api.js": {
+    "source": "src/api/auth.api.js",
+    "sha256": "6430c0bc2c4a2c6e6340a2c0364a9db9f8f5cc3c5a9b7e45ee55e5825cc56bfa"
+  },
+  "src/api/otp.api.js": {
+    "source": "src/api/otp.api.js",
+    "sha256": "0b6352f626700dbfe9b8a1ca0ee3af2a8194a7a70113f651727675b60923b0b6"
+  },
+  "src/api/users.api.js": {
+    "source": "src/api/users.api.js",
+    "sha256": "d144f4c9b12f4237528cbe0201a63a664c3631aecb44b5110b35cd390d04acc2"
+  },
+  "src/api/invitations.api.js": {
+    "source": "src/api/invitations.api.js",
+    "sha256": "e177c7b2898105867a7f97518f574f2b130fc071d6d880b2feedbb1dbbf2fd5c"
+  },
+  "src/api/media.api.js": {
+    "source": "src/api/content.api.js",
+    "sha256": "0eb500ab561d26503ea2f5822810c7e4bc356f220ac2d6e3a7130b0459284882"
+  },
+  "src/store/authStore.js": {
+    "source": "src/store/authStore.js",
+    "sha256": "6c2d11ca67d94f0b237ebb2347d05dee579db1cadbbcdc7919bb439dbb558217"
+  },
+  "src/hooks/useAuth.js": {
+    "source": "src/hooks/useAuth.js",
+    "sha256": "d2b1766906721930ece7235ed0110946f722b4f3ac038415a7fa74387614328c"
+  },
+  "src/hooks/useAuthBootstrap.js": {
+    "source": "src/hooks/useAuthBootstrap.js",
+    "sha256": "28c58d26a7735e0c140b5ccb6e2254bbf495a1005fa7a4b2cd9d86a88383b40f"
+  },
+  "src/hooks/useCodeDialog.js": {
+    "source": "src/hooks/useCodeDialog.js",
+    "sha256": "2b5a435909b820e7d6bcb0f1793e6da1617285a4a116a6b7b6f9b66c7f77425c"
+  },
+  "src/hooks/useOtpConfig.js": {
+    "source": "src/hooks/useOtpConfig.js",
+    "sha256": "4d0584e0a12a105979334cec6f4a97992c46e76a54649ddc6f3cb075760ebc5c"
+  },
+  "src/hooks/usePhoneVerification.js": {
+    "source": "src/hooks/usePhoneVerification.js",
+    "sha256": "562c5a65fe301c018f3aa7880d16c3473717e49d5f193669da859a58f723dae2"
+  },
+  "src/hooks/useEmailVerification.js": {
+    "source": "src/hooks/useEmailVerification.js",
+    "sha256": "b3f807722cc189ff964fd4f98457423ec6a9486398d976b3b70555db86d16a9c"
+  },
+  "src/components/otp/OtpCodeSheet.jsx": {
+    "source": "src/components/otp/OtpCodeSheet.jsx",
+    "sha256": "9a06d6ee83ff09827ffd3cae8afef3443d4382b3479c4f901b7227192a82f421"
+  },
+  "src/components/common/PhoneField.jsx": {
+    "source": "src/components/common/PhoneField.jsx",
+    "sha256": "481cef2c48a5f197a6b2122bd392fdffd660de38ecbfb39dcba3912bbb68eb93"
+  },
+  "src/components/common/AvatarField.jsx": {
+    "source": "src/components/common/ImageField.jsx",
+    "sha256": "98d7a573f28f049fa06bc9c0b32900b11ba861b9201efea95d0dbc048563672c"
+  },
+  "src/utils/countries.js": {
+    "source": "src/utils/countries.js",
+    "sha256": "ac5cb056166a9c68efaaf50f0d4703d50cac4549adccdafd3ddbdc7d0009e746"
+  },
+  "src/utils/validation.js": {
+    "source": "src/utils/validation.js",
+    "sha256": "255be07fd5bd68c4fcf93b5e56d2d102ccc40f64e37ac707a4a1f62eda5019b4"
+  },
+  "src/utils/mediaFile.js": {
+    "source": "src/utils/mediaFile.js",
+    "sha256": "7f2baa194165e437278f808f08fdd9995958db5478193abb42bcf2a63a142a92"
+  },
+  "src/app/auth/login.jsx": {
+    "source": "src/pages/auth/Login.jsx",
+    "sha256": "96c672e9c0504fe146d26ff101b0a8affb63c4bd5b41fd4db743a93084c53600"
+  },
+  "src/app/auth/register.jsx": {
+    "source": "src/pages/auth/Register.jsx",
+    "sha256": "7a6bd218535435e0b55b1cfe7f117f3eca910ca581d6525fa847c5312325097a"
+  },
+  "src/app/auth/forgot-password.jsx": {
+    "source": "src/pages/auth/ForgotPassword.jsx",
+    "sha256": "ffeab1667b2f69275cdd7ac296b2487f69dfda3db35c3842844e456c4c25b115"
+  },
+  "src/app/dashboard/profile.jsx": {
+    "source": "src/pages/dashboard/Profile.jsx",
+    "sha256": "702d7df4c42a1ab3c9ca6b59a207a035a13a732e03bf80ed240e7e8a5e88ff1a"
   }
 }

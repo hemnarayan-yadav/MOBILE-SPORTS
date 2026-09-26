@@ -1,0 +1,279 @@
+// Create an account — adapted from frontend/src/pages/auth/Register.jsx. Two
+// steps: prove the number (the account's identity), then the details. The
+// invitations waiting for the proved number are read from the server and the
+// captain's name for the player is suggested.
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { Link } from 'expo-router';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { authApi } from '../../api/auth.api.js';
+import { startSession } from '../../api/client.js';
+import { invitationsApi } from '../../api/invitations.api.js';
+import AppText from '../../components/common/AppText.jsx';
+import Button from '../../components/common/Button.jsx';
+import PhoneField from '../../components/common/PhoneField.jsx';
+import Screen from '../../components/common/Screen.jsx';
+import TextField from '../../components/common/TextField.jsx';
+import { useGuestScreen } from '../../hooks/useGuestScreen.js';
+import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
+import { notify } from '../../store/noticeStore.js';
+import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
+import { useTheme } from '../../theme/useTheme.js';
+import { apiErrorKey } from '../../utils/apiErrors.js';
+import { formatPhone } from '../../utils/countries.js';
+import { registerPhoneSchema, registerProfileSchema } from '../../utils/validation.js';
+
+const STEPS = Object.freeze({ PHONE: 'phone', PROFILE: 'profile' });
+
+// Step one: the number and its one-time code. Coming back to it from step two
+// keeps the proof: the same number continues without a new code.
+function PhoneStep({ verification, verified, onVerified, onContinue }) {
+  const { t } = useTranslation();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerPhoneSchema),
+    defaultValues: { phone: verified?.phone ?? '' },
+  });
+  const stillVerified = Boolean(verified) && watch('phone') === verified.phone;
+
+  const onSubmit = async ({ phone }) => {
+    if (stillVerified) return onContinue();
+    const otpToken = await verification.verify(phone).catch((error) => {
+      notify.error(t(apiErrorKey(error)));
+      return null;
+    });
+    if (otpToken) await onVerified({ phone, otpToken });
+  };
+
+  return (
+    <View style={styles.form}>
+      {!verification.isAvailable && !verification.isChecking ? (
+        <AppText tone="muted" accessibilityLiveRegion="polite">
+          {t('auth.otpUnavailableRegister')}
+        </AppText>
+      ) : null}
+      <Controller
+        control={control}
+        name="phone"
+        render={({ field }) => (
+          <PhoneField
+            label={t('auth.phone')}
+            hint={t('auth.registerOtpHint', { context: verification.channel })}
+            value={field.value}
+            onChange={field.onChange}
+            error={errors.phone}
+          />
+        )}
+      />
+      {stillVerified ? (
+        <AppText weight="semibold" tone="success">
+          {t('auth.phoneVerified', { phone: formatPhone(verified.phone) })}
+        </AppText>
+      ) : null}
+      <Button
+        onPress={handleSubmit(onSubmit)}
+        loading={isSubmitting}
+        disabled={!stillVerified && !verification.isAvailable}
+      >
+        {t(stillVerified ? 'auth.continue' : 'auth.sendOtp')}
+      </Button>
+    </View>
+  );
+}
+
+// The captain's squad details for each team waiting for this number.
+function InvitationSummary({ invitations }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.banner, { backgroundColor: colors.brandSoft }]}>
+      {invitations.map(({ team, jerseyNumber }) => (
+        <AppText key={team.id} weight="semibold" tone="brandStrong">
+          {jerseyNumber === null
+            ? t('auth.joiningTeam', { team: team.name })
+            : t('auth.joiningTeamJersey', { team: team.name, jersey: jerseyNumber })}
+        </AppText>
+      ))}
+    </View>
+  );
+}
+
+// Step two: the rest of the account, created with the proof from step one.
+function ProfileStep({ verified, onChangeNumber }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const invitedName = verified.invitations[0]?.playerName ?? '';
+  const registerAccount = useMutation({
+    mutationFn: authApi.register,
+    onSuccess: async ({ joinedTeams, ...session }) => {
+      await startSession(session);
+      // The team the server says the account joined (newest invitation first).
+      // Team pages arrive with Phase M2; until then the app says so here.
+      const team = joinedTeams?.[0];
+      notify.success(team ? t('app.joinedTeam', { team: team.name }) : t('auth.registerSuccess'));
+    },
+  });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerProfileSchema),
+    defaultValues: { name: invitedName, email: '', password: '', confirmPassword: '' },
+  });
+
+  const onSubmit = ({ confirmPassword: _confirmPassword, ...profile }) => {
+    registerAccount.mutate(
+      { ...profile, phone: verified.phone, otpToken: verified.otpToken },
+      {
+        onError: (error) => {
+          notify.error(t(apiErrorKey(error)));
+          // A number taken meanwhile sends them back to step one.
+          if (error?.code === 'PHONE_TAKEN') onChangeNumber();
+        },
+      },
+    );
+  };
+
+  const field = (name, props) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: input }) => (
+        <TextField
+          value={input.value}
+          onChangeText={input.onChange}
+          onBlur={input.onBlur}
+          error={errors[name]}
+          {...props}
+        />
+      )}
+    />
+  );
+
+  return (
+    <View style={styles.form}>
+      <View style={[styles.banner, styles.verifiedRow, { backgroundColor: colors.surface2 }]}>
+        <AppText weight="semibold" tone="success" style={styles.flex}>
+          {t('auth.phoneVerified', { phone: formatPhone(verified.phone) })}
+        </AppText>
+        <Pressable onPress={onChangeNumber} accessibilityRole="button" style={styles.inlineAction}>
+          <AppText weight="semibold" tone="brandStrong">
+            {t('auth.useAnotherPhone')}
+          </AppText>
+        </Pressable>
+      </View>
+      {verified.invitations.length > 0 ? (
+        <InvitationSummary invitations={verified.invitations} />
+      ) : null}
+      {field('name', {
+        label: t('auth.name'),
+        hint: invitedName ? t('auth.invitedNameHint') : undefined,
+        autoComplete: 'name',
+        textContentType: 'name',
+      })}
+      {field('email', {
+        label: t('auth.emailOptional'),
+        hint: t('auth.emailOptionalHint'),
+        keyboardType: 'email-address',
+        autoCapitalize: 'none',
+        autoComplete: 'email',
+      })}
+      {field('password', {
+        label: t('auth.password'),
+        secureTextEntry: true,
+        autoCapitalize: 'none',
+        autoComplete: 'new-password',
+        textContentType: 'newPassword',
+      })}
+      {field('confirmPassword', {
+        label: t('auth.confirmPassword'),
+        secureTextEntry: true,
+        autoCapitalize: 'none',
+        autoComplete: 'new-password',
+        textContentType: 'newPassword',
+      })}
+      <Button onPress={handleSubmit(onSubmit)} loading={registerAccount.isPending}>
+        {t('auth.registerSubmit')}
+      </Button>
+    </View>
+  );
+}
+
+// The open invitations for a number just proved by OTP, from the server. A
+// failed lookup only means nothing is filled in; signing up still accepts them.
+function lookupInvitations(phone, otpToken) {
+  return invitationsApi
+    .lookup({ phone, otpToken })
+    .then((data) => data.invitations)
+    .catch(() => []);
+}
+
+export default function Register() {
+  const { t } = useTranslation();
+  useGuestScreen();
+  const verification = usePhoneVerification();
+  const [step, setStep] = useState(STEPS.PHONE);
+  // The proved number, its single-use proof and the invitations waiting for it.
+  const [verified, setVerified] = useState(null);
+
+  const handleVerified = async ({ phone, otpToken }) => {
+    setVerified({ phone, otpToken, invitations: await lookupInvitations(phone, otpToken) });
+    setStep(STEPS.PROFILE);
+  };
+  const changeNumber = () => {
+    setVerified(null);
+    setStep(STEPS.PHONE);
+  };
+
+  return (
+    <Screen
+      title={t('auth.registerTitle')}
+      subtitle={t(step === STEPS.PROFILE ? 'auth.registerStep2' : 'auth.registerStep1')}
+      // Step two steps back to step one, keeping the proof and what was typed.
+      onBack={step === STEPS.PROFILE ? () => setStep(STEPS.PHONE) : undefined}
+    >
+      {step === STEPS.PHONE ? (
+        <PhoneStep
+          verification={verification}
+          verified={verified}
+          onVerified={handleVerified}
+          onContinue={() => setStep(STEPS.PROFILE)}
+        />
+      ) : null}
+      {/* Kept mounted while step one is shown again, so nothing typed is lost;
+          a new proof (another number) starts a fresh form. */}
+      {verified ? (
+        <View style={step !== STEPS.PROFILE && styles.hidden}>
+          <ProfileStep key={verified.otpToken} verified={verified} onChangeNumber={changeNumber} />
+        </View>
+      ) : null}
+      <View style={styles.footer}>
+        <AppText tone="muted">{t('auth.haveAccount')}</AppText>
+        <Link href="/auth/login">
+          <AppText weight="semibold" tone="brandStrong">
+            {t('nav.login')}
+          </AppText>
+        </Link>
+      </View>
+      {verification.dialog}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  form: { gap: SPACING.lg },
+  banner: { borderRadius: RADII.md, padding: SPACING.md, gap: SPACING.xs },
+  verifiedRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
+  flex: { flex: 1 },
+  inlineAction: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: SPACING.sm },
+  hidden: { display: 'none' },
+  footer: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs, justifyContent: 'center' },
+});

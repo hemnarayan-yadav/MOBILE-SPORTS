@@ -54,6 +54,10 @@ module.exports = () => {
     },
     plugins: [
       'expo-router',
+      // Refresh token in the Android Keystore; auto-backup excludes it.
+      ['expo-secure-store', { configureAndroidBackup: true }],
+      // Profile photos come from the photo library only: no camera or microphone.
+      ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
       [
         'expo-splash-screen',
         {

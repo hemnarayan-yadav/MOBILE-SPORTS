@@ -2,11 +2,13 @@ jest.mock('../api/matches.api.js', () => ({ matchesApi: { list: jest.fn() } }));
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { act, configure, fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import { matchesApi } from '../api/matches.api.js';
 import Home from '../app/index.jsx';
 import hi from '../i18n/locales/hi.json';
 import i18n from '../i18n/index.js';
 import { createQueryClient } from '../lib/queryClient.js';
+import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
 import { useUiStore } from '../store/uiStore.js';
 
 // The default 1 s wait for `findBy…` ran out once on a busy machine (a Gradle
@@ -98,5 +100,26 @@ describe('Home (live matches)', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Theme: System. Tap to change' }));
     expect(useUiStore.getState().theme).toBe('light');
     expect(screen.getByRole('button', { name: 'Theme: Light. Tap to change' })).toBeTruthy();
+  });
+
+  it('offers sign-in when signed out and the account when signed in', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS });
+    await renderHome();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Log in' }));
+    expect(router.push).toHaveBeenCalledWith('/auth/login');
+
+    await act(() => useAuthStore.setState({ status: AUTH_STATUS.AUTHENTICATED }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Account' }));
+    expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
+  });
+
+  it('shows neither while the stored session is still being restored', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    useAuthStore.setState({ status: AUTH_STATUS.UNKNOWN });
+    await renderHome();
+    await screen.findByText('Live now');
+    expect(screen.queryByRole('button', { name: 'Log in' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Account' })).toBeNull();
   });
 });

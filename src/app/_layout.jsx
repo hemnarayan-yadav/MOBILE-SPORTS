@@ -5,6 +5,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
+import NoticeHost from '../components/common/NoticeHost.jsx';
+import UpdateGate from '../components/common/UpdateGate.jsx';
+import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
 import i18n from '../i18n/index.js';
 import { startAppLifecycle } from '../lib/appLifecycle.js';
 import { queryClient } from '../lib/queryClient.js';
@@ -16,6 +19,13 @@ import { useTheme } from '../theme/useTheme.js';
 // and theme are restored, so the first frame is already the right one.
 SplashScreen.preventAutoHideAsync();
 startAppLifecycle();
+
+// The session is restored from the keystore in the background: public screens
+// do not wait for it.
+function SessionBootstrap() {
+  useAuthBootstrap();
+  return null;
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
@@ -43,7 +53,13 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+      <SessionBootstrap />
+      <UpdateGate>
+        <Stack
+          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
+        />
+      </UpdateGate>
+      <NoticeHost />
     </QueryClientProvider>
   );
 }
