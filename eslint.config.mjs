@@ -17,6 +17,7 @@ const reactNativeGlobals = {
   AbortController: 'readonly',
   URL: 'readonly',
   URLSearchParams: 'readonly',
+  atob: 'readonly',
   setTimeout: 'readonly',
   clearTimeout: 'readonly',
   setInterval: 'readonly',

@@ -1,6 +1,8 @@
-// Home — Phase M0 placeholder: the live matches, with the language and theme
-// switches. The full home screen (upcoming, results, tabs) arrives in Phase M2.
+// Home — placeholder until Phase M2: the live matches, the language and theme
+// switches, and the way to sign in or to the account. The full home screen
+// (upcoming, results, tabs) arrives in Phase M2.
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
@@ -8,10 +10,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { matchesApi } from '../api/matches.api.js';
 import { qk } from '../api/queryKeys.js';
 import AppText from '../components/common/AppText.jsx';
+import Button from '../components/common/Button.jsx';
 import { LanguageSwitcher, ThemeToggle } from '../components/common/Controls.jsx';
 import Logo from '../components/common/Logo.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../components/common/States.jsx';
 import MatchCard from '../components/match/MatchCard.jsx';
+import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
 import { SPACING } from '../theme/tokens.js';
 import { useTheme } from '../theme/useTheme.js';
 import { MATCH_STATUS } from '../utils/constants.js';
@@ -32,10 +36,31 @@ function Header() {
           <ThemeToggle />
         </View>
       </View>
-      <AppText variant="title" accessibilityRole="header">
-        {t('home.liveNow')}
-      </AppText>
+      <View style={styles.headerRow}>
+        <AppText variant="title" accessibilityRole="header">
+          {t('home.liveNow')}
+        </AppText>
+        <AccountButton />
+      </View>
     </View>
+  );
+}
+
+// Signed in: the account (profile). Signed out: sign in. Nothing while the
+// stored session is still being restored, so the label never flickers.
+function AccountButton() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const status = useAuthStore((s) => s.status);
+  if (status === AUTH_STATUS.UNKNOWN) return null;
+  const signedIn = status === AUTH_STATUS.AUTHENTICATED;
+  return (
+    <Button
+      variant="secondary"
+      onPress={() => router.push(signedIn ? '/dashboard/profile' : '/auth/login')}
+    >
+      {signedIn ? t('app.account') : t('nav.login')}
+    </Button>
   );
 }
 

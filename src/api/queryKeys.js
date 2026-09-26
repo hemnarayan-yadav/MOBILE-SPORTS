@@ -6,4 +6,9 @@ export const qk = Object.freeze({
     all: ['matches'],
     list: (params) => ['matches', 'list', params],
   },
+  otp: { config: ['otp', 'config'] },
+  media: { config: ['media', 'config'] },
+  // The web keeps this key in users.api.js (ME_QUERY_KEY); same value.
+  me: ['users', 'me'],
+  mobile: { config: ['mobile', 'config'] },
 });
