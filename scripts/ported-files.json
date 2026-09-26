@@ -1,0 +1,74 @@
+{
+  "src/api/client.js": {
+    "source": "src/api/client.js",
+    "sha256": "9544fb8ca2b624d0ba9fe76a18b9da6eac7edee2227da9a2b7cc52d038533da8"
+  },
+  "src/api/matches.api.js": {
+    "source": "src/api/matches.api.js",
+    "sha256": "c738dec70915ac5b6cbb0cd5994bab993ab2860b157aec995bf6c691f8f6b3db"
+  },
+  "src/api/queryKeys.js": {
+    "source": "src/api/queryKeys.js",
+    "sha256": "0834d4b1f75a806189043c4833d6e08e07bd6bc81a078c95b0c66cc8e1c77617"
+  },
+  "src/assets/logo/khelscoreFull.js": {
+    "source": "src/assets/logo/khelscore-full.svg",
+    "sha256": "c0cba2f61f617f9559059fe3712a7f3203311cefeaa57ed5794b7aa71c8aacfe"
+  },
+  "src/components/match/MatchCard.jsx": {
+    "source": "src/components/match/MatchBits.jsx",
+    "sha256": "5d582175fdeccd925f12e3f13dc750b0d9939f9e72fd0b38cadfa6c4501928d3"
+  },
+  "src/components/match/MatchClock.jsx": {
+    "source": "src/components/match/MatchBits.jsx",
+    "sha256": "5d582175fdeccd925f12e3f13dc750b0d9939f9e72fd0b38cadfa6c4501928d3"
+  },
+  "src/hooks/useLanguage.js": {
+    "source": "src/hooks/useLanguage.js",
+    "sha256": "db7fde9ed1853a086ab4d7a00fbb261f4c6adf2f831ecfbd6009fd4691ba553f"
+  },
+  "src/hooks/useNow.js": {
+    "source": "src/hooks/useNow.js",
+    "sha256": "b2a64da9eb6850588102b7b69a48e38d0fd3f3af9a25abd0a59d363ae6c1c902"
+  },
+  "src/lib/queryClient.js": {
+    "source": "src/lib/queryClient.js",
+    "sha256": "45190e5afad2f95014e709875ae3802bbd35b8e1f85b70b5ad543075c14edab8"
+  },
+  "src/lib/serverClock.js": {
+    "source": "src/lib/serverClock.js",
+    "sha256": "84f02ed00b85e37481d7d65eb9076c32d97d2e1c9a42c5a6031361029ece442d"
+  },
+  "src/store/uiStore.js": {
+    "source": "src/store/uiStore.js",
+    "sha256": "eb8651aa997fc283806e73425c58231a2fa6c15118b4113cc5c25a160a154008"
+  },
+  "src/tests/serverClock.test.js": {
+    "source": "src/tests/serverClock.test.jsx",
+    "sha256": "e3493b493f6a3785d2fcaa5c6d5daaece0920e241fce8896da91c817dda72f4f"
+  },
+  "src/tests/i18n.test.js": {
+    "source": "src/tests/i18n.test.js",
+    "sha256": "59304eee864d6d294e7bec03ae51847792c339dd1532bace3d0730c91324830d"
+  },
+  "src/theme/tokens.js": {
+    "source": "src/index.css",
+    "sha256": "be2f7e2bd18989101c0a409b24648143536b82823f6fbc8edad2426af1225e15"
+  },
+  "src/theme/useTheme.js": {
+    "source": "src/hooks/useTheme.js",
+    "sha256": "e40222514ab627c78dd245f2e85748566737cff11566db7fb9fbc5cdfbfce813"
+  },
+  "src/utils/apiErrors.js": {
+    "source": "src/utils/apiErrors.js",
+    "sha256": "a06e8edec9a83ff7d3acab3649d1462f693b3eb344f8ebd4ec1b700cb660999e"
+  },
+  "src/utils/constants.js": {
+    "source": "src/utils/constants.js",
+    "sha256": "58f6a8f1b7a3353a015ceb9b16ad238a9e62a67f2ea302503c1c247e70d336ea"
+  },
+  "src/utils/format.js": {
+    "source": "src/utils/format.js",
+    "sha256": "8c6678341eed9aa67c4dc8812df31158a3638f4ab3ebf8e1932c5ecadd401027"
+  }
+}

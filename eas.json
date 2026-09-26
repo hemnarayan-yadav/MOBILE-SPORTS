@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "development"
+      }
+    },
+    "staging": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "staging",
+        "EXPO_PUBLIC_SITE_URL": "https://www.khelscore.in",
+        "EXPO_PUBLIC_DEFAULT_LOCALE": "en"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": { "buildType": "app-bundle" },
+      "env": {
+        "EXPO_PUBLIC_APP_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://api.khelscore.in/api/v1",
+        "EXPO_PUBLIC_SOCKET_URL": "https://api.khelscore.in",
+        "EXPO_PUBLIC_SITE_URL": "https://www.khelscore.in",
+        "EXPO_PUBLIC_DEFAULT_LOCALE": "en"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
