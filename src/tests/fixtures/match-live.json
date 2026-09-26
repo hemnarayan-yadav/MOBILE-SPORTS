@@ -1,0 +1,990 @@
+{
+  "id": "6ab7f915cc1ed5569c0a6b21",
+  "sport": "kabaddi",
+  "tournament": null,
+  "round": null,
+  "teamA": {
+    "id": "6ab7f915cc1ed5569c0a6ab9",
+    "name": "Team 2",
+    "shortName": "T2",
+    "logoUrl": null,
+    "status": "active"
+  },
+  "teamB": {
+    "id": "6ab7f915cc1ed5569c0a6aee",
+    "name": "Team 16",
+    "shortName": "T16",
+    "logoUrl": null,
+    "status": "active"
+  },
+  "scheduledAt": "2026-09-26T17:55:49.854Z",
+  "venue": "Village Ground",
+  "status": "live",
+  "teamAScore": 2,
+  "teamBScore": 1,
+  "winner": null,
+  "isTie": false,
+  "phase": "first_half",
+  "half": 1,
+  "clock": {
+    "running": true,
+    "elapsedMs": 0,
+    "runningSince": "2026-09-26T16:55:50.232Z"
+  },
+  "startedAt": "2026-09-26T16:55:49.994Z",
+  "endedAt": null,
+  "cancelReason": null,
+  "rules": {
+    "firstHalfDurationSeconds": 900,
+    "secondHalfDurationSeconds": 900,
+    "raidClockSeconds": 30,
+    "officialTimeoutRules": false,
+    "officialRaidDelayRule": false,
+    "officialSubstitutionRule": false
+  },
+  "tossWinner": "6ab7f915cc1ed5569c0a6ab9",
+  "tossDecision": "raid",
+  "lineups": [
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6abc",
+        "name": "Player 4",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": true,
+      "jerseyNumber": 1,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ac0",
+        "name": "Player 5",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 2,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ac4",
+        "name": "Player 6",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 3,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ac8",
+        "name": "Player 7",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 4,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6acc",
+        "name": "Player 8",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 5,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ad0",
+        "name": "Player 9",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 6,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ad4",
+        "name": "Player 10",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 7,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ad8",
+        "name": "Player 11",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 8,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6adc",
+        "name": "Player 12",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 9,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ae0",
+        "name": "Player 13",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 10,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ae4",
+        "name": "Player 14",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 11,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6ab9",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6ae8",
+        "name": "Player 15",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 12,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6af1",
+        "name": "Player 18",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": true,
+      "jerseyNumber": 1,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6af5",
+        "name": "Player 19",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 2,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6af9",
+        "name": "Player 20",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 3,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6afd",
+        "name": "Player 21",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 4,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b01",
+        "name": "Player 22",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 5,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b05",
+        "name": "Player 23",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 6,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b09",
+        "name": "Player 24",
+        "photoUrl": null
+      },
+      "isStartingSeven": true,
+      "isMatchCaptain": false,
+      "jerseyNumber": 7,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b0d",
+        "name": "Player 25",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 8,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b11",
+        "name": "Player 26",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 9,
+      "playingRole": "all_rounder"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b15",
+        "name": "Player 27",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 10,
+      "playingRole": "raider"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b19",
+        "name": "Player 28",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 11,
+      "playingRole": "defender"
+    },
+    {
+      "team": "6ab7f915cc1ed5569c0a6aee",
+      "player": {
+        "id": "6ab7f915cc1ed5569c0a6b1d",
+        "name": "Player 29",
+        "photoUrl": null
+      },
+      "isStartingSeven": false,
+      "isMatchCaptain": false,
+      "jerseyNumber": 12,
+      "playingRole": "all_rounder"
+    }
+  ],
+  "mvp": null,
+  "statsStatus": "none",
+  "createdBy": "6ab7f915cc1ed5569c0a6ab5",
+  "live": {
+    "version": 11,
+    "phase": "first_half",
+    "half": 1,
+    "clock": {
+      "running": true,
+      "elapsedMs": 0,
+      "runningSince": "2026-09-26T16:55:50.232Z"
+    },
+    "score": {
+      "A": 2,
+      "B": 1
+    },
+    "teams": {
+      "A": {
+        "teamId": "6ab7f915cc1ed5569c0a6ab9",
+        "onCourt": [
+          "6ab7f915cc1ed5569c0a6ac0",
+          "6ab7f915cc1ed5569c0a6ac4",
+          "6ab7f915cc1ed5569c0a6ac8",
+          "6ab7f915cc1ed5569c0a6acc",
+          "6ab7f915cc1ed5569c0a6ad0",
+          "6ab7f915cc1ed5569c0a6ad4"
+        ],
+        "out": ["6ab7f915cc1ed5569c0a6abc"],
+        "bench": [
+          "6ab7f915cc1ed5569c0a6ad8",
+          "6ab7f915cc1ed5569c0a6adc",
+          "6ab7f915cc1ed5569c0a6ae0",
+          "6ab7f915cc1ed5569c0a6ae4",
+          "6ab7f915cc1ed5569c0a6ae8"
+        ],
+        "timeoutsUsed": 0,
+        "timeoutsUsedByHalf": {
+          "1": 0,
+          "2": 0
+        },
+        "substitutionsUsed": 0,
+        "emptyRaidStreak": 0,
+        "doOrDieNext": false,
+        "courtSide": "left"
+      },
+      "B": {
+        "teamId": "6ab7f915cc1ed5569c0a6aee",
+        "onCourt": [
+          "6ab7f915cc1ed5569c0a6af9",
+          "6ab7f915cc1ed5569c0a6afd",
+          "6ab7f915cc1ed5569c0a6b01",
+          "6ab7f915cc1ed5569c0a6b05",
+          "6ab7f915cc1ed5569c0a6b09",
+          "6ab7f915cc1ed5569c0a6af1"
+        ],
+        "out": ["6ab7f915cc1ed5569c0a6af5"],
+        "bench": [
+          "6ab7f915cc1ed5569c0a6b0d",
+          "6ab7f915cc1ed5569c0a6b11",
+          "6ab7f915cc1ed5569c0a6b15",
+          "6ab7f915cc1ed5569c0a6b19",
+          "6ab7f915cc1ed5569c0a6b1d"
+        ],
+        "timeoutsUsed": 0,
+        "timeoutsUsedByHalf": {
+          "1": 0,
+          "2": 0
+        },
+        "substitutionsUsed": 0,
+        "emptyRaidStreak": 0,
+        "doOrDieNext": false,
+        "courtSide": "right"
+      }
+    },
+    "nextRaidingTeam": "A",
+    "raidNumber": 4,
+    "raids": [
+      {
+        "raidNumber": 1,
+        "half": 1,
+        "raidingTeam": "A",
+        "raider": "6ab7f915cc1ed5569c0a6abc",
+        "defendersTouched": ["6ab7f915cc1ed5569c0a6af1"],
+        "tacklers": [],
+        "outcome": "successful",
+        "isDoOrDie": false,
+        "touchPoints": 1,
+        "bonusPoint": 0,
+        "raidPoints": 1,
+        "tacklePoints": 0,
+        "defendingPoints": 0,
+        "superRaid": false,
+        "superTackle": false,
+        "raiderOut": false,
+        "allOutTeams": [],
+        "revived": {
+          "A": [],
+          "B": []
+        },
+        "durationSeconds": 0,
+        "at": "2026-09-26T16:55:50.281Z"
+      },
+      {
+        "raidNumber": 2,
+        "half": 1,
+        "raidingTeam": "B",
+        "raider": "6ab7f915cc1ed5569c0a6af5",
+        "defendersTouched": [],
+        "tacklers": [],
+        "outcome": "empty",
+        "isDoOrDie": false,
+        "touchPoints": 0,
+        "bonusPoint": 0,
+        "raidPoints": 0,
+        "tacklePoints": 0,
+        "defendingPoints": 0,
+        "superRaid": false,
+        "superTackle": false,
+        "raiderOut": false,
+        "allOutTeams": [],
+        "revived": {
+          "A": [],
+          "B": []
+        },
+        "durationSeconds": 0,
+        "at": "2026-09-26T16:55:50.321Z"
+      },
+      {
+        "raidNumber": 3,
+        "half": 1,
+        "raidingTeam": "A",
+        "raider": "6ab7f915cc1ed5569c0a6abc",
+        "defendersTouched": ["6ab7f915cc1ed5569c0a6af5"],
+        "tacklers": [],
+        "outcome": "successful",
+        "isDoOrDie": false,
+        "touchPoints": 1,
+        "bonusPoint": 0,
+        "raidPoints": 1,
+        "tacklePoints": 0,
+        "defendingPoints": 0,
+        "superRaid": false,
+        "superTackle": false,
+        "raiderOut": false,
+        "allOutTeams": [],
+        "revived": {
+          "A": [],
+          "B": []
+        },
+        "durationSeconds": 0,
+        "at": "2026-09-26T16:55:50.368Z"
+      },
+      {
+        "raidNumber": 4,
+        "half": 1,
+        "raidingTeam": "B",
+        "raider": "6ab7f915cc1ed5569c0a6af9",
+        "defendersTouched": ["6ab7f915cc1ed5569c0a6abc"],
+        "tacklers": [],
+        "outcome": "successful",
+        "isDoOrDie": false,
+        "touchPoints": 1,
+        "bonusPoint": 0,
+        "raidPoints": 1,
+        "tacklePoints": 0,
+        "defendingPoints": 0,
+        "superRaid": false,
+        "superTackle": false,
+        "raiderOut": false,
+        "allOutTeams": [],
+        "revived": {
+          "A": [],
+          "B": ["6ab7f915cc1ed5569c0a6af1"]
+        },
+        "durationSeconds": 0,
+        "at": "2026-09-26T16:55:50.409Z"
+      }
+    ],
+    "events": [],
+    "currentRaid": {
+      "team": "A",
+      "raider": "6ab7f915cc1ed5569c0a6ac0",
+      "raidNumber": 5,
+      "startedAt": "2026-09-26T16:55:50.425Z",
+      "elapsedMs": 0,
+      "runningSince": "2026-09-26T16:55:50.425Z"
+    },
+    "activeTimeout": null,
+    "raidDelay": {
+      "elapsedMs": 0,
+      "runningSince": null
+    },
+    "halfExpired": false,
+    "halfComplete": false,
+    "playerStats": {
+      "6ab7f915cc1ed5569c0a6abc": {
+        "raids": 2,
+        "successfulRaids": 2,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 2,
+        "touchPoints": 2,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 1,
+        "totalPoints": 2,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ac0": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ac4": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ac8": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6acc": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ad0": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ad4": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ad8": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6adc": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ae0": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ae4": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6ae8": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "A"
+      },
+      "6ab7f915cc1ed5569c0a6af1": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 1,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6af5": {
+        "raids": 1,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 1,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 1,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6af9": {
+        "raids": 1,
+        "successfulRaids": 1,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 1,
+        "touchPoints": 1,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 1,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6afd": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b01": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b05": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b09": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b0d": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b11": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b15": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b19": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      },
+      "6ab7f915cc1ed5569c0a6b1d": {
+        "raids": 0,
+        "successfulRaids": 0,
+        "unsuccessfulRaids": 0,
+        "emptyRaids": 0,
+        "doOrDieRaids": 0,
+        "raidPoints": 0,
+        "touchPoints": 0,
+        "bonusPoints": 0,
+        "superRaids": 0,
+        "tacklePoints": 0,
+        "successfulTackles": 0,
+        "superTackles": 0,
+        "timesTouchedOut": 0,
+        "totalPoints": 0,
+        "team": "B"
+      }
+    },
+    "teamStats": {
+      "A": {
+        "totalPoints": 2,
+        "raidPoints": 2,
+        "tacklePoints": 0,
+        "allOutPoints": 0,
+        "technicalPoints": 0,
+        "doOrDiePoints": 0,
+        "raids": 2,
+        "successfulRaids": 2,
+        "superRaids": 0,
+        "superTackles": 0,
+        "allOutsInflicted": 0,
+        "allOutsConceded": 0
+      },
+      "B": {
+        "totalPoints": 1,
+        "raidPoints": 1,
+        "tacklePoints": 0,
+        "allOutPoints": 0,
+        "technicalPoints": 0,
+        "doOrDiePoints": 0,
+        "raids": 2,
+        "successfulRaids": 1,
+        "superRaids": 0,
+        "superTackles": 0,
+        "allOutsInflicted": 0,
+        "allOutsConceded": 0
+      }
+    },
+    "rules": {
+      "halfDurationSeconds": 900,
+      "firstHalfDurationSeconds": 900,
+      "secondHalfDurationSeconds": 900,
+      "raidClockSeconds": 30,
+      "timeoutsPerHalf": 2,
+      "maxSubstitutionsPerMatch": 5,
+      "bonusMinDefenders": 6,
+      "superTackleMaxDefenders": 3,
+      "officialTimeoutRules": false,
+      "officialTimeoutSeconds": 30,
+      "officialRaidDelayRule": false,
+      "raidDelayPenaltySeconds": 15,
+      "maxRaidDelayPointsPerRaid": 2,
+      "officialSubstitutionRule": false,
+      "raidStartRequiresRunningClock": true
+    },
+    "serverTime": "2026-09-26T16:55:50.440Z"
+  }
+}

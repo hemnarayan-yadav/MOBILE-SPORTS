@@ -15,6 +15,10 @@ import { useUiStore } from '../store/uiStore.js';
 import { FONT_ASSETS } from '../theme/fonts.js';
 import { useTheme } from '../theme/useTheme.js';
 
+// A screen opened directly (a deep link to a match, say) still has the tabs
+// beneath it, so Back leads into the app rather than out of it.
+export const unstable_settings = { initialRouteName: '(tabs)' };
+
 // Keep the splash screen up until the fonts are loaded and the saved language
 // and theme are restored, so the first frame is already the right one.
 SplashScreen.preventAutoHideAsync();

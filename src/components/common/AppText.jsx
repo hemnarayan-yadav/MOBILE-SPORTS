@@ -10,15 +10,31 @@ const VARIANTS = Object.freeze({
   title: { fontSize: 20, lineHeight: 26, weight: 'bold' },
   // Barlow Condensed, for scores and clocks.
   score: { fontSize: 26, lineHeight: 28, weight: 'bold', display: true },
+  bigScore: { fontSize: 52, lineHeight: 56, weight: 'bold', display: true },
+  heading: { fontSize: 30, lineHeight: 32, weight: 'bold', display: true },
   clock: { fontSize: 14, lineHeight: 18, weight: 'bold', display: true },
 });
 
 // Themed text in the app's type scale. Hindi text is set in Noto Sans
-// Devanagari (see theme/fonts.js); `tone` picks a token colour.
-export default function AppText({ variant = 'body', tone = 'text', weight, style, ...props }) {
+// Devanagari (see theme/fonts.js); `tone` picks a token colour; `display` sets
+// any variant in Barlow Condensed (names, numbers).
+export default function AppText({
+  variant = 'body',
+  tone = 'text',
+  weight,
+  display: displayFace,
+  style,
+  ...props
+}) {
   const { i18n } = useTranslation();
   const { colors } = useTheme();
-  const { fontSize, lineHeight, display, ...base } = VARIANTS[variant] ?? VARIANTS.body;
+  const {
+    fontSize,
+    lineHeight,
+    display: variantDisplay,
+    ...base
+  } = VARIANTS[variant] ?? VARIANTS.body;
+  const display = displayFace ?? variantDisplay;
   const family = fontFamily({ language: i18n.language, weight: weight ?? base.weight, display });
   return (
     <Text

@@ -46,6 +46,7 @@ jest.mock('expo-router', () => {
   return {
     router,
     useRouter: () => router,
+    useLocalSearchParams: jest.fn(() => ({})),
     Link: ({ href, children }) =>
       createElement(
         Text,

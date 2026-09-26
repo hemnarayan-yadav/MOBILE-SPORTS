@@ -158,5 +158,145 @@
   "src/app/dashboard/profile.jsx": {
     "source": "src/pages/dashboard/Profile.jsx",
     "sha256": "702d7df4c42a1ab3c9ca6b59a207a035a13a732e03bf80ed240e7e8a5e88ff1a"
+  },
+  "src/api/teams.api.js": {
+    "source": "src/api/teams.api.js",
+    "sha256": "b505bd8dc8a014c7f6b01a61ab02a6a5c9ff4478ddb4519937c225d5f6ddec6c"
+  },
+  "src/api/tournaments.api.js": {
+    "source": "src/api/tournaments.api.js",
+    "sha256": "f98ba91f7d4358f7b8d347f10e920d22dfb7b2094b592e2bdc9d328f4b1d9073"
+  },
+  "src/api/follows.api.js": {
+    "source": "src/api/notifications.api.js",
+    "sha256": "df70ff234614145ad3c1b7fb1dddac8ae037d48cae55b5aee4b6c68e2ff80adc"
+  },
+  "src/api/content.api.js": {
+    "source": "src/api/content.api.js",
+    "sha256": "0eb500ab561d26503ea2f5822810c7e4bc356f220ac2d6e3a7130b0459284882"
+  },
+  "src/lib/socket.js": {
+    "source": "src/lib/socket.js",
+    "sha256": "a99f6f93bcdd4ebaf1023f11f239cbd79dc5d4caad6ea30e305abe61101ff5eb"
+  },
+  "src/hooks/useMatchSocket.js": {
+    "source": "src/hooks/useMatchSocket.js",
+    "sha256": "be32d6498a1bc731350cf8bf10e6dba7b98b2f2e36a02ac42ef3dfb15aae949f"
+  },
+  "src/hooks/useFollow.js": {
+    "source": "src/hooks/useFollow.js",
+    "sha256": "5076e60b14843828c33b28b330a07e0579c6d582d00e34b27a2ae9fb835fa509"
+  },
+  "src/hooks/useDebouncedValue.js": {
+    "source": "src/hooks/useDebouncedValue.js",
+    "sha256": "9738f7d68c1c6f7d156d029084ffaf4ad9b8136670968263daf8a3fc33b8c195"
+  },
+  "src/sports/kabaddi/commentary.js": {
+    "source": "src/sports/kabaddi/commentary.js",
+    "sha256": "c93a3bb7255ddfc0bac761aaf571fb13532339af09ced017cf467502d648c839"
+  },
+  "src/sports/kabaddi/LivePanel.jsx": {
+    "source": "src/components/live/RaidClock.jsx",
+    "sha256": "3149745867fcb07eceb0d39e3e1d5eb29aa24b1649bb3fb1ceb1575c46e95ba5"
+  },
+  "src/utils/cloudinary.js": {
+    "source": "src/utils/cloudinary.js",
+    "sha256": "6eebeb073bd25e1dd2c005bc2a6fb5331d518ca3961ba8d19b7d3161f265ff91"
+  },
+  "src/components/common/Badge.jsx": {
+    "source": "src/components/common/Badge.jsx",
+    "sha256": "78d785a04ca78a2c6970ca01a2d68f329a14299f2a9d039b10c6bb8c54ddb029"
+  },
+  "src/components/common/Avatar.jsx": {
+    "source": "src/components/common/Avatar.jsx",
+    "sha256": "37aa0b6c54accfb95bcd3a29acfffac9f7817d2a16f8c3589ec6b02b6c1f1bb2"
+  },
+  "src/components/common/FollowButton.jsx": {
+    "source": "src/components/common/FollowButton.jsx",
+    "sha256": "59614d655b3fd2bc819e74a1932a78396929585c0aa2c5d2154fce3a3913cd9c"
+  },
+  "src/components/common/Countdown.jsx": {
+    "source": "src/components/common/Controls.jsx",
+    "sha256": "557bf51da7dec6721a69d85a8898d9e407254733512be94f550352a158b1631a"
+  },
+  "src/components/common/Layout.jsx": {
+    "source": "src/components/common/Layout.jsx",
+    "sha256": "2c57f711df7ebd8a29836c09379f427cd3ab65e10e1dc88fb7f901d63d01a656"
+  },
+  "src/components/team/TeamCrest.jsx": {
+    "source": "src/components/team/TeamCrest.jsx",
+    "sha256": "5ba5f3857833b684c5eacb252e1bb395a7d87f65828348b85043727134bf83d9"
+  },
+  "src/components/team/TeamBits.jsx": {
+    "source": "src/components/team/Squad.jsx",
+    "sha256": "33448fc5a896f19b39807b578a5ea3e74eb5785f6d043ea885cec714a11df72c"
+  },
+  "src/components/match/ScoreBoard.jsx": {
+    "source": "src/components/match/ScoreBoard.jsx",
+    "sha256": "bc5c6f0b03b6f75579c69ab09a89e7c111de5270e0caf11d4417e157a1dade6c"
+  },
+  "src/components/match/MatchSections.jsx": {
+    "source": "src/pages/public/MatchDetails.jsx",
+    "sha256": "8ec4f5867c876517316669e6a3b6b30125521d0fde500f641da20a2be5e68cff"
+  },
+  "src/components/player/PlayerBits.jsx": {
+    "source": "src/components/player/PlayerBits.jsx",
+    "sha256": "4f36d36ac639f328549ee2faa3fe1d3f8e2aef3d12ffe579fd1156496576caf9"
+  },
+  "src/components/tournament/TournamentBits.jsx": {
+    "source": "src/components/tournament/TournamentBits.jsx",
+    "sha256": "72632c843b6e9b75fe168922dc43cf7e7e970153a1503935c7d1f9d5339d5eec"
+  },
+  "src/app/(tabs)/index.jsx": {
+    "source": "src/pages/public/Home.jsx",
+    "sha256": "db31d36f84a82c80cf921bff0b77f530b2ec7f7b0f2b2a966b0151966bf694c3"
+  },
+  "src/app/(tabs)/matches.jsx": {
+    "source": "src/pages/public/Matches.jsx",
+    "sha256": "899c423f409012dcb9123e17a0b9340c19fb8c836dcb9d4fcd8331e582fecc3f"
+  },
+  "src/app/(tabs)/tournaments.jsx": {
+    "source": "src/pages/public/Tournaments.jsx",
+    "sha256": "3107ad8dffc809530801376559254c40fd036eb0df9b0e857790e18faa047fa0"
+  },
+  "src/app/(tabs)/rankings.jsx": {
+    "source": "src/pages/public/Rankings.jsx",
+    "sha256": "690b66ded5c82a4fd04060270b18b3717ed8ab377fae6852197a9c8f30a563a9"
+  },
+  "src/app/match/[id].jsx": {
+    "source": "src/pages/public/MatchDetails.jsx",
+    "sha256": "8ec4f5867c876517316669e6a3b6b30125521d0fde500f641da20a2be5e68cff"
+  },
+  "src/app/tournament/[id].jsx": {
+    "source": "src/pages/public/TournamentDetails.jsx",
+    "sha256": "b6ba1abf75d0be9ad7211422ac0c77d39f306257593109327d2559fa05749f81"
+  },
+  "src/app/team/[id].jsx": {
+    "source": "src/pages/public/TeamProfile.jsx",
+    "sha256": "e5961b0117a1437a0c368ececdf0816b5e84b7f2b402f9f4368f9f1b5b11ee9d"
+  },
+  "src/app/teams.jsx": {
+    "source": "src/pages/public/Teams.jsx",
+    "sha256": "3ab1eb8057f787f99760908a6c863b8db203d33ec75e5ac257a24f39faeb057e"
+  },
+  "src/app/players.jsx": {
+    "source": "src/pages/public/Players.jsx",
+    "sha256": "0b6bfc31738dfe8f5786dbf3c336d606281532370eb21d8d781e68a9683c5c9d"
+  },
+  "src/app/player/[id].jsx": {
+    "source": "src/pages/public/PlayerProfile.jsx",
+    "sha256": "69c67444f6cb539b835a082e35fdc278dc36db89563010acb719a22be66ffc4d"
+  },
+  "src/app/news/index.jsx": {
+    "source": "src/pages/public/News.jsx",
+    "sha256": "45ad310460e9ec47a32d6ef53641955d91cfc8b55588448802025e70648d0659"
+  },
+  "src/app/news/[slug].jsx": {
+    "source": "src/pages/public/News.jsx",
+    "sha256": "45ad310460e9ec47a32d6ef53641955d91cfc8b55588448802025e70648d0659"
+  },
+  "src/app/dashboard/following.jsx": {
+    "source": "src/pages/dashboard/Following.jsx",
+    "sha256": "10e23e019fb204c7c28c4dd8cebf5cd0e3fd4eb64ace370999c5ea35a4a21892"
   }
 }

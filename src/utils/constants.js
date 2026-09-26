@@ -24,3 +24,14 @@ export const MATCH_STATUS = Object.freeze({
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
 });
+
+export const PLAYING_ROLES = Object.freeze(['raider', 'defender', 'all_rounder']);
+
+export const LEADERBOARD_CATEGORIES = Object.freeze([
+  'best_raider',
+  'best_defender',
+  'best_allrounder',
+]);
+
+// Kabaddi rules the UI needs before a match exists (the API stays authoritative).
+export const KABADDI = Object.freeze({ playersOnCourt: 7 });

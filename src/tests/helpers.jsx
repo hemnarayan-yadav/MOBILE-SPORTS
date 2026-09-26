@@ -24,7 +24,13 @@ export function fakeApi(handler) {
   const original = apiClient.defaults.adapter;
   apiClient.defaults.adapter = async (config) => {
     const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
-    const call = { method: config.method, url: config.url, body, headers: config.headers };
+    const call = {
+      method: config.method,
+      url: config.url,
+      params: config.params,
+      body,
+      headers: config.headers,
+    };
     calls.push(call);
     const { status = 200, data = {} } = (await handler(call)) ?? {};
     const response = { status, data, headers: {}, config, statusText: String(status) };

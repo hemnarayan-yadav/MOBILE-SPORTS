@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { act, configure, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { matchesApi } from '../api/matches.api.js';
-import Home from '../app/index.jsx';
+import Home from '../app/(tabs)/index.jsx';
 import hi from '../i18n/locales/hi.json';
 import i18n from '../i18n/index.js';
 import { createQueryClient } from '../lib/queryClient.js';

@@ -26,6 +26,12 @@ const LIGHT = {
   warning: [161, 98, 7],
   danger: [185, 28, 28],
   info: [55, 84, 170],
+  raider: [214, 84, 18],
+  defender: [67, 72, 190],
+  allrounder: [126, 64, 214],
+  gold: [190, 150, 30],
+  silver: [140, 148, 160],
+  bronze: [176, 106, 48],
 };
 
 const DARK = {
@@ -48,6 +54,12 @@ const DARK = {
   warning: [234, 179, 60],
   danger: [248, 113, 113],
   info: [129, 160, 245],
+  raider: [251, 146, 60],
+  defender: [140, 150, 250],
+  allrounder: [190, 140, 250],
+  gold: [232, 196, 80],
+  silver: [190, 198, 210],
+  bronze: [214, 150, 96],
 };
 
 const toColors = (palette) =>
