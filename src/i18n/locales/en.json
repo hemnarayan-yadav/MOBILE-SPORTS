@@ -462,7 +462,19 @@
     "searchLabel": "Search",
     "loadingMore": "Loading more…",
     "points": "Points",
-    "recentPoints": "Raid and tackle points, last {{count}} matches"
+    "recentPoints": "Raid and tackle points, last {{count}} matches",
+    "prefPush": "On this phone",
+    "prefPushHint": "Match alerts and results as notifications on this device",
+    "pushPrimeTitle": "Get told when it matters?",
+    "pushPrimeBody": "We can notify you when a match you follow starts, reaches half-time or ends.",
+    "pushPrimeAllow": "Allow notifications",
+    "pushPrimeLater": "Not now",
+    "pushBlocked": "Notifications are turned off for KhelScore in your phone settings.",
+    "pushUnavailable": "Notifications are not available in this build.",
+    "openSettings": "Open settings",
+    "channelMatches": "Match updates",
+    "channelRegistrations": "Registrations",
+    "channelAccount": "Account"
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",
@@ -822,5 +834,25 @@
     "termsTitle": "Terms and conditions",
     "refundTitle": "Refund and cancellation policy",
     "cookiesTitle": "Cookie policy"
+  },
+  "notif": {
+    "match_scheduled": "Match scheduled: {{teamA}} vs {{teamB}}",
+    "match_starting_soon": "Starting soon: {{teamA}} vs {{teamB}}",
+    "match_started": "Live now: {{teamA}} vs {{teamB}}",
+    "match_half_time": "Half-time: {{teamA}} {{scoreA}} – {{scoreB}} {{teamB}}",
+    "match_result": "Full time: {{teamA}} {{scoreA}} – {{scoreB}} {{teamB}}",
+    "match_cancelled": "Cancelled: {{teamA}} vs {{teamB}}",
+    "registration_submitted": "{{teamName}} wants to join {{tournamentName}}",
+    "registration_approved": "{{teamName}} is in {{tournamentName}}!",
+    "registration_rejected": "{{teamName}}'s registration for {{tournamentName}} was not approved",
+    "tournament_assigned": "You now manage {{tournamentName}}",
+    "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "unread": "Unread",
+    "empty": "You're all caught up",
+    "emptyHint": "Match alerts and registration updates will appear here."
   }
 }

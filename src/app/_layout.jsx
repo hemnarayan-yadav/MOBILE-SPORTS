@@ -8,6 +8,8 @@ import { useEffect } from 'react';
 import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
+import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
+import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
 import i18n from '../i18n/index.js';
 import { startAppLifecycle } from '../lib/appLifecycle.js';
 import { queryClient } from '../lib/queryClient.js';
@@ -25,9 +27,14 @@ SplashScreen.preventAutoHideAsync();
 startAppLifecycle();
 
 // The session is restored from the keystore in the background: public screens
-// do not wait for it.
+// do not wait for it. Push hangs off the session: this device is registered
+// while somebody is signed in, a tapped notification opens what it is about,
+// and one that arrives while the app is open is shown as a notice.
 function SessionBootstrap() {
   useAuthBootstrap();
+  usePushRegistration();
+  useNotificationTaps();
+  useNotificationSocket();
   return null;
 }
 

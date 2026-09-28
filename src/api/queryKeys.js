@@ -33,6 +33,10 @@ export const qk = Object.freeze({
     overview: (params) => ['rankings', 'overview', params],
     teams: (params) => ['rankings', 'teams', params],
   },
+  notifications: {
+    all: ['notifications'],
+    list: (params) => ['notifications', 'list', params],
+  },
   follows: {
     all: ['follows'],
     list: ['follows', 'list'],

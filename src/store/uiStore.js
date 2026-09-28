@@ -15,14 +15,18 @@ export const useUiStore = create(
     (set) => ({
       theme: 'system',
       language: null,
+      // Whether the notification permission has already been offered (on the
+      // first follow). Android prompts only once, so the app asks once too.
+      pushPrimed: false,
       hasHydrated: false,
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
+      setPushPrimed: () => set({ pushPrimed: true }),
     }),
     {
       name: UI_STORAGE_KEY,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ theme, language }) => ({ theme, language }),
+      partialize: ({ theme, language, pushPrimed }) => ({ theme, language, pushPrimed }),
       onRehydrateStorage: () => () => useUiStore.setState({ hasHydrated: true }),
     },
   ),

@@ -73,8 +73,9 @@ describe('match room', () => {
     expect(socket.emit).toHaveBeenCalledWith('match:join', live.id, expect.any(Function));
     expect(client.getQueryData(KEY).live.version).toBe(5);
     expect(hook.result.current.connected).toBe(true);
-    // The snapshot's server time was 25 s behind this device.
-    expect(Math.round(serverOffsetMs() / 1000)).toBe(-25);
+    // The snapshot's server time was 25 s behind this device (give or take the
+    // time the round trip itself takes).
+    expect(serverOffsetMs() / 1000).toBeCloseTo(-25, 0);
   });
 
   it('applies newer updates and ignores stale ones', async () => {

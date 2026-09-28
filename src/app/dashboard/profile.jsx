@@ -21,8 +21,10 @@ import Sheet from '../../components/common/Sheet.jsx';
 import { ErrorState, LoadingState } from '../../components/common/States.jsx';
 import TextField from '../../components/common/TextField.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
+import { usePushPermission } from '../../hooks/usePush.js';
 import { useCodeDialog } from '../../hooks/useCodeDialog.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
+import { PUSH_BLOCKERS } from '../../lib/push/expoPush.js';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
@@ -32,7 +34,24 @@ import { MANAGER_ROLES, OTP_CHANNELS } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
 import { changePhoneSchema, profileSchemaFor } from '../../utils/validation.js';
 
-const PREFERENCES = ['matchUpdates', 'results', 'reminders', 'registrations', 'email'];
+// Which notifications the account wants, and where. `push` is this phone, so
+// its labels are the app's own (`app.*`); the rest are the website's wording.
+const PREFERENCES = Object.freeze([
+  {
+    key: 'matchUpdates',
+    label: 'profile.pref.matchUpdates',
+    hint: 'profile.pref.matchUpdatesHint',
+  },
+  { key: 'results', label: 'profile.pref.results', hint: 'profile.pref.resultsHint' },
+  { key: 'reminders', label: 'profile.pref.reminders', hint: 'profile.pref.remindersHint' },
+  {
+    key: 'registrations',
+    label: 'profile.pref.registrations',
+    hint: 'profile.pref.registrationsHint',
+  },
+  { key: 'push', label: 'app.prefPush', hint: 'app.prefPushHint' },
+  { key: 'email', label: 'profile.pref.email', hint: 'profile.pref.emailHint' },
+]);
 
 function toFormValues(profile) {
   return {
@@ -333,16 +352,17 @@ function NotificationPreferences({ profile }) {
     onError: (error) => notify.error(t(apiErrorKey(error))),
   });
 
-  return PREFERENCES.map((key) => (
+  return PREFERENCES.map(({ key, label, hint }) => (
     <View key={key} style={styles.switchRow}>
       <View style={styles.flex}>
-        <AppText weight="semibold">{t(`profile.pref.${key}`)}</AppText>
+        <AppText weight="semibold">{t(label)}</AppText>
         <AppText variant="small" tone="muted">
-          {t(`profile.pref.${key}Hint`)}
+          {t(hint)}
         </AppText>
+        {key === 'push' ? <PushState /> : null}
       </View>
       <Switch
-        accessibilityLabel={t(`profile.pref.${key}`)}
+        accessibilityLabel={t(label)}
         value={Boolean(profile.notificationPreferences[key])}
         disabled={save.isPending}
         onValueChange={(checked) => save.mutate({ [key]: checked })}
@@ -350,6 +370,32 @@ function NotificationPreferences({ profile }) {
       />
     </View>
   ));
+}
+
+// Wanting notifications is not enough: the phone has to allow them, and the
+// build has to be able to ask for a token at all. Whichever is missing is said
+// here, with the way to fix it.
+function PushState() {
+  const { t } = useTranslation();
+  const permission = usePushPermission();
+  if (!permission.blocker) return null;
+  if (permission.blocker === PUSH_BLOCKERS.UNAVAILABLE) {
+    return (
+      <AppText variant="small" tone="warning">
+        {t('app.pushUnavailable')}
+      </AppText>
+    );
+  }
+  return (
+    <View style={styles.pushBlocked}>
+      <AppText variant="small" tone="warning">
+        {t('app.pushBlocked')}
+      </AppText>
+      <Button variant="secondary" onPress={permission.openSettings}>
+        {t('app.openSettings')}
+      </Button>
+    </View>
+  );
 }
 
 export default function Profile() {
@@ -414,5 +460,6 @@ const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: RADII.xxl, padding: SPACING.lg, gap: SPACING.lg },
   stack: { gap: SPACING.sm },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
+  pushBlocked: { gap: SPACING.xs, marginTop: SPACING.xs },
   flex: { flex: 1 },
 });

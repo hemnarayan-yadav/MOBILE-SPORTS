@@ -22,6 +22,14 @@ const SPLASH_LIGHT = '#FAF8F5';
 const SPLASH_DARK = '#090D16';
 const ICON = './assets/images/icon.png';
 
+// The website's host, and the paths the app opens instead of the browser. Each
+// one is a screen of the app (src/app/…), so a shared link lands in the same
+// place either way. Android only verifies these once the site serves
+// /.well-known/assetlinks.json with this build's signing fingerprint; until
+// then the links still work, but Android asks which app should open them.
+const SITE_HOST = 'www.khelscore.in';
+const LINKED_PATHS = ['/match/*', '/team/*', '/tournament/*', '/player/*', '/join', '/join/*'];
+
 function resolveVariant() {
   const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? 'development';
   const variant = VARIANTS[appEnv];
@@ -47,6 +55,23 @@ module.exports = () => {
       package: `${BASE_ID}${idSuffix}`,
       adaptiveIcon: { foregroundImage: ICON, backgroundColor: '#FFFFFF' },
       predictiveBackGestureEnabled: false,
+      // App Links: the production app opens khelscore.in links itself. The
+      // development and staging variants are left out on purpose — they are
+      // not the app that site vouches for, and `scheme` still opens them.
+      intentFilters: idSuffix
+        ? []
+        : [
+            {
+              action: 'VIEW',
+              autoVerify: true,
+              category: ['BROWSABLE', 'DEFAULT'],
+              data: LINKED_PATHS.map((pathPrefix) => ({
+                scheme: 'https',
+                host: SITE_HOST,
+                pathPrefix: pathPrefix.replace(/\/\*$/, ''),
+              })),
+            },
+          ],
     },
     ios: {
       // Reserved for later; no iOS build is configured yet.
@@ -54,6 +79,9 @@ module.exports = () => {
     },
     plugins: [
       'expo-router',
+      // Push notifications. Without an EAS project id and Firebase credentials
+      // the app simply reports push unavailable (src/lib/push/expoPush.js).
+      'expo-notifications',
       // Refresh token in the Android Keystore; auto-backup excludes it.
       ['expo-secure-store', { configureAndroidBackup: true }],
       // Profile photos come from the photo library only: no camera or microphone.

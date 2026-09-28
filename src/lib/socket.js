@@ -1,7 +1,8 @@
 // Adapted from frontend/src/lib/socket.js: one shared public socket for live
 // match rooms. React Native speaks WebSocket natively, so there is no HTTP
 // long-polling fallback (the backend accepts native connections as they are —
-// M0 spike). The authenticated notification socket arrives with Phase M3.
+// M0 spike). The authenticated socket for notification pushes is separate: it
+// carries the access token and follows it.
 //
 // A phone in the background should not hold a connection (battery, data): the
 // socket closes BACKGROUND_DISCONNECT_MS after the app leaves the foreground,
@@ -43,6 +44,13 @@ export function getMatchSocket() {
     AppState.addEventListener('change', onAppStateChange);
   }
   return matchSocket;
+}
+
+// Authenticated socket for notification pushes; recreated when the token
+// changes. Unlike the match socket it is not shared: the hook that opens it
+// closes it when the session ends.
+export function createUserSocket(token) {
+  return io(env.SOCKET_URL, { auth: { token }, transports: ['websocket'] });
 }
 
 // Called when the app returns to the foreground with the socket still open.

@@ -58,7 +58,12 @@ export default function More() {
     ['/teams', 'nav.teams'],
     ['/players', 'nav.players'],
     ['/news', 'nav.news'],
-    ...(signedIn ? [['/dashboard/following', 'nav.following']] : []),
+    ...(signedIn
+      ? [
+          ['/dashboard/notifications', 'nav.notifications'],
+          ['/dashboard/following', 'nav.following'],
+        ]
+      : []),
     signedIn ? ['/dashboard/profile', 'app.account'] : ['/auth/login', 'nav.login'],
   ];
 

@@ -462,7 +462,19 @@
     "searchLabel": "खोजें",
     "loadingMore": "और लोड हो रहा है…",
     "points": "पॉइंट्स",
-    "recentPoints": "रेड और टैकल पॉइंट्स, पिछले {{count}} मैच"
+    "recentPoints": "रेड और टैकल पॉइंट्स, पिछले {{count}} मैच",
+    "prefPush": "इस फ़ोन पर",
+    "prefPushHint": "इस फ़ोन पर मैच अलर्ट और नतीजे नोटिफिकेशन के तौर पर",
+    "pushPrimeTitle": "ज़रूरी खबर चाहिए?",
+    "pushPrimeBody": "आप जो मैच फॉलो करते हैं, वह शुरू हो, हाफ़-टाइम पर पहुंचे या खत्म हो — हम बता देंगे।",
+    "pushPrimeAllow": "नोटिफिकेशन चालू करें",
+    "pushPrimeLater": "अभी नहीं",
+    "pushBlocked": "आपके फ़ोन की सेटिंग में KhelScore के नोटिफिकेशन बंद हैं।",
+    "pushUnavailable": "इस ऐप वर्ज़न में नोटिफिकेशन उपलब्ध नहीं हैं।",
+    "openSettings": "सेटिंग खोलें",
+    "channelMatches": "मैच अपडेट",
+    "channelRegistrations": "रजिस्ट्रेशन",
+    "channelAccount": "अकाउंट"
   },
   "commentary": {
     "raidNumber": "रेड {{number}}",
@@ -822,5 +834,25 @@
     "termsTitle": "नियम और शर्तें",
     "refundTitle": "रिफ़ंड और कैंसिलेशन पॉलिसी",
     "cookiesTitle": "कुकी पॉलिसी"
+  },
+  "notif": {
+    "match_scheduled": "मैच तय: {{teamA}} बनाम {{teamB}}",
+    "match_starting_soon": "जल्द शुरू: {{teamA}} बनाम {{teamB}}",
+    "match_started": "अभी लाइव: {{teamA}} बनाम {{teamB}}",
+    "match_half_time": "हाफ़-टाइम: {{teamA}} {{scoreA}} – {{scoreB}} {{teamB}}",
+    "match_result": "मैच खत्म: {{teamA}} {{scoreA}} – {{scoreB}} {{teamB}}",
+    "match_cancelled": "रद्द: {{teamA}} बनाम {{teamB}}",
+    "registration_submitted": "{{teamName}} {{tournamentName}} में आना चाहती है",
+    "registration_approved": "{{teamName}} {{tournamentName}} में शामिल!",
+    "registration_rejected": "{{tournamentName}} के लिए {{teamName}} का रजिस्ट्रेशन मंज़ूर नहीं हुआ",
+    "tournament_assigned": "अब आप {{tournamentName}} मैनेज करेंगे",
+    "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया"
+  },
+  "notifications": {
+    "title": "नोटिफिकेशन",
+    "markAllRead": "सब पढ़ा हुआ करें",
+    "unread": "नहीं पढ़े",
+    "empty": "सब देख लिया",
+    "emptyHint": "मैच अलर्ट और रजिस्ट्रेशन अपडेट यहां दिखेंगे।"
   }
 }
