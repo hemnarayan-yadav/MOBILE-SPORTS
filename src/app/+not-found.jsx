@@ -1,7 +1,6 @@
-// A link the app cannot open yet — a shared `/join/<token>` invitation, say,
-// whose screen arrives with the captain phase, or a path from a newer website.
-// Rather than a blank screen, it says so and leads back into the app; the link
-// itself still works in a browser.
+// A link the app cannot open — a path from a newer website, say. Rather than a
+// blank screen, it says so and leads back into the app; the link itself still
+// works in a browser.
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';

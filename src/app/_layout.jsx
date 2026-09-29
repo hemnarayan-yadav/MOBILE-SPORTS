@@ -12,6 +12,7 @@ import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
 import i18n from '../i18n/index.js';
 import { startAppLifecycle } from '../lib/appLifecycle.js';
+import { initMonitoring } from '../lib/monitoring.js';
 import { queryClient } from '../lib/queryClient.js';
 import { useUiStore } from '../store/uiStore.js';
 import { FONT_ASSETS } from '../theme/fonts.js';
@@ -25,6 +26,8 @@ export const unstable_settings = { initialRouteName: '(tabs)' };
 // and theme are restored, so the first frame is already the right one.
 SplashScreen.preventAutoHideAsync();
 startAppLifecycle();
+// Crash reporting, if this build was given a DSN; a no-op otherwise.
+initMonitoring();
 
 // The session is restored from the keystore in the background: public screens
 // do not wait for it. Push hangs off the session: this device is registered

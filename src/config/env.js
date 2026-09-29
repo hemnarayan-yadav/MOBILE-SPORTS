@@ -13,6 +13,7 @@ function readRawEnv() {
     SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL,
     SITE_URL: process.env.EXPO_PUBLIC_SITE_URL,
     DEFAULT_LOCALE: process.env.EXPO_PUBLIC_DEFAULT_LOCALE,
+    SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
   };
 }
 
@@ -28,6 +29,9 @@ const envSchema = z
     SOCKET_URL: urlSchema('EXPO_PUBLIC_SOCKET_URL'),
     SITE_URL: urlSchema('EXPO_PUBLIC_SITE_URL'),
     DEFAULT_LOCALE: z.enum(['en', 'hi']).default('en'),
+    // Optional. A Sentry DSN is an ingest URL, not a secret (it can only write
+    // events), but it is still per-environment. Unset: no crash reporting.
+    SENTRY_DSN: urlSchema('EXPO_PUBLIC_SENTRY_DSN').optional(),
   })
   .superRefine((cfg, ctx) => {
     // Only a development build may talk to a plain-http backend (a laptop on

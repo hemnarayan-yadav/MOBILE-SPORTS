@@ -1,3 +1,4 @@
+jest.mock('expo-web-browser', () => ({ openBrowserAsync: jest.fn() }));
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { version: '0.1.0', android: { package: 'in.khelscore.app.dev' } } },
@@ -6,10 +7,12 @@ jest.mock('expo-constants', () => ({
 import { configure, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Linking, Platform, Text } from 'react-native';
 import Profile from '../app/dashboard/profile.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
+import { useNoticeStore } from '../store/noticeStore.js';
 import { REFRESH_KEY, fail, fakeApi, ok, renderWithQuery, resetSession } from './helpers.jsx';
 
 configure({ asyncUtilTimeout: 5000 });
@@ -101,6 +104,84 @@ describe('Profile', () => {
     await waitFor(() => expect(SecureStore.__store.has(REFRESH_KEY)).toBe(false));
     expect(api.calls.find((c) => c.url === '/auth/logout').body).toEqual({ refreshToken: 'rt-1' });
     expect(useAuthStore.getState().status).toBe(AUTH_STATUS.ANONYMOUS);
+  });
+});
+
+// Deleting the account from the app (M4). Google Play requires the app itself
+// to offer it, so the whole flow is here.
+describe('Delete account', () => {
+  const openSheet = async () => {
+    const buttons = await screen.findAllByRole('button', { name: 'Delete my account' });
+    await fireEvent.press(buttons[0]);
+  };
+  const submitButton = () => screen.getAllByRole('button', { name: 'Delete my account' }).at(-1);
+
+  it('says what is erased and what is kept, and opens the public page on the website', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    expect(await screen.findByText(/Erased: your name/)).toBeTruthy();
+    expect(screen.getByText(/Kept: the matches, scores and statistics/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'How account deletion works' }));
+    expect(WebBrowser.openBrowserAsync).toHaveBeenCalledWith(
+      'https://www.khelscore.in/legal/deletion',
+    );
+  });
+
+  it('confirms with the password, leaves the screen and ends the session', async () => {
+    SecureStore.__store.set(REFRESH_KEY, 'rt-1');
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await openSheet();
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Passw0rd123');
+    await fireEvent.press(submitButton());
+
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/users/me/delete')?.body).toEqual({
+        password: 'Passw0rd123',
+      }),
+    );
+    expect(router.dismissTo).toHaveBeenCalledWith('/');
+    await waitFor(() => expect(useAuthStore.getState().status).toBe(AUTH_STATUS.ANONYMOUS));
+  });
+
+  it('keeps the session and shows the translated refusal when the captain still has a team', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = fakeApi((call) => {
+      if (call.url === '/users/me/delete') return fail(409, 'CAPTAIN_TEAM_ACTIVE');
+      if (call.url === '/users/me') return ok({ ...PROFILE, role: 'captain' });
+      if (call.url === '/otp/config')
+        return ok({ available: true, flow: 'code', channel: 'whatsapp' });
+      if (call.url === '/media/config') return ok({ enabled: true, maxImageMb: 5, maxVideoMb: 50 });
+      return ok(null);
+    });
+    await renderWithQuery(<Profile />);
+
+    await openSheet();
+    expect(screen.getByText(/You are a team captain/)).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Passw0rd123');
+    await fireEvent.press(submitButton());
+
+    await waitFor(() =>
+      expect(useNoticeStore.getState().notice).toMatchObject({
+        tone: 'error',
+        message: 'Hand your team to another captain or deactivate it before deleting your account',
+      }),
+    );
+    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.AUTHENTICATED);
+  });
+
+  it('never sends an empty confirmation', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await openSheet();
+    await fireEvent.press(submitButton());
+    expect(api.calls.some((c) => c.url === '/users/me/delete')).toBe(false);
   });
 });
 

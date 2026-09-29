@@ -7,6 +7,7 @@ export const qk = Object.freeze({
     list: (params) => ['teams', 'list', params],
     detail: (id) => ['teams', 'detail', id],
     stats: (id) => ['teams', 'stats', id],
+    registrations: (id) => ['teams', 'registrations', id],
   },
   players: {
     all: ['players'],
@@ -32,6 +33,10 @@ export const qk = Object.freeze({
     players: (params) => ['rankings', 'players', params],
     overview: (params) => ['rankings', 'overview', params],
     teams: (params) => ['rankings', 'teams', params],
+  },
+  invitations: {
+    preview: (token) => ['invitations', 'preview', token],
+    team: (teamId) => ['invitations', 'team', teamId],
   },
   notifications: {
     all: ['notifications'],

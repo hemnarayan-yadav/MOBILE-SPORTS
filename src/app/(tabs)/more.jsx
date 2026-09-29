@@ -13,6 +13,7 @@ import { env } from '../../config/env.js';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { MIN_TOUCH, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
+import { ROLES } from '../../utils/constants.js';
 
 // Website paths (frontend/src/routes/routes.jsx) and their labels.
 const WEB_PAGES = Object.freeze([
@@ -52,12 +53,24 @@ export default function More() {
   const router = useRouter();
   const { colors } = useTheme();
   const status = useAuthStore((s) => s.status);
+  const role = useAuthStore((s) => s.user?.role);
   const signedIn = status === AUTH_STATUS.AUTHENTICATED;
+
+  // A captain's own desk, or the way to register a team for an account that
+  // has none — the same two entries the website puts in its dashboard.
+  const teamRows = !signedIn
+    ? []
+    : role === ROLES.CAPTAIN
+      ? [['/captain', 'nav.sectionTeam']]
+      : role === ROLES.USER
+        ? [['/user/create-team', 'team.createSubmit']]
+        : [];
 
   const appRows = [
     ['/teams', 'nav.teams'],
     ['/players', 'nav.players'],
     ['/news', 'nav.news'],
+    ...teamRows,
     ...(signedIn
       ? [
           ['/dashboard/notifications', 'nav.notifications'],

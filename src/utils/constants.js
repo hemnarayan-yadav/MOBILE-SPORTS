@@ -18,6 +18,10 @@ export const OTP_FLOWS = Object.freeze({ CODE: 'code', WIDGET: 'widget' });
 // word itself. Phone channels come from the API; email codes are our own.
 export const OTP_CHANNELS = Object.freeze({ WHATSAPP: 'whatsapp', SMS: 'sms', EMAIL: 'email' });
 
+// Accounts and teams share the same two states (the web keeps TEAM_STATUS as
+// an alias of USER_STATUS on the API side).
+export const TEAM_STATUS = Object.freeze({ ACTIVE: 'active', INACTIVE: 'inactive' });
+
 export const MATCH_STATUS = Object.freeze({
   UPCOMING: 'upcoming',
   LIVE: 'live',
@@ -34,4 +38,8 @@ export const LEADERBOARD_CATEGORIES = Object.freeze([
 ]);
 
 // Kabaddi rules the UI needs before a match exists (the API stays authoritative).
-export const KABADDI = Object.freeze({ playersOnCourt: 7 });
+export const KABADDI = Object.freeze({
+  playersOnCourt: 7,
+  minSquadSize: 7,
+  maxTeamSquadSize: 25,
+});

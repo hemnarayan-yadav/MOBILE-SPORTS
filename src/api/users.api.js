@@ -11,6 +11,9 @@ export const usersApi = {
   // already on the account, so neither call names it.
   sendEmailCode: () => apiClient.post('/users/me/email/send-code').then(unwrap),
   verifyEmail: (otpToken) => apiClient.post('/users/me/email/verify', { otpToken }).then(unwrap),
+  // Deleting your own account. Irreversible, so it carries a fresh proof of
+  // ownership — the password, or an OTP proof of the number on the account.
+  deleteAccount: (proof) => apiClient.post('/users/me/delete', proof).then(unwrap),
   updatePreferences: (changes) =>
     apiClient.patch('/users/me/notification-preferences', changes).then(unwrap),
 };

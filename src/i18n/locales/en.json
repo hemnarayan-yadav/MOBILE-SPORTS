@@ -13,7 +13,11 @@
     "days": "Days",
     "hours": "Hours",
     "minutes": "Mins",
-    "seconds": "Secs"
+    "seconds": "Secs",
+    "confirm": "Confirm",
+    "done": "Done",
+    "missing": "Missing",
+    "saveChanges": "Save changes"
   },
   "theme": {
     "label": "Theme",
@@ -319,7 +323,9 @@
     "emailNotRegistered": "No account uses this email address.",
     "emailAlreadyVerified": "This email address is already confirmed.",
     "adminInviteNotFound": "No admin invitation is open for this email address.",
-    "adminInviteAlreadyAccepted": "This admin account is already set up. Sign in instead."
+    "adminInviteAlreadyAccepted": "This admin account is already set up. Sign in instead.",
+    "captainTeamActive": "Hand your team to another captain or deactivate it before deleting your account",
+    "passwordConfirmationRequired": "Confirm with your password"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -422,7 +428,19 @@
     "phoneRemoved": "Phone number removed",
     "noEmail": "No email address added",
     "confirmEmail": "Confirm email",
-    "emailConfirmed": "Email address confirmed."
+    "emailConfirmed": "Email address confirmed.",
+    "deleteTitle": "Delete account",
+    "deleteIntro": "Deleting your account erases your personal details from KhelScore. It cannot be undone.",
+    "deleteErased": "Erased: your name, email address, phone number and photo, the teams you follow and your notifications. You are signed out everywhere.",
+    "deleteKept": "Kept: the matches, scores and statistics you played in, and the player profile behind them — with nothing linking them to you.",
+    "deleteFinal": "Your phone number becomes free to register a new account with.",
+    "deleteLearnMore": "How account deletion works",
+    "deleteAction": "Delete my account",
+    "deleteConfirm": "This is permanent. Confirm it is you and the account is deleted straight away.",
+    "deleteCaptainNote": "You are a team captain. Hand your team to another captain or deactivate it first, or the deletion will be refused.",
+    "deletePasswordHint": "Enter your password to confirm.",
+    "deleteWithOtp": "Confirm with a code instead",
+    "deleteDone": "Your account has been deleted."
   },
   "validation": {
     "required": "This field is required",
@@ -437,7 +455,15 @@
     "tooLong": "This is too long",
     "phoneRequired": "Enter your phone number",
     "contactRequired": "Enter an email or a phone number",
-    "phoneIndia": "Enter a 10-digit Indian mobile number"
+    "phoneIndia": "Enter a 10-digit Indian mobile number",
+    "date": "Enter a valid date",
+    "foundedYear": "Enter a year between 1900 and this year",
+    "height": "Height must be between 100 and 250 cm",
+    "jersey": "Jersey number must be between 0 and 99",
+    "number": "Enter a number",
+    "shortName": "Use 2–5 letters or digits",
+    "teamNameMin": "Team name must be at least 2 characters",
+    "weight": "Weight must be between 30 and 200 kg"
   },
   "roles": {
     "super_admin": "Super Admin",
@@ -450,7 +476,8 @@
     "uploaded": "Uploaded",
     "tooLarge": "This file is larger than {{mb}} MB. Pick a smaller one.",
     "replace": "Replace",
-    "unavailable": "Image uploads are not configured right now."
+    "unavailable": "Image uploads are not configured right now.",
+    "remove": "Remove"
   },
   "app": {
     "account": "Account",
@@ -474,7 +501,8 @@
     "openSettings": "Open settings",
     "channelMatches": "Match updates",
     "channelRegistrations": "Registrations",
-    "channelAccount": "Account"
+    "channelAccount": "Account",
+    "dateFormatHint": "Use the form YYYY-MM-DD, for example 1998-07-24."
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",
@@ -854,5 +882,111 @@
     "unread": "Unread",
     "empty": "You're all caught up",
     "emptyHint": "Match alerts and registration updates will appear here."
+  },
+  "captain": {
+    "subtitle": "Manage your team, squad and tournament entries.",
+    "noTeam": "No team linked to this account",
+    "noTeamHint": "Your team may have been removed. Contact support if this is unexpected.",
+    "lockedBySuperAdmin": "This team was deactivated by a Super Admin. Contact support to reactivate it.",
+    "inactiveNotice": "Your team is inactive — it can't join tournaments or matches until you activate it.",
+    "publicPage": "Public page",
+    "editTeam": "Edit team",
+    "squad": "Squad",
+    "pendingEntries": "Pending entries",
+    "quickActions": "Quick actions",
+    "findTournaments": "Find tournaments",
+    "upcomingMatches": "Upcoming matches",
+    "noUpcoming": "No matches scheduled yet",
+    "tournamentsSubtitle": "Register your team for open tournaments and track your entries.",
+    "teamStats": "Team stats"
+  },
+  "teamInvite": {
+    "byPhone": "By phone number",
+    "withoutPhone": "Without a phone",
+    "phoneHint": "The player's mobile number. We'll check whether they already use KhelScore.",
+    "continue": "Continue",
+    "hasAccount": "Already on KhelScore",
+    "alreadyInSquad": "{{name}} is already in your squad.",
+    "addExistingHint": "Choose their jersey number and role to add them to your squad.",
+    "addToSquad": "Add to squad",
+    "noAccount": "Nobody uses {{phone}} on KhelScore yet. The player joins your squad now and gets a WhatsApp invitation to create an account.",
+    "send": "Add and send invitation",
+    "sent": "{{name}} was added. The WhatsApp invitation is on its way.",
+    "unavailable": "can't be added to a squad right now.",
+    "changeNumber": "Use another number",
+    "title": "Invitations",
+    "subtitle": "Invited players are in your squad already. They join KhelScore from the WhatsApp link.",
+    "empty": "No open invitations.",
+    "invitedTag": "Invited",
+    "status": {
+      "pending": "Waiting to join",
+      "expired": "Expired",
+      "accepted": "Joined",
+      "cancelled": "Cancelled"
+    },
+    "delivery": {
+      "none": "Not sent yet",
+      "sending": "Sending on WhatsApp…",
+      "sent": "Sent on WhatsApp {{when}}",
+      "failed": "Could not be sent. Try sending again.",
+      "undeliverable": "This number can't receive the WhatsApp invitation."
+    },
+    "expires": "valid until {{date}}",
+    "resend": "Send again",
+    "resendFor": "Send the invitation to {{name}} again",
+    "resent": "A new invitation link is on its way to {{name}}. The old link no longer works.",
+    "cancel": "Cancel invitation",
+    "cancelFor": "Cancel the invitation of {{name}}",
+    "cancelled": "Invitation for {{name}} cancelled. Their squad place is free again.",
+    "cancelTitle": "Cancel invitation?",
+    "cancelConfirm": "{{name}} will be removed from your squad and their invitation link will stop working. You can invite them again later."
+  },
+  "join": {
+    "title": "Team invitation",
+    "invalid": "This invitation link is not valid. Ask the captain to send you a new one.",
+    "directTitle": "Join your team",
+    "directIntro": "Sign in or create your KhelScore account with the number your invitation was sent to. Verifying that number adds you to every team waiting for you.",
+    "pendingTitle": "Join {{team}}",
+    "invitedBy": "{{captain}} has invited {{player}} to play for {{team}} on KhelScore.",
+    "sentTo": "Sent to",
+    "expiresOn": "Valid until",
+    "signUpHint": "Create your account with the invited number. Verifying it adds you to the team.",
+    "signUp": "Create account",
+    "signIn": "I already have an account",
+    "addPhone": "Add the invited number to your account to accept this invitation.",
+    "openProfile": "Open my profile",
+    "otherNumber": "This invitation was sent to a different number from the one on your account.",
+    "confirmHint": "Confirm your number with a one-time code to join the team.",
+    "accept": "Confirm number and join",
+    "otpUnavailable": "Number verification is unavailable right now. Please try again later.",
+    "acceptedToast_one": "You joined the team.",
+    "acceptedToast_other": "You joined {{count}} teams.",
+    "nothingAccepted": "No open invitation was found for your number.",
+    "acceptedTitle": "You are in the team",
+    "acceptedText": "This invitation to {{team}} has been accepted.",
+    "viewTeam": "View team",
+    "expired": "This invitation to {{team}} has expired. Ask the captain to send it again.",
+    "cancelled": "This invitation to {{team}} is no longer valid.",
+    "useAnotherAccount": "Use another account",
+    "alreadyAccepted": "This invitation to {{team}} has already been accepted.",
+    "loadError": "We couldn't load this invitation. Check your connection and try again."
+  },
+  "registration": {
+    "submitted": "Registration sent! The organisers will review it.",
+    "withdrawn": "Registration withdrawn",
+    "yourTeam": "Your team",
+    "withdraw": "Withdraw",
+    "rejectedReason": "Last registration was not approved: {{reason}}",
+    "registerTeam": "Register my team",
+    "none": "Your team hasn't registered for any tournament yet.",
+    "registeredOn": "Registered {{date}}",
+    "notEligible": "Your team must be active and have at least {{min}} players to register.",
+    "noneOpen": "No tournaments are open for registration right now.",
+    "alreadyEntered": "Already registered",
+    "openTab": "Open now",
+    "mineTab": "My registrations"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {{name}}"
   }
 }

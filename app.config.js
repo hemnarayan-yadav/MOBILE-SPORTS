@@ -20,7 +20,27 @@ const VARIANTS = Object.freeze({
 // Brand surfaces (frontend/src/index.css: --color-bg light / dark).
 const SPLASH_LIGHT = '#FAF8F5';
 const SPLASH_DARK = '#090D16';
+// All three are generated from the brand file by `node scripts/makeBrandAssets.js`:
+// the square icon on white, the launcher foreground inside the adaptive-icon
+// safe circle, and the transparent splash mark that sits on either surface.
 const ICON = './assets/images/icon.png';
+const ADAPTIVE_ICON = './assets/images/adaptive-icon.png';
+const SPLASH_ICON = './assets/images/splash-icon.png';
+
+// Permissions pulled in by libraries that this app never uses. Each one would
+// have to be declared and defended on the Play data-safety form, so it is
+// removed from the manifest instead.
+//   SYSTEM_ALERT_WINDOW  — React Native's debug overlay (the dev menu still opens)
+//   USE_BIOMETRIC / USE_FINGERPRINT — expo-secure-store's biometric mode; the
+//     refresh token is stored with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY instead
+//   CHANGE_WIFI_MULTICAST_STATE — Metro's local network discovery; the app
+//     reaches its server by URL
+const BLOCKED_PERMISSIONS = [
+  'android.permission.SYSTEM_ALERT_WINDOW',
+  'android.permission.USE_BIOMETRIC',
+  'android.permission.USE_FINGERPRINT',
+  'android.permission.CHANGE_WIFI_MULTICAST_STATE',
+];
 
 // The website's host, and the paths the app opens instead of the browser. Each
 // one is a screen of the app (src/app/…), so a shared link lands in the same
@@ -53,7 +73,8 @@ module.exports = () => {
     icon: ICON,
     android: {
       package: `${BASE_ID}${idSuffix}`,
-      adaptiveIcon: { foregroundImage: ICON, backgroundColor: '#FFFFFF' },
+      adaptiveIcon: { foregroundImage: ADAPTIVE_ICON, backgroundColor: '#FFFFFF' },
+      blockedPermissions: BLOCKED_PERMISSIONS,
       predictiveBackGestureEnabled: false,
       // App Links: the production app opens khelscore.in links itself. The
       // development and staging variants are left out on purpose — they are
@@ -89,11 +110,11 @@ module.exports = () => {
       [
         'expo-splash-screen',
         {
-          image: ICON,
+          image: SPLASH_ICON,
           imageWidth: 160,
           resizeMode: 'contain',
           backgroundColor: SPLASH_LIGHT,
-          dark: { image: ICON, backgroundColor: SPLASH_DARK },
+          dark: { image: SPLASH_ICON, backgroundColor: SPLASH_DARK },
         },
       ],
     ],

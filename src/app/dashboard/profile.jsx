@@ -4,6 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Redirect, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,14 +13,15 @@ import { authApi } from '../../api/auth.api.js';
 import { qk } from '../../api/queryKeys.js';
 import { usersApi } from '../../api/users.api.js';
 import AppText from '../../components/common/AppText.jsx';
-import AvatarField from '../../components/common/AvatarField.jsx';
 import Button from '../../components/common/Button.jsx';
 import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.jsx';
+import ImageField from '../../components/common/ImageField.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
 import Sheet from '../../components/common/Sheet.jsx';
 import { ErrorState, LoadingState } from '../../components/common/States.jsx';
 import TextField from '../../components/common/TextField.jsx';
+import { env } from '../../config/env.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { usePushPermission } from '../../hooks/usePush.js';
 import { useCodeDialog } from '../../hooks/useCodeDialog.js';
@@ -30,7 +32,7 @@ import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
-import { MANAGER_ROLES, OTP_CHANNELS } from '../../utils/constants.js';
+import { MANAGER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
 import { changePhoneSchema, profileSchemaFor } from '../../utils/validation.js';
 
@@ -130,8 +132,10 @@ function ProfileForm({ profile }) {
         control={control}
         name="avatarUrl"
         render={({ field }) => (
-          <AvatarField
+          <ImageField
             label={t('profile.avatarUrl')}
+            kind="avatar"
+            round
             name={watch('name')}
             value={field.value}
             onChange={(url) => field.onChange(url)}
@@ -398,6 +402,105 @@ function PushState() {
   );
 }
 
+// Deleting the account. Google Play requires the app itself to offer it, so the
+// whole flow lives here: what goes, what stays, the public page on the website,
+// and a fresh proof (password, or a code to the number on the account) before
+// it runs. The screen is left before the session ends, so the signed-out
+// redirect above never flashes.
+function DeleteAccountSection({ profile }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const clearSession = useAuthStore((s) => s.clear);
+  const phoneVerification = usePhoneVerification();
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+
+  const remove = useMutation({
+    mutationFn: usersApi.deleteAccount,
+    onSuccess: () => {
+      setOpen(false);
+      router.dismissTo('/');
+      notify.success(t('profile.deleteDone'));
+      clearSession();
+      queryClient.clear();
+    },
+    onError: (error) => notify.error(t(apiErrorKey(error))),
+  });
+
+  const byOtp = async () => {
+    const otpToken = await phoneVerification.verify(profile.phone).catch((error) => {
+      notify.error(t(apiErrorKey(error)));
+      return null;
+    });
+    if (otpToken) remove.mutate({ otpToken });
+  };
+  const canUseOtp =
+    Boolean(profile.phone) && profile.phoneVerified && phoneVerification.isAvailable;
+
+  return (
+    <Section title={t('profile.deleteTitle')}>
+      <AppText variant="small" tone="muted">
+        {t('profile.deleteIntro')}
+      </AppText>
+      <View style={styles.stack}>
+        <AppText variant="small" tone="muted">
+          {`• ${t('profile.deleteErased')}`}
+        </AppText>
+        <AppText variant="small" tone="muted">
+          {`• ${t('profile.deleteKept')}`}
+        </AppText>
+        <AppText variant="small" tone="muted">
+          {`• ${t('profile.deleteFinal')}`}
+        </AppText>
+      </View>
+      <Button
+        variant="ghost"
+        onPress={() => WebBrowser.openBrowserAsync(`${env.SITE_URL}/legal/deletion`)}
+      >
+        {t('profile.deleteLearnMore')}
+      </Button>
+      <Button variant="danger" onPress={() => setOpen(true)}>
+        {t('profile.deleteAction')}
+      </Button>
+
+      <Sheet open={open} onClose={() => setOpen(false)} title={t('profile.deleteTitle')}>
+        <View style={styles.stack}>
+          <AppText>{t('profile.deleteConfirm')}</AppText>
+          {profile.role === ROLES.CAPTAIN ? (
+            <AppText variant="small" tone="warning">
+              {t('profile.deleteCaptainNote')}
+            </AppText>
+          ) : null}
+          <TextField
+            label={t('auth.password')}
+            hint={t('profile.deletePasswordHint')}
+            secureTextEntry
+            autoCapitalize="none"
+            autoComplete="current-password"
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Button
+            variant="danger"
+            disabled={!password}
+            loading={remove.isPending}
+            onPress={() => remove.mutate({ password })}
+          >
+            {t('profile.deleteAction')}
+          </Button>
+          {canUseOtp ? (
+            <Button variant="ghost" disabled={remove.isPending} onPress={byOtp}>
+              {t('profile.deleteWithOtp')}
+            </Button>
+          ) : null}
+        </View>
+      </Sheet>
+      {phoneVerification.dialog}
+    </Section>
+  );
+}
+
 export default function Profile() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -445,6 +548,7 @@ export default function Profile() {
               <ThemeToggle />
             </View>
           </Section>
+          <DeleteAccountSection profile={profile} />
         </>
       ) : null}
       {status === AUTH_STATUS.AUTHENTICATED ? (
