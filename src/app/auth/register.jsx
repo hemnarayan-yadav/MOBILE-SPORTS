@@ -4,7 +4,7 @@
 // captain's name for the player is suggested.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +29,14 @@ import { registerPhoneSchema, registerProfileSchema } from '../../utils/validati
 const STEPS = Object.freeze({ PHONE: 'phone', PROFILE: 'profile' });
 
 // Step one: the number and its one-time code. Coming back to it from step two
-// keeps the proof: the same number continues without a new code.
+// keeps the proof: the same number continues without a new code. The number
+// is first checked against the API — if it already has an account, the OTP is
+// never sent (a real bug the owner reported on 2026-09-29: sending the OTP,
+// taking name and password and only then failing at register with PHONE_TAKEN).
 function PhoneStep({ verification, verified, onVerified, onContinue }) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const [takenPhone, setTakenPhone] = useState(null);
   const {
     control,
     handleSubmit,
@@ -41,10 +46,33 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
     resolver: zodResolver(registerPhoneSchema),
     defaultValues: { phone: verified?.phone ?? '' },
   });
-  const stillVerified = Boolean(verified) && watch('phone') === verified.phone;
+  const currentPhone = watch('phone');
+  const stillVerified = Boolean(verified) && currentPhone === verified.phone;
+  // The notice only stands as long as the number in the field is the one it
+  // was raised for; edit the number and it goes away.
+  const showTakenNotice = takenPhone && takenPhone === currentPhone;
 
   const onSubmit = async ({ phone }) => {
     if (stillVerified) return onContinue();
+    // Ask the API whether the number is free before spending an OTP send.
+    // Any transport failure falls through to the OTP path — the server-side
+    // check on /auth/register still refuses a taken number, so this is a UX
+    // improvement, not the sole gate.
+    try {
+      const result = await authApi.checkPhone(phone);
+      if (result && result.available === false) {
+        setTakenPhone(phone);
+        return;
+      }
+    } catch (error) {
+      // Availability could not be checked — fall through to the OTP path;
+      // /auth/register remains the authority and will refuse if truly taken.
+      if (error?.code) {
+        notify.error(t(apiErrorKey(error)));
+        return;
+      }
+    }
+    setTakenPhone(null);
     const otpToken = await verification.verify(phone).catch((error) => {
       notify.error(t(apiErrorKey(error)));
       return null;
@@ -67,7 +95,10 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
             label={t('auth.phone')}
             hint={t('auth.registerOtpHint', { context: verification.channel })}
             value={field.value}
-            onChange={field.onChange}
+            onChange={(value) => {
+              if (takenPhone) setTakenPhone(null);
+              field.onChange(value);
+            }}
             error={errors.phone}
           />
         )}
@@ -77,6 +108,14 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
           {t('auth.phoneVerified', { phone: formatPhone(verified.phone) })}
         </AppText>
       ) : null}
+      {showTakenNotice ? (
+        <PhoneTakenNotice
+          phone={takenPhone}
+          onSignIn={() =>
+            router.replace({ pathname: '/auth/login', params: { phone: takenPhone } })
+          }
+        />
+      ) : null}
       <Button
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
@@ -84,6 +123,26 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
       >
         {t(stillVerified ? 'auth.continue' : 'auth.sendOtp')}
       </Button>
+    </View>
+  );
+}
+
+// The "already has an account" notice with a one-tap sign-in that carries the
+// number over. Kept a component so its colours pick up the current theme.
+function PhoneTakenNotice({ phone, onSignIn }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.banner, { backgroundColor: colors.surface2 }]}>
+      <AppText weight="semibold" accessibilityLiveRegion="polite">
+        {t('app.phoneAlreadyRegistered')}
+      </AppText>
+      <AppText tone="muted">{formatPhone(phone)}</AppText>
+      <Pressable onPress={onSignIn} accessibilityRole="button" style={styles.inlineAction}>
+        <AppText weight="semibold" tone="brandStrong">
+          {t('app.signInInstead')}
+        </AppText>
+      </Pressable>
     </View>
   );
 }

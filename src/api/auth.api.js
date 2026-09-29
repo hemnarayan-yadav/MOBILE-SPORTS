@@ -9,6 +9,10 @@ export const EMAIL_OTP_PURPOSES = Object.freeze({ PASSWORD_RESET: 'password_rese
 
 export const authApi = {
   register: (payload) => apiClient.post('/auth/register', payload).then(unwrap),
+  // Sign-up availability lookup. Called before the OTP is sent so a number
+  // that already has an account never spends a code; the server answers only
+  // whether registration may proceed and never who owns the number.
+  checkPhone: (phone) => apiClient.post('/auth/check-phone', { phone }).then(unwrap),
   login: (credentials) => apiClient.post('/auth/login', credentials).then(unwrap),
   otpLogin: ({ phone, otpToken }) =>
     apiClient.post('/auth/otp/login', { phone, otpToken }).then(unwrap),

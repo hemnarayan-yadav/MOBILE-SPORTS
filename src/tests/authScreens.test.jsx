@@ -39,6 +39,8 @@ function authApi(overrides = {}) {
     switch (url) {
       case '/otp/config':
         return ok(OTP_CODE_FLOW);
+      case '/auth/check-phone':
+        return ok({ available: true });
       case '/otp/send':
         return ok({ challengeId: 'c1', expiresAt: PAST, resendAvailableAt: PAST }, 201);
       case '/otp/verify':
@@ -179,6 +181,32 @@ describe('Create account', () => {
     await verifyCodeInSheet('000000');
     expect(await screen.findByText("That code isn't right. Check it and try again.")).toBeTruthy();
     expect(api.calls.some((c) => c.url === '/auth/register')).toBe(false);
+  });
+
+  it('shows the sign-in branch when the number already has an account, without sending an OTP', async () => {
+    api = authApi({
+      '/auth/check-phone': () => ok({ available: false, reason: 'inUse' }),
+    });
+    await renderWithQuery(withNotices(<Register />));
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+
+    expect(
+      await screen.findByText('This number already has an account — sign in instead.'),
+    ).toBeTruthy();
+    // The OTP was not spent, and registration was never attempted.
+    expect(api.calls.some((c) => c.url === '/otp/send')).toBe(false);
+    expect(api.calls.some((c) => c.url === '/auth/register')).toBe(false);
+
+    // The Sign-in button takes them to /auth/login with the number pre-filled.
+    await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
+    await waitFor(() =>
+      expect(router.replace).toHaveBeenCalledWith({
+        pathname: '/auth/login',
+        params: { phone: '+919876543210' },
+      }),
+    );
   });
 });
 

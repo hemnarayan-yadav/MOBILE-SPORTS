@@ -39,15 +39,15 @@ export function LanguageSwitcher() {
   );
 }
 
-// Cycles light → dark → system, like the web's theme button. It names the
-// current theme in words rather than relying on an icon.
+// Toggles Light ↔ Dark. Launch-readiness item #3 dropped System from the app,
+// so the button names the current mode in words rather than an icon.
 export function ThemeToggle() {
   const { t } = useTranslation();
-  const { colors, theme, cycle } = useTheme();
-  const label = t(`theme.${theme}`);
+  const { colors, scheme, toggle } = useTheme();
+  const label = t(`theme.${scheme}`);
   return (
     <Pressable
-      onPress={cycle}
+      onPress={toggle}
       accessibilityRole="button"
       accessibilityLabel={t('theme.toggle', { theme: label })}
       style={[styles.group, styles.segment, { backgroundColor: colors.surface2 }]}

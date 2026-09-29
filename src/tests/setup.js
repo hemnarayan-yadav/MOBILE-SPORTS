@@ -10,6 +10,18 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
+// Ionicons pulls in expo-font, which in turn requires expo-asset. Neither is
+// used at runtime by the pure-vector glyph rendering path the app uses, but
+// they run at import time. A tiny stub keeps the icon a plain Text node so
+// tests can find labels and assertions on the icon-bearing buttons still work.
+jest.mock('@expo/vector-icons/Ionicons', () => {
+  const { createElement } = require('react');
+  const { Text } = require('react-native');
+  const Ionicons = ({ name, accessibilityLabel }) =>
+    createElement(Text, { accessibilityLabel, testID: `ionicon-${name}` }, '');
+  return { __esModule: true, default: Ionicons };
+});
+
 jest.mock(
   'react-native-safe-area-context',
   () => require('react-native-safe-area-context/jest/mock').default,

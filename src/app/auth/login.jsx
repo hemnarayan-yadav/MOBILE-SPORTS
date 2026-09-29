@@ -2,7 +2,7 @@
 // phone) or a one-time code on the phone. OTP sign-in is offered only when the
 // API's code flow is available.
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,7 @@ import { loginSchema, otpLoginSchema } from '../../utils/validation.js';
 
 const METHODS = Object.freeze({ PASSWORD: 'password', OTP: 'otp' });
 
-function PasswordLoginForm() {
+function PasswordLoginForm({ initialIdentifier = '' }) {
   const { t } = useTranslation();
   const { login } = useAuth();
   const {
@@ -32,7 +32,7 @@ function PasswordLoginForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { identifier: '', password: '' },
+    defaultValues: { identifier: initialIdentifier, password: '' },
   });
 
   const onSubmit = (values) =>
@@ -134,6 +134,12 @@ function OtpLoginForm({ verify, channel }) {
 export default function Login() {
   const { t } = useTranslation();
   useGuestScreen();
+  // A pre-filled phone comes in from the sign-up screen when someone tried to
+  // register a number that already has an account (item #1 of the launch
+  // sprint). It is only accepted for the password path; the OTP path collects
+  // its own number.
+  const params = useLocalSearchParams();
+  const initialIdentifier = typeof params.phone === 'string' ? params.phone : '';
   const phoneVerification = usePhoneVerification();
   const [method, setMethod] = useState(METHODS.PASSWORD);
   const showOtp = phoneVerification.isAvailable && method === METHODS.OTP;
@@ -154,7 +160,7 @@ export default function Login() {
       {showOtp ? (
         <OtpLoginForm verify={phoneVerification.verify} channel={phoneVerification.channel} />
       ) : (
-        <PasswordLoginForm />
+        <PasswordLoginForm initialIdentifier={initialIdentifier} />
       )}
       <View style={styles.footer}>
         <AppText tone="muted">{t('auth.noAccount')}</AppText>

@@ -1,9 +1,16 @@
-jest.mock('../api/matches.api.js', () => ({ matchesApi: { list: jest.fn() } }));
+jest.mock('../api/matches.api.js', () => ({
+  matchesApi: { list: jest.fn() },
+  rankingsApi: { overview: jest.fn() },
+}));
+jest.mock('../api/tournaments.api.js', () => ({
+  tournamentsApi: { list: jest.fn() },
+}));
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { act, configure, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
-import { matchesApi } from '../api/matches.api.js';
+import { matchesApi, rankingsApi } from '../api/matches.api.js';
+import { tournamentsApi } from '../api/tournaments.api.js';
 import Home from '../app/(tabs)/index.jsx';
 import hi from '../i18n/locales/hi.json';
 import i18n from '../i18n/index.js';
@@ -29,6 +36,13 @@ const LIVE_MATCH = {
   clock: { elapsedMs: 300_000, runningSince: null },
 };
 
+const EMPTY_OVERVIEW = {
+  best_raider: { entries: [] },
+  best_defender: { entries: [] },
+  best_allrounder: { entries: [] },
+  computedAt: null,
+};
+
 async function renderHome() {
   const client = createQueryClient();
   client.setDefaultOptions({ queries: { retry: false, gcTime: Infinity } });
@@ -41,17 +55,25 @@ async function renderHome() {
 
 beforeEach(async () => {
   matchesApi.list.mockReset();
-  useUiStore.setState({ theme: 'system', language: null });
+  rankingsApi.overview.mockReset();
+  tournamentsApi.list.mockReset();
+  // The store no longer holds 'system' after launch-readiness item #3; a
+  // fresh install now starts on the resolved scheme (Light in tests).
+  useUiStore.setState({ theme: 'light', language: null });
+  useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS, user: null });
+  // Default: empty everything so a test only mocks what it asserts on.
+  rankingsApi.overview.mockResolvedValue(EMPTY_OVERVIEW);
+  tournamentsApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
   await act(() => i18n.changeLanguage('en'));
 });
 
-describe('Home (live matches)', () => {
-  it('asks the API for live matches and lists them with score, phase and clock', async () => {
+describe('Home (matches preview)', () => {
+  it('asks the API for the first 5 live matches and lists them with score, phase and clock', async () => {
     matchesApi.list.mockResolvedValue({ items: [LIVE_MATCH], pagination: { total: 1 } });
     await renderHome();
 
     expect(await screen.findByText('Shiva Raiders')).toBeTruthy();
-    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 20 });
+    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 5 });
     expect(screen.getByText('Gaon Warriors')).toBeTruthy();
     expect(screen.getByText('12')).toBeTruthy();
     expect(screen.getByText('Village Cup · Final')).toBeTruthy();
@@ -84,42 +106,106 @@ describe('Home (live matches)', () => {
   it('switches the language to Hindi and remembers the choice', async () => {
     matchesApi.list.mockResolvedValue({ items: [] });
     await renderHome();
-    await screen.findByText('Live now');
+    await screen.findByText('Matches');
 
     await fireEvent.press(screen.getByRole('radio', { name: 'हिं' }));
 
-    expect(await screen.findByText(hi.home.liveNow)).toBeTruthy();
+    expect(await screen.findByText(hi.home.matchesTitle)).toBeTruthy();
     expect(useUiStore.getState().language).toBe('hi');
   });
 
-  it('cycles the theme and names it in words', async () => {
+  it('toggles the theme between Light and Dark (System is dropped)', async () => {
     matchesApi.list.mockResolvedValue({ items: [] });
     await renderHome();
-    await screen.findByText('Live now');
+    await screen.findByText('Matches');
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Theme: System. Tap to change' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Theme: Light. Tap to change' }));
+    expect(useUiStore.getState().theme).toBe('dark');
+    expect(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' })).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' }));
     expect(useUiStore.getState().theme).toBe('light');
-    expect(screen.getByRole('button', { name: 'Theme: Light. Tap to change' })).toBeTruthy();
   });
 
-  it('offers sign-in when signed out and the account when signed in', async () => {
+  it('offers a sign-in icon when signed out and an account icon when signed in', async () => {
     matchesApi.list.mockResolvedValue({ items: [] });
-    useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS });
+    useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS, user: null });
     await renderHome();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Log in' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Sign in' }));
     expect(router.push).toHaveBeenCalledWith('/auth/login');
 
-    await act(() => useAuthStore.setState({ status: AUTH_STATUS.AUTHENTICATED }));
+    await act(() =>
+      useAuthStore.setState({
+        status: AUTH_STATUS.AUTHENTICATED,
+        user: { id: 'u1', name: 'Asha', role: 'user' },
+      }),
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Account' }));
     expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
   });
 
-  it('shows neither while the stored session is still being restored', async () => {
+  it('shows neither icon while the stored session is still being restored', async () => {
     matchesApi.list.mockResolvedValue({ items: [] });
     useAuthStore.setState({ status: AUTH_STATUS.UNKNOWN });
     await renderHome();
-    await screen.findByText('Live now');
-    expect(screen.queryByRole('button', { name: 'Log in' })).toBeNull();
+    await screen.findByText('Matches');
+    expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Account' })).toBeNull();
+  });
+});
+
+describe('Home (signed-in shortcut)', () => {
+  it('offers "Create your team" to a signed-in user without a team', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    useAuthStore.setState({
+      status: AUTH_STATUS.AUTHENTICATED,
+      user: { id: 'u1', name: 'Asha', role: 'user' },
+    });
+    await renderHome();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Create your team' }));
+    expect(router.push).toHaveBeenCalledWith('/user/create-team');
+  });
+
+  it('offers "My team" to a captain, into the captain desk', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    useAuthStore.setState({
+      status: AUTH_STATUS.AUTHENTICATED,
+      user: { id: 'u2', name: 'Ravi', role: 'captain' },
+    });
+    await renderHome();
+    await fireEvent.press(await screen.findByRole('button', { name: 'My team' }));
+    expect(router.push).toHaveBeenCalledWith('/captain');
+  });
+
+  it('is hidden for signed-out visitors', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    await renderHome();
+    await screen.findByText('Matches');
+    expect(screen.queryByRole('button', { name: 'Create your team' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'My team' })).toBeNull();
+  });
+});
+
+describe('Home (tournaments and leaders)', () => {
+  it('shows the tournaments empty state when the API returns none', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    tournamentsApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
+    await renderHome();
+    expect(await screen.findByText('No tournaments open yet')).toBeTruthy();
+    // The list is capped for a Home preview (item #2 rule: no big lists on Home).
+    expect(tournamentsApi.list).toHaveBeenCalledWith({ limit: 4 });
+  });
+
+  it('shows the leaders empty state with the "waiting for matches" hint', async () => {
+    matchesApi.list.mockResolvedValue({ items: [] });
+    rankingsApi.overview.mockResolvedValue(EMPTY_OVERVIEW);
+    await renderHome();
+    expect(await screen.findByText('No rankings yet')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Waiting for the first matches — rankings appear once matches are completed.',
+      ),
+    ).toBeTruthy();
+    expect(rankingsApi.overview).toHaveBeenCalledWith({ limit: 3 });
   });
 });
