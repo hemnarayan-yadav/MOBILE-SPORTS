@@ -102,6 +102,11 @@ module.exports = () => {
       // Reserved for later; no iOS build is configured yet.
       bundleIdentifier: `${BASE_ID}${idSuffix}`,
     },
+    extra: {
+      eas: {
+        projectId: '8bbc3694-92f8-48c7-97e5-f65c72352c81',
+      },
+    },
     plugins: [
       'expo-router',
       // Push notifications. Without an EAS project id and Firebase credentials
