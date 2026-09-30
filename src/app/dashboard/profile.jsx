@@ -18,6 +18,7 @@ import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.
 import ImageField from '../../components/common/ImageField.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
+import StateDistrictFields from '../../components/common/StateDistrictFields.jsx';
 import Sheet from '../../components/common/Sheet.jsx';
 import { ErrorState, LoadingState } from '../../components/common/States.jsx';
 import TextField from '../../components/common/TextField.jsx';
@@ -34,7 +35,12 @@ import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
 import { MANAGER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
-import { changePhoneSchema, profileSchemaFor } from '../../utils/validation.js';
+import {
+  changePhoneSchema,
+  profileSchemaFor,
+  toLocationPayload,
+  toLocationValues,
+} from '../../utils/validation.js';
 
 // Which notifications the account wants, and where. `push` is this phone, so
 // its labels are the app's own (`app.*`); the rest are the website's wording.
@@ -61,6 +67,7 @@ function toFormValues(profile) {
     email: profile.email ?? '',
     phone: profile.phone ?? '',
     avatarUrl: profile.avatarUrl ?? '',
+    ...toLocationValues(profile.location),
   };
 }
 
@@ -75,9 +82,10 @@ function useApplyProfile() {
 }
 
 // The phone stays in the form values only for the role-based contact rules; it
-// is never sent from here — a number is saved through PhoneSection alone.
-function withoutPhone({ phone: _phone, ...values }) {
-  return values;
+// is never sent from here — a number is saved through PhoneSection alone. The
+// location goes the other way: the form holds it flat, the API takes it nested.
+function toPayload({ phone: _phone, state, district, ...values }) {
+  return { ...values, location: toLocationPayload({ state, district }) };
 }
 
 function Section({ title, children }) {
@@ -115,6 +123,7 @@ function ProfileForm({ profile }) {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isDirty },
   } = useForm({
     resolver: zodResolver(
@@ -125,6 +134,12 @@ function ProfileForm({ profile }) {
     ),
     defaultValues: toFormValues(profile),
   });
+
+  // The two pickers are driven together: picking a state clears the district.
+  const setLocation = ({ state, district }) => {
+    setValue('state', state, { shouldDirty: true });
+    setValue('district', district, { shouldDirty: true });
+  };
 
   return (
     <View style={styles.stack}>
@@ -175,8 +190,14 @@ function ProfileForm({ profile }) {
           />
         )}
       />
+      <StateDistrictFields
+        state={watch('state')}
+        district={watch('district')}
+        onChange={setLocation}
+        errors={{ state: errors.state, district: errors.district }}
+      />
       <Button
-        onPress={handleSubmit((values) => update.mutate(withoutPhone(values)))}
+        onPress={handleSubmit((values) => update.mutate(toPayload(values)))}
         disabled={!isDirty}
         loading={update.isPending}
       >

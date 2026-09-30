@@ -159,6 +159,8 @@ describe('Create account', () => {
       phone: '+919876543210',
       password: 'Kabaddi123',
       otpToken: 'proof-1',
+      // Sign-up always sends the (optional) location pair; left blank it is null.
+      location: { state: null, district: null },
     });
     expect(SecureStore.__store.get(REFRESH_KEY)).toBe('rt-register');
     await waitFor(() => expect(router.dismissTo).toHaveBeenCalledWith('/'));

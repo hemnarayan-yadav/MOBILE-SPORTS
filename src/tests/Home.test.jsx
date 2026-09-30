@@ -26,7 +26,8 @@ const LIVE_MATCH = {
   id: 'm1',
   status: 'live',
   tournament: { id: 't1', name: 'Village Cup' },
-  round: 'Final',
+  round: 'final',
+  roundLabel: null,
   teamA: { id: 'a', name: 'Shiva Raiders' },
   teamB: { id: 'b', name: 'Gaon Warriors' },
   teamAScore: 12,
@@ -76,7 +77,10 @@ describe('Home (matches preview)', () => {
     expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 5 });
     expect(screen.getByText('Gaon Warriors')).toBeTruthy();
     expect(screen.getByText('12')).toBeTruthy();
-    expect(screen.getByText('Village Cup · Final')).toBeTruthy();
+    // The tournament and the round are their own lines now, so a knockout
+    // round can carry its own colour.
+    expect(screen.getByText('Village Cup')).toBeTruthy();
+    expect(screen.getByText('FINAL')).toBeTruthy();
     expect(screen.getByText('Half 1')).toBeTruthy();
     expect(screen.getByText('15:00')).toBeTruthy(); // 20-minute half, 5 minutes played, paused
   });

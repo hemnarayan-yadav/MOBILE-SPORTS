@@ -9,6 +9,7 @@ import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { MATCH_STATUS } from '../../utils/constants.js';
 import { formatDateTime } from '../../utils/format.js';
+import { roundName } from '../../utils/rounds.js';
 import AppText from '../common/AppText.jsx';
 import Countdown from '../common/Countdown.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
@@ -58,7 +59,7 @@ export default function ScoreBoard({ match, directory }) {
         >
           <AppText variant="label" tone="onInk" numberOfLines={1}>
             {match.tournament?.name ?? t('match.friendly')}
-            {match.round ? ` · ${match.round}` : ''}
+            {roundName(match, t) ? ` · ${roundName(match, t)}` : ''}
           </AppText>
         </Pressable>
         <MatchStatusBadge match={match} />

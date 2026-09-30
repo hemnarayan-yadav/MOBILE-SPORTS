@@ -6,16 +6,19 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { SPACING } from '../../theme/tokens.js';
-import { teamSchema } from '../../utils/validation.js';
+import { teamSchema, toLocationPayload, toLocationValues } from '../../utils/validation.js';
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
 import ImageField from '../common/ImageField.jsx';
+import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField from '../common/TextField.jsx';
 
 export const EMPTY_TEAM_VALUES = Object.freeze({
   name: '',
   shortName: '',
   city: '',
+  state: '',
+  district: '',
   homeGround: '',
   foundedYear: '',
   description: '',
@@ -28,9 +31,13 @@ const toFormValue = (value) => (value === null || value === undefined ? '' : Str
 
 export function toTeamFormValues(team) {
   if (!team) return EMPTY_TEAM_VALUES;
-  return Object.fromEntries(
-    Object.keys(EMPTY_TEAM_VALUES).map((key) => [key, toFormValue(team[key])]),
-  );
+  return {
+    ...Object.fromEntries(
+      Object.keys(EMPTY_TEAM_VALUES).map((key) => [key, toFormValue(team[key])]),
+    ),
+    // The API nests the pair; the form holds it flat.
+    ...toLocationValues(team.location),
+  };
 }
 
 function Field({ control, name, label, hint, error, ...inputProps }) {
@@ -64,8 +71,19 @@ export default function TeamForm({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(teamSchema), defaultValues });
+
+  // The two pickers are driven together: picking a state clears the district.
+  const setLocation = ({ state, district }) => {
+    setValue('state', state, { shouldDirty: true });
+    setValue('district', district, { shouldDirty: true });
+  };
+
+  // The form holds the location flat; the API takes it nested.
+  const submit = ({ state, district, ...values }) =>
+    onSubmit({ ...values, location: toLocationPayload({ state, district }) });
 
   return (
     <View style={styles.form}>
@@ -133,6 +151,12 @@ export default function TeamForm({
         error={errors.foundedYear}
         keyboardType="number-pad"
       />
+      <StateDistrictFields
+        state={watch('state')}
+        district={watch('district')}
+        onChange={setLocation}
+        errors={{ state: errors.state, district: errors.district }}
+      />
       <Field
         control={control}
         name="description"
@@ -143,7 +167,7 @@ export default function TeamForm({
         inputStyle={styles.textarea}
       />
 
-      <Button onPress={handleSubmit(onSubmit)} loading={submitting}>
+      <Button onPress={handleSubmit(submit)} loading={submitting}>
         {submitLabel}
       </Button>
     </View>

@@ -111,6 +111,14 @@
     "sectionContent": "कंटेंट",
     "sectionAccount": "अकाउंट"
   },
+  "round": {
+    "league": "लीग",
+    "knockout": "नॉकआउट",
+    "quarter_final": "क्वार्टर फ़ाइनल",
+    "semi_final": "सेमी फ़ाइनल",
+    "final": "फ़ाइनल",
+    "other": "अन्य"
+  },
   "match": {
     "live": "लाइव",
     "vs": "बनाम",
@@ -131,6 +139,15 @@
       "cancelled": "कोई मैच रद्द नहीं हुआ"
     },
     "emptyHint": "थोड़ी देर बाद देखें या अपनी पसंदीदा टीम को फॉलो करें।",
+    "filter": {
+      "allTournaments": "सभी टूर्नामेंट",
+      "allRounds": "सभी राउंड",
+      "from": "इस तारीख़ से",
+      "to": "इस तारीख़ तक",
+      "clear": "फ़िल्टर हटाएँ",
+      "emptyTitle": "कोई मैच नहीं मिला",
+      "emptyHint": "दूसरा टूर्नामेंट, राउंड या तारीख़ चुनकर देखें।"
+    },
     "tab": {
       "feed": "लाइव फ़ीड",
       "lineups": "लाइनअप",
@@ -442,6 +459,15 @@
     "deleteWithOtp": "इसकी जगह कोड से पुष्टि करें",
     "deleteDone": "आपका अकाउंट डिलीट हो गया है।"
   },
+  "location": {
+    "state": "राज्य",
+    "district": "ज़िला",
+    "statePlaceholder": "राज्य चुनें",
+    "districtPlaceholder": "ज़िला चुनें",
+    "allStates": "सभी राज्य",
+    "allDistricts": "सभी ज़िले",
+    "pickStateFirst": "पहले राज्य चुनें"
+  },
   "validation": {
     "required": "यह भरना ज़रूरी है",
     "emailInvalid": "सही ईमेल डालें",
@@ -463,7 +489,10 @@
     "number": "नंबर डालें",
     "shortName": "2–5 अक्षर या अंक लिखें",
     "teamNameMin": "टीम का नाम कम से कम 2 अक्षर का होना चाहिए",
-    "weight": "वज़न 30 से 200 किलो के बीच होना चाहिए"
+    "weight": "वज़न 30 से 200 किलो के बीच होना चाहिए",
+    "stateUnknown": "सूची में से राज्य चुनें",
+    "districtNeedsState": "पहले राज्य चुनें",
+    "districtNotInState": "यह ज़िला चुने गए राज्य में नहीं है"
   },
   "roles": {
     "super_admin": "सुपर एडमिन",
@@ -501,6 +530,12 @@
     "onWebsite": "वेबसाइट पर",
     "searchLabel": "खोजें",
     "loadingMore": "और लोड हो रहा है…",
+    "matchRange": {
+      "label": "कब खेला गया",
+      "last7Days": "पिछले 7 दिन",
+      "last30Days": "पिछले 30 दिन",
+      "thisYear": "इस साल"
+    },
     "points": "पॉइंट्स",
     "recentPoints": "रेड और टैकल पॉइंट्स, पिछले {{count}} मैच",
     "prefPush": "इस फ़ोन पर",
@@ -515,7 +550,15 @@
     "channelMatches": "मैच अपडेट",
     "channelRegistrations": "रजिस्ट्रेशन",
     "channelAccount": "अकाउंट",
-    "dateFormatHint": "तारीख़ ऐसे लिखें: YYYY-MM-DD, जैसे 1998-07-24।"
+    "datePicker": {
+      "clear": "तारीख़ हटाएँ",
+      "chooseYear": "साल चुनें",
+      "previousMonth": "पिछला महीना",
+      "nextMonth": "अगला महीना",
+      "pick": "तारीख़ चुनें",
+      "exactSpan": "या पूरी तारीख़ चुनें"
+    },
+    "noMatches": "कोई नतीजा नहीं"
   },
   "commentary": {
     "raidNumber": "रेड {{number}}",
@@ -703,7 +746,10 @@
       "ongoing": "टूर्नामेंट चालू माना जाएगा।",
       "completed": "सारे मैच पूरे होने चाहिए। टूर्नामेंट लॉक हो जाएगा।",
       "cancelled": "आने वाले सारे मैच रद्द होंगे और टूर्नामेंट लॉक होगा। यह वापस नहीं होगा।"
-    }
+    },
+    "championTitle": "विजेता",
+    "championNamed": "विजेता: {{team}}",
+    "playerOfTournament": "प्लेयर ऑफ़ द टूर्नामेंट"
   },
   "team": {
     "pageTitle": "टीमें",

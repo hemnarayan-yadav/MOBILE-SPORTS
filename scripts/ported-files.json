@@ -17,11 +17,11 @@
   },
   "src/components/match/MatchCard.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "5d582175fdeccd925f12e3f13dc750b0d9939f9e72fd0b38cadfa6c4501928d3"
+    "sha256": "9d3b8e1db2b92c685cebb5e707ff1e5b0f86e99a21a0914326d3c27c10251962"
   },
   "src/components/match/MatchClock.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "5d582175fdeccd925f12e3f13dc750b0d9939f9e72fd0b38cadfa6c4501928d3"
+    "sha256": "9d3b8e1db2b92c685cebb5e707ff1e5b0f86e99a21a0914326d3c27c10251962"
   },
   "src/hooks/useLanguage.js": {
     "source": "src/hooks/useLanguage.js",
@@ -53,7 +53,7 @@
   },
   "src/theme/tokens.js": {
     "source": "src/index.css",
-    "sha256": "be2f7e2bd18989101c0a409b24648143536b82823f6fbc8edad2426af1225e15"
+    "sha256": "8adc82d98dc12a236cd72a0ea8a900d32d23029ef67d97cd08c443159200fd50"
   },
   "src/theme/useTheme.js": {
     "source": "src/hooks/useTheme.js",
@@ -65,7 +65,7 @@
   },
   "src/utils/constants.js": {
     "source": "src/utils/constants.js",
-    "sha256": "01b039b18c211088aaaca4a45b58bc4de137fee5dc9b346881cdb7be0bf1be62"
+    "sha256": "d4a7bd9807e108686fd98566a6c045f79ada8c55b2b9eecbf1eb441463ca0923"
   },
   "src/utils/format.js": {
     "source": "src/utils/format.js",
@@ -131,9 +131,13 @@
     "source": "src/utils/countries.js",
     "sha256": "ac5cb056166a9c68efaaf50f0d4703d50cac4549adccdafd3ddbdc7d0009e746"
   },
+  "src/utils/india.js": {
+    "source": "src/utils/india.js",
+    "sha256": "f04f2eca6ccef5b1bd85a984aeba8a4d20a2118a88d66b48f025a01e0074c740"
+  },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
-    "sha256": "255be07fd5bd68c4fcf93b5e56d2d102ccc40f64e37ac707a4a1f62eda5019b4"
+    "sha256": "c2f57f4f34578fa2da590ffd8440b338a550b4e1b883c1597eb87521d6c20f49"
   },
   "src/utils/mediaFile.js": {
     "source": "src/utils/mediaFile.js",
@@ -145,7 +149,7 @@
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "7a6bd218535435e0b55b1cfe7f117f3eca910ca581d6525fa847c5312325097a"
+    "sha256": "42415a23665bd14994c66099b2c41fbcf42230667f3667f2f29db0caa5f93e37"
   },
   "src/app/auth/forgot-password.jsx": {
     "source": "src/pages/auth/ForgotPassword.jsx",
@@ -153,7 +157,7 @@
   },
   "src/app/dashboard/profile.jsx": {
     "source": "src/pages/dashboard/Profile.jsx",
-    "sha256": "aeeb90bd0968de0c63c2b852a1621a1de48dd6d814d89c138661fa5f04f8135b"
+    "sha256": "e34e17bbabbb17882bf60155a08a4e2b3c7e8191d50caeb8c879c05143844de3"
   },
   "src/api/teams.api.js": {
     "source": "src/api/teams.api.js",
@@ -161,7 +165,7 @@
   },
   "src/api/tournaments.api.js": {
     "source": "src/api/tournaments.api.js",
-    "sha256": "f98ba91f7d4358f7b8d347f10e920d22dfb7b2094b592e2bdc9d328f4b1d9073"
+    "sha256": "5175cf0c6a44154196052ecccd8698c696a0f8be957b3510cdf3eb436c1a4fc1"
   },
   "src/api/follows.api.js": {
     "source": "src/api/notifications.api.js",
@@ -229,7 +233,7 @@
   },
   "src/components/match/ScoreBoard.jsx": {
     "source": "src/components/match/ScoreBoard.jsx",
-    "sha256": "bc5c6f0b03b6f75579c69ab09a89e7c111de5270e0caf11d4417e157a1dade6c"
+    "sha256": "afe02165a3ea2940240f87c1c2d823d9da108c13bd0ffaf61a5e66acae6c1f74"
   },
   "src/components/match/MatchSections.jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
@@ -241,7 +245,7 @@
   },
   "src/components/tournament/TournamentBits.jsx": {
     "source": "src/components/tournament/TournamentBits.jsx",
-    "sha256": "72632c843b6e9b75fe168922dc43cf7e7e970153a1503935c7d1f9d5339d5eec"
+    "sha256": "b69c9c9ee1a122ce6431aae413e0e68f578fadfaa12c556419d1092fc05694ba"
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
@@ -249,7 +253,7 @@
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
-    "sha256": "899c423f409012dcb9123e17a0b9340c19fb8c836dcb9d4fcd8331e582fecc3f"
+    "sha256": "73eeae750bf11aa400980e531140c5a58759225ad69a376a9d2cbf519625a2c2"
   },
   "src/app/(tabs)/tournaments.jsx": {
     "source": "src/pages/public/Tournaments.jsx",
@@ -265,7 +269,7 @@
   },
   "src/app/tournament/[id].jsx": {
     "source": "src/pages/public/TournamentDetails.jsx",
-    "sha256": "b6ba1abf75d0be9ad7211422ac0c77d39f306257593109327d2559fa05749f81"
+    "sha256": "efdd6969b90e1ba4104f969ebcfc119a34e6de24f1aeac31d03c2b143c1c5847"
   },
   "src/app/team/[id].jsx": {
     "source": "src/pages/public/TeamProfile.jsx",
@@ -273,11 +277,11 @@
   },
   "src/app/teams.jsx": {
     "source": "src/pages/public/Teams.jsx",
-    "sha256": "3ab1eb8057f787f99760908a6c863b8db203d33ec75e5ac257a24f39faeb057e"
+    "sha256": "de73a994000acbc08c31223380aacf7c70769169dccecae05e6d0db2d44243b1"
   },
   "src/app/players.jsx": {
     "source": "src/pages/public/Players.jsx",
-    "sha256": "0b6bfc31738dfe8f5786dbf3c336d606281532370eb21d8d781e68a9683c5c9d"
+    "sha256": "a0ef068042e694fa3b603a0487b80122c23fa1d42484d43d93248264ce053e2f"
   },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
@@ -317,11 +321,11 @@
   },
   "src/components/team/TeamForm.jsx": {
     "source": "src/components/team/TeamForm.jsx",
-    "sha256": "b6dd245df40ae2f2d4fff32ab487ad6258af30eab891059e9ef7582b96df16aa"
+    "sha256": "c4407b7bf6bb528f649e8dbe767d9027dba4483ded25c3eaacb597d93daee644"
   },
   "src/components/player/PlayerForm.jsx": {
     "source": "src/components/player/PlayerForm.jsx",
-    "sha256": "100c14cb10d072c0c290ece9877c93c6f24c7abc1aa84686eb3b34d898b9aac7"
+    "sha256": "a5a181d04c21f6deea322d7c62c15a0ab0a1117ec7de05cc4740eb42c1402953"
   },
   "src/components/team/SquadBits.jsx": {
     "source": "src/components/team/Squad.jsx",
@@ -382,5 +386,17 @@
   "src/app/join/[token].jsx": {
     "source": "src/pages/public/JoinTeam.jsx",
     "sha256": "69edf91e61168e580b4d6d983f9bbd45824e9e8e3560b555412f56ebd0f5cafa"
+  },
+  "src/utils/rounds.js": {
+    "source": "src/utils/rounds.js",
+    "sha256": "18ed661ac14437f500a7ebf48a6f3a736468759fde7e8cc507b2033a14a0edf2"
+  },
+  "src/utils/medals.js": {
+    "source": "src/utils/medals.js",
+    "sha256": "f5fac924267016d50ba97f5691ec1a731be923d583dfb681a5e29a09155310a6"
+  },
+  "src/components/tournament/ChampionBanner.jsx": {
+    "source": "src/components/tournament/ChampionBanner.jsx",
+    "sha256": "6f58660411797507eacfe95f5666b914e3124f9d13baa283d665e7cb2bca3179"
   }
 }

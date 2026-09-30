@@ -29,6 +29,22 @@ export const MATCH_STATUS = Object.freeze({
   CANCELLED: 'cancelled',
 });
 
+// The stage a match belongs to (backend utils/constants.js MATCH_ROUNDS).
+// OTHER carries a free-text `roundLabel`; a friendly has no round at all.
+export const MATCH_ROUNDS = Object.freeze([
+  'league',
+  'knockout',
+  'quarter_final',
+  'semi_final',
+  'final',
+  'other',
+]);
+
+export const ROUND_OTHER = 'other';
+
+// The rounds that get their own look on a card and a match page.
+export const KNOCKOUT_ROUNDS = Object.freeze(['quarter_final', 'semi_final', 'final']);
+
 export const PLAYING_ROLES = Object.freeze(['raider', 'defender', 'all_rounder']);
 
 export const LEADERBOARD_CATEGORIES = Object.freeze([

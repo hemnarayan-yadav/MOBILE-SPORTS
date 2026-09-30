@@ -12,6 +12,7 @@ import Avatar from '../components/common/Avatar.jsx';
 import { BackHeader, Card, TabStrip } from '../components/common/Layout.jsx';
 import PagedList from '../components/common/PagedList.jsx';
 import SearchField from '../components/common/SearchField.jsx';
+import StateDistrictFields from '../components/common/StateDistrictFields.jsx';
 import { PlayingRoleBadge } from '../components/player/PlayerBits.jsx';
 import TeamCrest from '../components/team/TeamCrest.jsx';
 import { useDebouncedValue } from '../hooks/useDebouncedValue.js';
@@ -67,8 +68,15 @@ export default function Players() {
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
   const [role, setRole] = useState(ALL_ROLES);
+  const [location, setLocation] = useState({ state: '', district: '' });
   const debouncedSearch = useDebouncedValue(search);
-  const params = { search: debouncedSearch, playingRole: role };
+  const params = {
+    search: debouncedSearch,
+    playingRole: role,
+    state: location.state,
+    // A district alone means nothing; the API ignores it without its state.
+    district: location.district,
+  };
   const query = usePagedQuery({
     queryKey: qk.players.list({ ...params, limit: PAGE_SIZE, paged: true }),
     fetchPage: ({ page }) => playersApi.list({ ...params, page, limit: PAGE_SIZE }),
@@ -96,6 +104,12 @@ export default function Players() {
                 { id: ALL_ROLES, label: t('common.all') },
                 ...PLAYING_ROLES.map((id) => ({ id, label: t(`playingRole.${id}`) })),
               ]}
+            />
+            <StateDistrictFields
+              variant="filter"
+              state={location.state}
+              district={location.district}
+              onChange={setLocation}
             />
           </View>
         }

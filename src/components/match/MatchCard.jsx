@@ -8,12 +8,20 @@ import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { MATCH_STATUS } from '../../utils/constants.js';
 import { formatDateTime } from '../../utils/format.js';
+import { roundName, roundTone } from '../../utils/rounds.js';
 import AppText from '../common/AppText.jsx';
 import Badge, { StatusBadge } from '../common/Badge.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 import MatchClock from './MatchClock.jsx';
 
 const DEFAULT_HALF_SECONDS = 20 * 60;
+
+// When a completed match was played. The footer's left slot always answers
+// "when": the running clock while a match is live, kick-off while it is
+// upcoming, and this once it is over — where the badge above already says
+// "Completed", so the slot is not spent repeating it. A match completed without
+// ever being started (the lifecycle job) has no end, and falls back to kick-off.
+export const playedAt = (match) => match.endedAt ?? match.scheduledAt;
 
 export function phaseKey(phase) {
   if (!phase) return null;
@@ -69,13 +77,17 @@ function Footer({ match }) {
       </View>
     );
   }
-  const text =
-    match.status === MATCH_STATUS.COMPLETED
-      ? t(match.isTie ? 'match.tie' : 'match.fullTime')
-      : formatDateTime(match.scheduledAt);
+  if (match.status === MATCH_STATUS.COMPLETED) {
+    const when = formatDateTime(playedAt(match));
+    return (
+      <AppText variant="small" tone="muted">
+        {match.isTie ? `${t('match.tie')} · ${when}` : when}
+      </AppText>
+    );
+  }
   return (
     <AppText variant="small" tone="muted">
-      {text}
+      {formatDateTime(match.scheduledAt)}
     </AppText>
   );
 }
@@ -87,6 +99,9 @@ export default function MatchCard({ match }) {
   const live = match.status === MATCH_STATUS.LIVE;
   const completed = match.status === MATCH_STATUS.COMPLETED;
   const showScore = live || completed;
+  // A knockout round gets its own colour; a live match still leads with LIVE.
+  const tone = roundTone(match.round, colors);
+  const round = roundName(match, t);
   return (
     <Pressable
       onPress={() => router.push(`/match/${match.id}`)}
@@ -95,7 +110,7 @@ export default function MatchCard({ match }) {
         styles.card,
         {
           backgroundColor: colors.surface,
-          borderColor: live ? colors.liveBorder : colors.border,
+          borderColor: live ? colors.liveBorder : (tone?.border ?? colors.border),
           opacity: pressed ? 0.9 : 1,
         },
       ]}
@@ -103,10 +118,19 @@ export default function MatchCard({ match }) {
       <View style={styles.header}>
         <AppText variant="label" tone="muted" numberOfLines={1} style={styles.flex}>
           {match.tournament?.name ?? t('match.friendly')}
-          {match.round ? ` · ${match.round}` : ''}
         </AppText>
         <MatchStatusBadge match={match} />
       </View>
+      {round ? (
+        <AppText
+          variant="label"
+          numberOfLines={1}
+          style={tone ? { color: tone.color } : undefined}
+          tone={tone ? undefined : 'muted'}
+        >
+          {round.toUpperCase()}
+        </AppText>
+      ) : null}
       <ScoreLine
         team={match.teamA}
         score={match.teamAScore}

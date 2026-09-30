@@ -11,21 +11,33 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { SPACING } from '../../theme/tokens.js';
 import { PLAYING_ROLES } from '../../utils/constants.js';
+import { isoYearsAgo } from '../../utils/dates.js';
 import {
   invitePlayerSchema,
   membershipSchema,
   playerProfileSchema,
   playerSchema,
+  toLocationPayload,
+  toLocationValues,
 } from '../../utils/validation.js';
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
+import DateField from '../common/DateField.jsx';
 import ImageField from '../common/ImageField.jsx';
 import SegmentedControl from '../common/SegmentedControl.jsx';
+import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField, { FieldMessages } from '../common/TextField.jsx';
+
+// The ages the API accepts for a player (backend players.validation.js), which
+// are what the date-of-birth calendar is bounded by.
+const MIN_PLAYER_AGE = 10;
+const MAX_PLAYER_AGE = 60;
 
 export const EMPTY_PLAYER_PROFILE = Object.freeze({
   name: '',
   photoUrl: '',
+  state: '',
+  district: '',
   dob: '',
   heightCm: '',
   weightKg: '',
@@ -40,6 +52,7 @@ export function toPlayerFormValues(player, membership) {
   const values = Object.fromEntries(
     Object.keys(EMPTY_PLAYER_PROFILE).map((key) => [key, toFormValue(player?.[key])]),
   );
+  Object.assign(values, toLocationValues(player?.location));
   if (player?.dob) values.dob = String(player.dob).slice(0, 10);
   if (membership) {
     values.jerseyNumber = String(membership.jerseyNumber ?? '');
@@ -92,12 +105,26 @@ export default function PlayerForm({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({ resolver: zodResolver(SCHEMAS[mode]), defaultValues: initial });
 
   const showName = mode !== 'membership';
   const showProfile = mode === 'add' || mode === 'profile';
   const showMembership = mode !== 'profile';
+
+  // The two pickers are driven together: picking a state clears the district.
+  const setLocation = ({ state, district }) => {
+    setValue('state', state, { shouldDirty: true });
+    setValue('district', district, { shouldDirty: true });
+  };
+
+  // The form holds the location flat; the API takes it nested. The jersey-only
+  // and invite forms never show it, and their endpoints refuse an extra field.
+  const submit = ({ state, district, ...values }) =>
+    onSubmit(
+      showProfile ? { ...values, location: toLocationPayload({ state, district }) } : values,
+    );
 
   return (
     <View style={styles.form}>
@@ -157,14 +184,23 @@ export default function PlayerForm({
               />
             )}
           />
-          <Field
+          {/* The bounds are the API's own rule (players.validation.js accepts
+              an age from 10 to 60), so the calendar cannot offer a date the
+              server would refuse. */}
+          <Controller
             control={control}
             name="dob"
-            label={t('player.dob')}
-            hint={t('app.dateFormatHint')}
-            error={errors.dob}
-            placeholder="YYYY-MM-DD"
-            keyboardType="numbers-and-punctuation"
+            render={({ field }) => (
+              <DateField
+                label={t('player.dob')}
+                placeholder={t('app.datePicker.pick')}
+                error={errors.dob}
+                value={field.value}
+                onChange={field.onChange}
+                min={isoYearsAgo(MAX_PLAYER_AGE)}
+                max={isoYearsAgo(MIN_PLAYER_AGE)}
+              />
+            )}
           />
           <Field
             control={control}
@@ -186,6 +222,12 @@ export default function PlayerForm({
             error={errors.weightKg}
             keyboardType="decimal-pad"
           />
+          <StateDistrictFields
+            state={watch('state')}
+            district={watch('district')}
+            onChange={setLocation}
+            errors={{ state: errors.state, district: errors.district }}
+          />
           <Field
             control={control}
             name="bio"
@@ -198,7 +240,7 @@ export default function PlayerForm({
         </>
       ) : null}
       {submitLabel ? (
-        <Button onPress={handleSubmit(onSubmit)} loading={submitting}>
+        <Button onPress={handleSubmit(submit)} loading={submitting}>
           {submitLabel}
         </Button>
       ) : null}

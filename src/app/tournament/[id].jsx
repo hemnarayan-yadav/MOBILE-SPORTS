@@ -23,6 +23,7 @@ import {
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import TeamCrest from '../../components/team/TeamCrest.jsx';
+import ChampionBanner from '../../components/tournament/ChampionBanner.jsx';
 import {
   LeaderboardList,
   StandingsTable,
@@ -219,6 +220,7 @@ export default function TournamentScreen() {
               tournament={tournament}
               actions={<FollowButton targetType="tournament" targetId={tournament.id} />}
             />
+            {tournament.status === 'completed' ? <ChampionBanner tournament={tournament} /> : null}
             <TabStrip
               tabs={TABS.map((tabId) => ({ id: tabId, label: t(`tournament.tab.${tabId}`) }))}
               value={tab}

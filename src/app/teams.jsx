@@ -9,6 +9,7 @@ import { teamsApi } from '../api/teams.api.js';
 import { BackHeader } from '../components/common/Layout.jsx';
 import PagedList from '../components/common/PagedList.jsx';
 import SearchField from '../components/common/SearchField.jsx';
+import StateDistrictFields from '../components/common/StateDistrictFields.jsx';
 import { TeamCard } from '../components/team/TeamBits.jsx';
 import { useDebouncedValue } from '../hooks/useDebouncedValue.js';
 import { usePagedQuery } from '../hooks/usePagedQuery.js';
@@ -21,10 +22,12 @@ export default function Teams() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
+  const [location, setLocation] = useState({ state: '', district: '' });
   const debouncedSearch = useDebouncedValue(search);
+  const params = { search: debouncedSearch, state: location.state, district: location.district };
   const query = usePagedQuery({
-    queryKey: qk.teams.list({ search: debouncedSearch, limit: PAGE_SIZE, paged: true }),
-    fetchPage: ({ page }) => teamsApi.list({ search: debouncedSearch, page, limit: PAGE_SIZE }),
+    queryKey: qk.teams.list({ ...params, limit: PAGE_SIZE, paged: true }),
+    fetchPage: ({ page }) => teamsApi.list({ ...params, page, limit: PAGE_SIZE }),
   });
 
   return (
@@ -40,6 +43,12 @@ export default function Teams() {
               value={search}
               onChange={setSearch}
               placeholder={t('team.searchPlaceholder')}
+            />
+            <StateDistrictFields
+              variant="filter"
+              state={location.state}
+              district={location.district}
+              onChange={setLocation}
             />
           </View>
         }

@@ -4,6 +4,7 @@
 // API remains the authority.
 import { z } from 'zod';
 import { MANAGER_ROLES } from './constants.js';
+import { isKnownDistrict, isKnownState } from './india.js';
 
 const PASSWORD_MIN_LENGTH = 8;
 const NAME_MIN_LENGTH = 2;
@@ -40,6 +41,41 @@ const urlField = z
   .refine((value) => /^https?:\/\//i.test(value), 'validation.urlInvalid');
 
 const optionalField = (schema) => z.union([z.literal(''), schema]);
+
+// The state/district pair as the forms hold it: flat strings, "" for "not
+// chosen". Both default to "" so a caller with no location to give — an add
+// form, a schema reused without the pickers — parses exactly as before.
+const locationFields = {
+  state: z
+    .union([z.literal(''), z.string().refine(isKnownState, 'validation.stateUnknown')])
+    .default(''),
+  district: z.string().trim().max(80, 'validation.tooLong').default(''),
+};
+
+// A district only exists inside its state. StateDistrictFields already clears
+// the district when the state changes, so this is the backstop for a pair that
+// reached the schema some other way.
+const checkLocation = (values, ctx) => {
+  if (values.district && !values.state) {
+    ctx.addIssue({ code: 'custom', path: ['district'], message: 'validation.districtNeedsState' });
+  } else if (values.state && values.district && !isKnownDistrict(values.state, values.district)) {
+    ctx.addIssue({ code: 'custom', path: ['district'], message: 'validation.districtNotInState' });
+  }
+};
+
+const withLocation = (schema) => schema.superRefine(checkLocation);
+
+// Form values → the API's nested shape. "" clears the field on the server.
+export const toLocationPayload = ({ state, district }) => ({
+  state: state || null,
+  district: district || null,
+});
+
+// The API's nested shape → form values.
+export const toLocationValues = (location) => ({
+  state: location?.state ?? '',
+  district: location?.district ?? '',
+});
 const optionalUrl = optionalField(urlField);
 const text = (max) => z.string().trim().max(max, 'validation.tooLong');
 
@@ -78,14 +114,17 @@ export const otpLoginSchema = z.object({ phone: indianMobileField });
 // genuinely optional.
 export const registerPhoneSchema = z.object({ phone: indianMobileField });
 
-export const registerProfileSchema = z
-  .object({
-    name: nameField,
-    email: optionalField(emailField),
-    password: passwordField,
-    confirmPassword: z.string(),
-  })
-  .refine(passwordsMatch, passwordMismatch);
+export const registerProfileSchema = withLocation(
+  z
+    .object({
+      name: nameField,
+      email: optionalField(emailField),
+      password: passwordField,
+      confirmPassword: z.string(),
+      ...locationFields,
+    })
+    .refine(passwordsMatch, passwordMismatch),
+);
 
 // Resetting by email: the address, then the code, then the new password.
 export const emailResetSchema = z
@@ -112,33 +151,38 @@ export function profileSchemaFor(role, { hasPhone = false, hasEmail = false } = 
       email: mustKeepEmail ? emailField : optionalField(emailField),
       phone: mustKeepPhone ? requiredPhoneField : optionalField(phoneField),
       avatarUrl: optionalField(urlField),
+      ...locationFields,
     })
     .refine((values) => Boolean(values.email || values.phone), {
       path: ['phone'],
       message: 'validation.contactRequired',
-    });
+    })
+    .superRefine(checkLocation);
 }
 
-export const teamSchema = z.object({
-  name: z.string().trim().min(2, 'validation.teamNameMin').max(80, 'validation.tooLong'),
-  shortName: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(/^[A-Z0-9]{2,5}$/, 'validation.shortName'),
-  city: text(80),
-  homeGround: text(120),
-  foundedYear: optionalNumber(
-    z
-      .number({ invalid_type_error: 'validation.number' })
-      .int('validation.number')
-      .min(FIRST_FOUNDED_YEAR, 'validation.foundedYear')
-      .max(new Date().getFullYear(), 'validation.foundedYear'),
-  ),
-  description: text(1000),
-  logoUrl: optionalUrl,
-  bannerUrl: optionalUrl,
-});
+export const teamSchema = withLocation(
+  z.object({
+    name: z.string().trim().min(2, 'validation.teamNameMin').max(80, 'validation.tooLong'),
+    shortName: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z0-9]{2,5}$/, 'validation.shortName'),
+    city: text(80),
+    homeGround: text(120),
+    foundedYear: optionalNumber(
+      z
+        .number({ invalid_type_error: 'validation.number' })
+        .int('validation.number')
+        .min(FIRST_FOUNDED_YEAR, 'validation.foundedYear')
+        .max(new Date().getFullYear(), 'validation.foundedYear'),
+    ),
+    description: text(1000),
+    logoUrl: optionalUrl,
+    bannerUrl: optionalUrl,
+    ...locationFields,
+  }),
+);
 
 const jerseyField = requiredNumber(
   z
@@ -169,15 +213,18 @@ const profileFields = {
   ),
   hometown: text(80),
   bio: text(500),
+  ...locationFields,
 };
 
-export const playerProfileSchema = z.object({ name: nameField, ...profileFields });
-export const playerSchema = z.object({
-  name: nameField,
-  jerseyNumber: jerseyField,
-  playingRole: roleField,
-  ...profileFields,
-});
+export const playerProfileSchema = withLocation(z.object({ name: nameField, ...profileFields }));
+export const playerSchema = withLocation(
+  z.object({
+    name: nameField,
+    jerseyNumber: jerseyField,
+    playingRole: roleField,
+    ...profileFields,
+  }),
+);
 export const membershipSchema = z.object({ jerseyNumber: jerseyField, playingRole: roleField });
 // A player invited by phone: only what the captain knows before they sign up.
 export const invitePlayerSchema = z.object({

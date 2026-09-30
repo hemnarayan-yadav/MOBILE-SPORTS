@@ -29,9 +29,17 @@ const LIGHT = {
   raider: [214, 84, 18],
   defender: [67, 72, 190],
   allrounder: [126, 64, 214],
+  // Medals come in pairs: the fill a badge is filled with (dark `ink` text sits
+  // on all three), and the `strong` variant a medal is written in — the fills
+  // are far too light for small text here (gold is 2.8:1 on white). The bronze
+  // fill was lifted from 176/106/48, which no text could sit on (4.09:1 with
+  // ink); it now carries ink at 5.20:1.
   gold: [190, 150, 30],
+  goldStrong: [146, 106, 8],
   silver: [140, 148, 160],
-  bronze: [176, 106, 48],
+  silverStrong: [112, 116, 128],
+  bronze: [196, 124, 62],
+  bronzeStrong: [150, 82, 30],
 };
 
 const DARK = {
@@ -57,9 +65,15 @@ const DARK = {
   raider: [251, 146, 60],
   defender: [140, 150, 250],
   allrounder: [190, 140, 250],
+  // On a dark surface every fill already carries ink (11.7 / 11.5 / 7.9) and
+  // every medal is already legible written in as it is (10.6 / 10.4 / 7.2), so
+  // here each `strong` variant is its own fill.
   gold: [232, 196, 80],
+  goldStrong: [232, 196, 80],
   silver: [190, 198, 210],
+  silverStrong: [190, 198, 210],
   bronze: [214, 150, 96],
+  bronzeStrong: [214, 150, 96],
 };
 
 const toColors = (palette) =>

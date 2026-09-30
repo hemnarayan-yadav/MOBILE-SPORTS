@@ -16,6 +16,7 @@ import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
+import StateDistrictFields from '../../components/common/StateDistrictFields.jsx';
 import TextField from '../../components/common/TextField.jsx';
 import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
@@ -24,7 +25,11 @@ import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
 import { formatPhone } from '../../utils/countries.js';
-import { registerPhoneSchema, registerProfileSchema } from '../../utils/validation.js';
+import {
+  registerPhoneSchema,
+  registerProfileSchema,
+  toLocationPayload,
+} from '../../utils/validation.js';
 
 const STEPS = Object.freeze({ PHONE: 'phone', PROFILE: 'profile' });
 
@@ -182,15 +187,35 @@ function ProfileStep({ verified, onChangeNumber }) {
   const {
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerProfileSchema),
-    defaultValues: { name: invitedName, email: '', password: '', confirmPassword: '' },
+    defaultValues: {
+      name: invitedName,
+      email: '',
+      password: '',
+      confirmPassword: '',
+      state: '',
+      district: '',
+    },
   });
 
-  const onSubmit = ({ confirmPassword: _confirmPassword, ...profile }) => {
+  // The two pickers are driven together: picking a state clears the district.
+  const setLocation = ({ state, district }) => {
+    setValue('state', state);
+    setValue('district', district);
+  };
+
+  const onSubmit = ({ confirmPassword: _confirmPassword, state, district, ...profile }) => {
     registerAccount.mutate(
-      { ...profile, phone: verified.phone, otpToken: verified.otpToken },
+      {
+        ...profile,
+        phone: verified.phone,
+        otpToken: verified.otpToken,
+        location: toLocationPayload({ state, district }),
+      },
       {
         onError: (error) => {
           notify.error(t(apiErrorKey(error)));
@@ -245,6 +270,14 @@ function ProfileStep({ verified, onChangeNumber }) {
         autoCapitalize: 'none',
         autoComplete: 'email',
       })}
+      {/* Optional: the account is created whether or not these are filled in.
+          They are what the player and team location filters read. */}
+      <StateDistrictFields
+        state={watch('state')}
+        district={watch('district')}
+        onChange={setLocation}
+        errors={{ state: errors.state, district: errors.district }}
+      />
       {field('password', {
         label: t('auth.password'),
         secureTextEntry: true,

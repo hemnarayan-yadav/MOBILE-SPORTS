@@ -111,6 +111,14 @@
     "sectionContent": "Content",
     "sectionAccount": "Account"
   },
+  "round": {
+    "league": "League",
+    "knockout": "Knockout",
+    "quarter_final": "Quarter-Final",
+    "semi_final": "Semi-Final",
+    "final": "Final",
+    "other": "Other"
+  },
   "match": {
     "live": "Live",
     "vs": "vs",
@@ -131,6 +139,15 @@
       "cancelled": "No cancelled matches"
     },
     "emptyHint": "Check back soon or follow your favourite teams to get notified.",
+    "filter": {
+      "allTournaments": "All tournaments",
+      "allRounds": "All rounds",
+      "from": "From",
+      "to": "To",
+      "clear": "Clear filters",
+      "emptyTitle": "No matches found",
+      "emptyHint": "Try another tournament, round or date range."
+    },
     "tab": {
       "feed": "Live feed",
       "lineups": "Lineups",
@@ -442,6 +459,15 @@
     "deleteWithOtp": "Confirm with a code instead",
     "deleteDone": "Your account has been deleted."
   },
+  "location": {
+    "state": "State",
+    "district": "District",
+    "statePlaceholder": "Select state",
+    "districtPlaceholder": "Select district",
+    "allStates": "All states",
+    "allDistricts": "All districts",
+    "pickStateFirst": "Choose a state first"
+  },
   "validation": {
     "required": "This field is required",
     "emailInvalid": "Enter a valid email address",
@@ -463,7 +489,10 @@
     "number": "Enter a number",
     "shortName": "Use 2–5 letters or digits",
     "teamNameMin": "Team name must be at least 2 characters",
-    "weight": "Weight must be between 30 and 200 kg"
+    "weight": "Weight must be between 30 and 200 kg",
+    "stateUnknown": "Choose a state from the list",
+    "districtNeedsState": "Choose the state first",
+    "districtNotInState": "That district is not in the selected state"
   },
   "roles": {
     "super_admin": "Super Admin",
@@ -501,6 +530,12 @@
     "onWebsite": "On the website",
     "searchLabel": "Search",
     "loadingMore": "Loading more…",
+    "matchRange": {
+      "label": "Played",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "thisYear": "This year"
+    },
     "points": "Points",
     "recentPoints": "Raid and tackle points, last {{count}} matches",
     "prefPush": "On this phone",
@@ -515,7 +550,15 @@
     "channelMatches": "Match updates",
     "channelRegistrations": "Registrations",
     "channelAccount": "Account",
-    "dateFormatHint": "Use the form YYYY-MM-DD, for example 1998-07-24."
+    "datePicker": {
+      "clear": "Clear date",
+      "chooseYear": "Choose year",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "pick": "Pick a date",
+      "exactSpan": "Or an exact span"
+    },
+    "noMatches": "No matches"
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",
@@ -703,7 +746,10 @@
       "ongoing": "The tournament will be marked as in progress.",
       "completed": "All matches must be finished. The tournament will be locked.",
       "cancelled": "All upcoming matches will be cancelled and the tournament locked. This can't be undone."
-    }
+    },
+    "championTitle": "Champions",
+    "championNamed": "Winner: {{team}}",
+    "playerOfTournament": "Player of the Tournament"
   },
   "team": {
     "pageTitle": "Teams",

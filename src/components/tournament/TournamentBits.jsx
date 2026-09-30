@@ -7,15 +7,13 @@ import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { IMAGE_WIDTH, cloudinaryImage } from '../../utils/cloudinary.js';
 import { formatDate, formatNumber, formatPercent } from '../../utils/format.js';
+import { locationLabel } from '../../utils/india.js';
+import { rankTone } from '../../utils/medals.js';
 import AppText from '../common/AppText.jsx';
 import Avatar from '../common/Avatar.jsx';
 import Badge, { StatusBadge } from '../common/Badge.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
-
-const TOP_TEN = 10;
-const PODIUM = 3;
-// Medal colours for ranks 1–3 (tokens gold, silver, bronze).
-const RANK_TOKENS = Object.freeze({ 1: 'gold', 2: 'silver', 3: 'bronze' });
+import { ChampionLine } from './ChampionBanner.jsx';
 
 const dateRange = (tournament) =>
   `${formatDate(tournament.startDate)} – ${formatDate(tournament.endDate)}`;
@@ -54,6 +52,9 @@ export function TournamentCard({ tournament }) {
         <AppText variant="title" display numberOfLines={2}>
           {tournament.name}
         </AppText>
+        {/* A finished tournament leads with its winner — the one thing
+            somebody scanning the list is looking for. */}
+        <ChampionLine champion={tournament.champion} />
         <AppText variant="small" tone="muted">
           {dateRange(tournament)}
         </AppText>
@@ -111,12 +112,14 @@ export function TournamentHero({ tournament, actions }) {
   );
 }
 
+// The medal rule itself is in utils/medals.js, so this badge and every
+// leaderboard that draws a row around it agree on what rank 1–3 looks like.
 export function RankBadge({ rank }) {
   const { colors } = useTheme();
-  const medal = RANK_TOKENS[rank];
+  const tone = rankTone(rank, colors);
   return (
-    <View style={[styles.rank, { backgroundColor: medal ? colors[medal] : colors.surface2 }]}>
-      <AppText variant="small" weight="bold" tone={medal ? 'ink' : 'muted'}>
+    <View style={[styles.rank, { backgroundColor: tone.badge, borderColor: tone.rim }]}>
+      <AppText variant="small" weight="bold" tone={tone.badgeTone}>
         {rank}
       </AppText>
     </View>
@@ -164,7 +167,11 @@ export function StandingsTable({ rows }) {
           onPress={() => router.push(`/team/${row.team.id}`)}
           accessibilityRole="button"
           accessibilityLabel={`${row.rank}. ${row.team.name}: ${t('standings.played')} ${row.played}, ${t('standings.won')} ${row.won}, ${t('standings.lost')} ${row.lost}, ${t('standings.tied')} ${row.tied}, ${t('standings.scoreDiff')} ${row.scoreDiff}, ${t('stats.points')} ${row.points}`}
-          style={[styles.tr, { borderTopColor: colors.border }, styles.rowBorder]}
+          style={[
+            styles.tr,
+            { borderTopColor: colors.border, backgroundColor: rankTone(row.rank, colors).row },
+            styles.rowBorder,
+          ]}
         >
           <View style={styles.rankCol}>
             <RankBadge rank={row.rank} />
@@ -189,7 +196,8 @@ export function StandingsTable({ rows }) {
   );
 }
 
-// Top 3 get medals, ranks 4–10 a highlighted band (design rule from the spec).
+// Rows follow the design rule in utils/medals.js: top 3 get a medal and their
+// own tint, ranks 4–10 a highlighted band, the rest are plain.
 export function LeaderboardList({ entries, category, compact = false }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -198,7 +206,8 @@ export function LeaderboardList({ entries, category, compact = false }) {
   return (
     <View style={[styles.table, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       {entries.map((entry, index) => {
-        const highlighted = entry.rank > PODIUM && entry.rank <= TOP_TEN;
+        // The player's own city, when their profile gives one.
+        const city = locationLabel(entry.player?.location);
         return (
           <Pressable
             key={entry.player.id}
@@ -207,7 +216,7 @@ export function LeaderboardList({ entries, category, compact = false }) {
             style={[
               styles.leader,
               index > 0 && [styles.rowBorder, { borderTopColor: colors.border }],
-              highlighted && { backgroundColor: colors.brandSoft },
+              { backgroundColor: rankTone(entry.rank, colors).row },
             ]}
           >
             <RankBadge rank={entry.rank} />
@@ -222,6 +231,7 @@ export function LeaderboardList({ entries, category, compact = false }) {
               </AppText>
               <AppText variant="small" tone="muted" numberOfLines={1}>
                 {entry.team?.name ?? t('player.freeAgent')}
+                {city ? ` · ${city}` : ''}
                 {compact
                   ? ''
                   : ` · ${t('stats.matchesCount', { count: entry.matches })} · ${formatPercent(entry.metrics?.[rate])}`}
@@ -251,7 +261,15 @@ const styles = StyleSheet.create({
   heroImage: { opacity: 0.3 },
   heroBadges: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginTop: SPACING.sm },
-  rank: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  // The rim is what makes a medal read as a medal rather than a coloured dot.
+  rank: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   table: { borderWidth: 1, borderRadius: RADII.xxl, overflow: 'hidden' },
   tr: {
     flexDirection: 'row',
