@@ -1,3 +1,4 @@
+import easJson from '../../eas.json';
 import { loadEnv } from '../config/env.js';
 
 const DEV = {
@@ -45,5 +46,24 @@ describe('app configuration (EXPO_PUBLIC_*)', () => {
         loadEnv({ ...PROD, APP_ENV: appEnv, SOCKET_URL: 'http://api.khelscore.in' }),
       ).toThrow(/SOCKET_URL must use https/);
     }
+  });
+});
+
+// The profiles that build on EAS servers carry their own values: `.env` is
+// gitignored, so nothing else supplies one there. A profile missing an address
+// builds fine and then throws at launch, which is how the staging profile
+// shipped without an API URL — this reads the real eas.json so it cannot again.
+// `development` is excluded on purpose: it is a local build and reads `.env`.
+describe('eas.json build profiles', () => {
+  const stripPrefix = (profileEnv) =>
+    Object.fromEntries(
+      Object.entries(profileEnv).map(([key, value]) => [key.replace('EXPO_PUBLIC_', ''), value]),
+    );
+
+  it.each(['staging', 'production'])('%s satisfies the app configuration', (profile) => {
+    const config = loadEnv(stripPrefix(easJson.build[profile].env));
+    expect(config.APP_ENV).toBe(profile);
+    expect(config.API_URL.startsWith('https://')).toBe(true);
+    expect(config.SOCKET_URL.startsWith('https://')).toBe(true);
   });
 });

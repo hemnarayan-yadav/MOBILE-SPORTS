@@ -47,8 +47,12 @@ const BLOCKED_PERMISSIONS = [
 // place either way. Android only verifies these once the site serves
 // /.well-known/assetlinks.json with this build's signing fingerprint; until
 // then the links still work, but Android asks which app should open them.
+//
+// Each entry becomes an Android `pathPrefix`, so a trailing /* is redundant:
+// '/join' already covers /join and /join/<token>. Listing both would emit the
+// same prefix twice in the manifest.
 const SITE_HOST = 'www.khelscore.in';
-const LINKED_PATHS = ['/match/*', '/team/*', '/tournament/*', '/player/*', '/join', '/join/*'];
+const LINKED_PATHS = ['/match/*', '/team/*', '/tournament/*', '/player/*', '/join'];
 
 function resolveVariant() {
   const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? 'development';
@@ -66,7 +70,7 @@ module.exports = () => {
   return {
     name,
     slug: 'khelscore',
-    version: '0.1.0',
+    version: '1.0.0',
     scheme,
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',

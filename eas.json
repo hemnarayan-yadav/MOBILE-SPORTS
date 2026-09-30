@@ -17,6 +17,8 @@
       "android": { "buildType": "apk" },
       "env": {
         "EXPO_PUBLIC_APP_ENV": "staging",
+        "EXPO_PUBLIC_API_URL": "https://staging-api.khelscore.in/api/v1",
+        "EXPO_PUBLIC_SOCKET_URL": "https://staging-api.khelscore.in",
         "EXPO_PUBLIC_SITE_URL": "https://www.khelscore.in",
         "EXPO_PUBLIC_DEFAULT_LOCALE": "en"
       }
