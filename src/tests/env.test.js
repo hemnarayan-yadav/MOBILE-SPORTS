@@ -60,10 +60,48 @@ describe('eas.json build profiles', () => {
       Object.entries(profileEnv).map(([key, value]) => [key.replace('EXPO_PUBLIC_', ''), value]),
     );
 
-  it.each(['staging', 'production'])('%s satisfies the app configuration', (profile) => {
-    const config = loadEnv(stripPrefix(easJson.build[profile].env));
-    expect(config.APP_ENV).toBe(profile);
+  // `extends` supplies everything a profile does not set itself, so the env has
+  // to be resolved the way EAS resolves it — a profile that only extends
+  // another has no `env` key at all and would otherwise look empty.
+  function resolveEnv(name, seen = new Set()) {
+    if (seen.has(name)) throw new Error(`eas.json: circular extends at "${name}"`);
+    seen.add(name);
+    const profile = easJson.build[name];
+    if (!profile) throw new Error(`eas.json: profile "${name}" does not exist`);
+    const inherited = profile.extends ? resolveEnv(profile.extends, seen) : {};
+    return { ...inherited, ...profile.env };
+  }
+
+  // Taken from the file, not listed here: a profile added later is checked too.
+  const serverProfiles = Object.keys(easJson.build).filter((name) => name !== 'development');
+
+  it.each(serverProfiles)('%s satisfies the app configuration', (profile) => {
+    const config = loadEnv(stripPrefix(resolveEnv(profile)));
+    // A server build must never carry the development environment: that is the
+    // one setting that would let it talk to a plain-http address.
+    expect(config.APP_ENV).not.toBe('development');
     expect(config.API_URL.startsWith('https://')).toBe(true);
     expect(config.SOCKET_URL.startsWith('https://')).toBe(true);
+  });
+
+  // Which EAS environment a profile reads its stored variables from is inferred
+  // when the field is absent — `production` for a store build, `development`
+  // for a dev client, `preview` for anything else. An internal-distribution
+  // profile therefore silently reads `preview`, so a file variable such as
+  // GOOGLE_SERVICES_JSON set on `production` would never reach it. Every server
+  // profile names its environment instead of relying on that inference.
+  it.each(serverProfiles)('%s names the EAS environment it reads', (profile) => {
+    expect(easJson.build[profile].environment).toMatch(/^(preview|production)$/);
+  });
+
+  // Play accepts only an app bundle, and a test APK must not spend a version
+  // code the next release needs, so these two differ on purpose.
+  it('releases an app bundle and side-loads an APK on the production package', () => {
+    expect(easJson.build.production.android.buildType).toBe('app-bundle');
+    expect(easJson.build['production-apk'].android.buildType).toBe('apk');
+    expect(easJson.build['production-apk'].distribution).toBe('internal');
+    expect(easJson.build['production-apk'].autoIncrement).toBe(false);
+    // The point of the APK: the real package, against the live backend.
+    expect(resolveEnv('production-apk')).toEqual(resolveEnv('production'));
   });
 });

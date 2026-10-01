@@ -54,6 +54,12 @@ const BLOCKED_PERMISSIONS = [
 const SITE_HOST = 'www.khelscore.in';
 const LINKED_PATHS = ['/match/*', '/team/*', '/tournament/*', '/player/*', '/join'];
 
+// Firebase, for push delivery (Expo forwards to FCM). The file is gitignored —
+// it belongs to one Firebase project and one package — so an EAS build receives
+// it through the `file` environment variable GOOGLE_SERVICES_JSON, which holds
+// the path EAS wrote it to. A local build falls back to the checked-out copy.
+const GOOGLE_SERVICES_FILE = process.env.GOOGLE_SERVICES_JSON ?? './google-services.json';
+
 function resolveVariant() {
   const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? 'development';
   const variant = VARIANTS[appEnv];
@@ -70,6 +76,10 @@ module.exports = () => {
   return {
     name,
     slug: 'khelscore',
+    // The EAS account that owns the project (@khelscore/khelscore). Named
+    // explicitly because this login also has a personal `hemnarayan` account,
+    // and without it a build can resolve against the wrong one.
+    owner: 'khelscore',
     version: '1.0.0',
     scheme,
     orientation: 'portrait',
@@ -80,6 +90,13 @@ module.exports = () => {
       adaptiveIcon: { foregroundImage: ADAPTIVE_ICON, backgroundColor: '#FFFFFF' },
       blockedPermissions: BLOCKED_PERMISSIONS,
       predictiveBackGestureEnabled: false,
+      // Production only: `in.khelscore.app` is the one package registered in
+      // the Firebase project, and the Google Services Gradle plugin fails the
+      // build when the package it is handed has no matching client — so giving
+      // this file to the .dev or .staging variant would break their builds.
+      // Those variants keep no FCM credential and report push unavailable,
+      // exactly as they do today (src/lib/push/expoPush.js).
+      ...(idSuffix ? {} : { googleServicesFile: GOOGLE_SERVICES_FILE }),
       // App Links: the production app opens khelscore.in links itself. The
       // development and staging variants are left out on purpose — they are
       // not the app that site vouches for, and `scheme` still opens them.
