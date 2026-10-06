@@ -67,6 +67,7 @@ export default function More() {
         : [];
 
   const appRows = [
+    ['/ranked-matches', 'nav.rankedMatches'],
     ['/teams', 'nav.teams'],
     ['/players', 'nav.players'],
     ['/news', 'nav.news'],

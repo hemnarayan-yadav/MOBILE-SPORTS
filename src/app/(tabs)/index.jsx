@@ -22,7 +22,12 @@ import { LeaderboardList, TournamentCard } from '../../components/tournament/Tou
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { LEADERBOARD_CATEGORIES, MATCH_STATUS, ROLES } from '../../utils/constants.js';
+import {
+  LEADERBOARD_CATEGORIES,
+  MATCH_STATUS,
+  PLAYER_ROLES,
+  ROLES,
+} from '../../utils/constants.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 // A short preview on Home keeps the payload light on low-end Androids — full
@@ -114,6 +119,10 @@ function TeamShortcut() {
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
   if (status !== AUTH_STATUS.AUTHENTICATED || !user) return null;
+  // Only a player or a captain has a team of their own. An organiser (Admin,
+  // Manager, Super Admin) runs competitions from the website and must not be
+  // offered "create your team" here, which their role could not finish.
+  if (!PLAYER_ROLES.includes(user.role)) return null;
   const isCaptain = user.role === ROLES.CAPTAIN;
   const target = isCaptain ? '/captain' : '/user/create-team';
   const title = t(isCaptain ? 'app.myTeamTitle' : 'app.createTeamTitle');

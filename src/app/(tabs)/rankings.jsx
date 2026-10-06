@@ -1,6 +1,7 @@
 // Rankings — adapted from frontend/src/pages/public/Rankings.jsx: the three
 // player leaderboards and team standings, all-time or for one tournament.
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -9,6 +10,7 @@ import { rankingsApi } from '../../api/matches.api.js';
 import { qk } from '../../api/queryKeys.js';
 import { tournamentsApi } from '../../api/tournaments.api.js';
 import AppText from '../../components/common/AppText.jsx';
+import Button from '../../components/common/Button.jsx';
 import { TabStrip } from '../../components/common/Layout.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import { LeaderboardList, StandingsTable } from '../../components/tournament/TournamentBits.jsx';
@@ -41,6 +43,7 @@ function Result({ query, isEmpty, emptyTitle, emptyHint, children }) {
 export default function Rankings() {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const router = useRouter();
   const [tab, setTab] = useState(LEADERBOARD_CATEGORIES[0]);
   const [tournamentId, setTournamentId] = useState(ALL_TIME);
   const tournaments = useQuery({
@@ -74,6 +77,11 @@ export default function Rankings() {
         <AppText variant="heading" accessibilityRole="header">
           {t('rankings.pageTitle')}
         </AppText>
+        {/* Which matches these tables are built from — the obvious next
+            question, so the answer is one tap from the rankings. */}
+        <Button variant="secondary" onPress={() => router.push('/ranked-matches')}>
+          {t('rankedMatches.linkLabel')}
+        </Button>
         <View style={styles.block}>
           <AppText variant="label" tone="muted">
             {t('rankings.scope')}

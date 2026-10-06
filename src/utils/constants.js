@@ -3,12 +3,35 @@
 
 export const ROLES = Object.freeze({
   SUPER_ADMIN: 'super_admin',
+  MANAGER: 'manager',
   ADMIN: 'admin',
   CAPTAIN: 'captain',
   USER: 'user',
 });
 
-export const MANAGER_ROLES = Object.freeze([ROLES.ADMIN, ROLES.SUPER_ADMIN]);
+// The backend's role groupings (backend utils/constants.js), under the same
+// names. The list that used to be called MANAGER_ROLES here is ORGANISER_ROLES:
+// with a Manager role in existence that name would read as "the Manager's
+// roles".
+//
+// All three are mirrored whole, including the ones the app has no screen for
+// (it is a player and captain app — the organiser desks are on the website), so
+// a role check copied from the web can never land here half-right.
+//
+// Who runs competitions: tournaments, matches, live control and their media.
+export const ORGANISER_ROLES = Object.freeze([ROLES.ADMIN, ROLES.MANAGER, ROLES.SUPER_ADMIN]);
+
+// Who runs the news desk and the gallery — deliberately without Admin.
+export const CONTENT_ROLES = Object.freeze([ROLES.MANAGER, ROLES.SUPER_ADMIN]);
+
+// Who may create and manage any team and its squad. A team's own captain is
+// authorized separately, by team.
+export const TEAM_ADMIN_ROLES = Object.freeze([ROLES.MANAGER, ROLES.SUPER_ADMIN]);
+
+// The roles this app actually has screens for: a player, and a captain with a
+// squad. An organiser signing in on the phone has no captain desk and no player
+// profile, so those surfaces are hidden rather than shown empty.
+export const PLAYER_ROLES = Object.freeze([ROLES.USER, ROLES.CAPTAIN]);
 
 // How the API verifies phone numbers (GET /otp/config): `code` — KhelScore's own
 // code-entry dialog; `widget` — the provider's browser widget.

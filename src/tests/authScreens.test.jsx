@@ -6,6 +6,7 @@ import Login from '../app/auth/login.jsx';
 import Register from '../app/auth/register.jsx';
 import NoticeHost from '../components/common/NoticeHost.jsx';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
+import { useNoticeStore } from '../store/noticeStore.js';
 import { REFRESH_KEY, fail, fakeApi, ok, renderWithQuery, resetSession } from './helpers.jsx';
 
 configure({ asyncUtilTimeout: 5000 });
@@ -148,13 +149,16 @@ describe('Create account', () => {
 
     expect(await screen.findByText('Joining Gaon Warriors · Jersey #7')).toBeTruthy();
     expect(screen.getByLabelText('Name').props.value).toBe('Asha Devi');
+    // An invitation from before the change already names a shirt number.
+    expect(screen.getByLabelText('Jersey number').props.value).toBe('7');
     await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
     await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
     await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
 
-    expect(await screen.findByText("You're in the Gaon Warriors squad.")).toBeTruthy();
+    expect(await screen.findByText('Account created. Welcome to KhelScore!')).toBeTruthy();
     expect(api.calls.find((c) => c.url === '/auth/register').body).toEqual({
       name: 'Asha Devi',
+      jerseyNumber: 7,
       email: '',
       phone: '+919876543210',
       password: 'Kabaddi123',
@@ -164,6 +168,77 @@ describe('Create account', () => {
     });
     expect(SecureStore.__store.get(REFRESH_KEY)).toBe('rt-register');
     await waitFor(() => expect(router.dismissTo).toHaveBeenCalledWith('/'));
+  });
+
+  // The jersey number is part of who a player is on a kabaddi team, so sign-up
+  // asks for it and will not create the account without one.
+  it('will not create the account without a jersey number', async () => {
+    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
+    await renderWithQuery(withNotices(<Register />));
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+
+    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(await screen.findByText('This field is required')).toBeTruthy();
+    expect(api.calls.some((c) => c.url === '/auth/register')).toBe(false);
+
+    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/auth/register')?.body.jerseyNumber).toBe(12),
+    );
+  });
+
+  // Birthday, height and weight are not sign-up fields — they belong on the
+  // profile, and the account is created without them.
+  it('never asks for a birthday, a height or a weight', async () => {
+    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
+    await renderWithQuery(<Register />);
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+
+    await screen.findByLabelText('Jersey number');
+    expect(screen.queryByLabelText('Date of birth')).toBeNull();
+    expect(screen.queryByLabelText('Height (cm)')).toBeNull();
+    expect(screen.queryByLabelText('Weight (kg)')).toBeNull();
+  });
+
+  // The welcome panel is raised through the prompt queue, so it lives above the
+  // whole app and is never put up a second time.
+  it('welcomes the new account once, with both next steps, and stays dismissed', async () => {
+    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
+    await renderWithQuery(withNotices(<Register />));
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
+    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(await screen.findByText('Welcome to KhelScore!')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Complete profile' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'View my team' })).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Complete profile' }));
+    expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
+    await waitFor(() => expect(screen.queryByText('Welcome to KhelScore!')).toBeNull());
+
+    // Whatever asks for it again — a rerender, coming back to this screen, a
+    // token refresh — the store refuses to raise the same prompt twice.
+    useNoticeStore.getState().showPrompt({ accountId: 'u1', kind: 'onboarding' });
+    expect(useNoticeStore.getState().prompts).toEqual([]);
+    expect(screen.queryByText('Welcome to KhelScore!')).toBeNull();
   });
 
   it('refuses a number that is not an Indian mobile before sending anything', async () => {

@@ -1,10 +1,10 @@
 // Adapted from frontend/src/components/player/PlayerForm.jsx (and its
-// playerFormValues.js). One form, four modes:
+// playerFormValues.js). One form, three modes:
 //   add        profile + squad fields (a player the captain types in)
 //   profile    the profile only (editing a squad member's details)
 //   membership jersey number and playing role only
-//   invite     name + jersey + role, for a player invited by phone who fills in
-//              the rest of their profile after signing up
+// The old `invite` mode went with the WhatsApp invitations; a player who has a
+// number but no account is now added by components/team/AddByPhone.jsx.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,10 +13,8 @@ import { SPACING } from '../../theme/tokens.js';
 import { PLAYING_ROLES } from '../../utils/constants.js';
 import { isoYearsAgo } from '../../utils/dates.js';
 import {
-  invitePlayerSchema,
   membershipSchema,
   playerProfileSchema,
-  playerSchema,
   toLocationPayload,
   toLocationValues,
 } from '../../utils/validation.js';
@@ -61,11 +59,11 @@ export function toPlayerFormValues(player, membership) {
   return values;
 }
 
+// "profile" shows the name and the profile fields; "membership" the jersey and
+// the playing role of a player who already has a profile.
 const SCHEMAS = {
-  add: playerSchema,
   profile: playerProfileSchema,
   membership: membershipSchema,
-  invite: invitePlayerSchema,
 };
 
 function Field({ control, name, label, hint, error, ...inputProps }) {
@@ -89,7 +87,7 @@ function Field({ control, name, label, hint, error, ...inputProps }) {
 }
 
 export default function PlayerForm({
-  mode = 'add',
+  mode = 'profile',
   defaultValues,
   onSubmit,
   submitting,
@@ -109,9 +107,9 @@ export default function PlayerForm({
     formState: { errors },
   } = useForm({ resolver: zodResolver(SCHEMAS[mode]), defaultValues: initial });
 
-  const showName = mode !== 'membership';
-  const showProfile = mode === 'add' || mode === 'profile';
-  const showMembership = mode !== 'profile';
+  const showName = mode === 'profile';
+  const showProfile = mode === 'profile';
+  const showMembership = mode === 'membership';
 
   // The two pickers are driven together: picking a state clears the district.
   const setLocation = ({ state, district }) => {

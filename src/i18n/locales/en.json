@@ -109,7 +109,8 @@
     "sectionManage": "Manage",
     "sectionPlatform": "Platform",
     "sectionContent": "Content",
-    "sectionAccount": "Account"
+    "sectionAccount": "Account",
+    "rankedMatches": "Ranked matches"
   },
   "round": {
     "league": "League",
@@ -327,15 +328,15 @@
     "invitationNotFound": "This invitation link is not valid.",
     "noAccountForPhone": "No KhelScore account uses this number.",
     "accountUnavailable": "This account can't be added to a squad right now.",
+    "accountNotFound": "One of the players you chose no longer has an account.",
+    "duplicateTeamMember": "This player is already in the list",
+    "otpAuthNotAllowed": "This account signs in with its email address and password.",
+    "passwordChangeRequired": "Change your temporary password before managing a squad.",
     "playerAlreadyInSquad": "This player is already in your squad.",
     "playerInAnotherSquad": "This player is already in another squad.",
     "playerProfileDeleted": "This player's profile was removed. Contact support.",
     "playerSportMismatch": "This player plays a different sport.",
-    "accountExists": "This number already has a KhelScore account. Add the player directly.",
-    "invitationAlreadyPending": "This number already has an open invitation to your team.",
     "invitationNotPending": "This invitation is no longer open.",
-    "invitationResendTooSoon": "The invitation was just sent. Please wait a minute before sending it again.",
-    "invitationResendLimit": "This invitation has been sent too many times. Cancel it and invite the player again.",
     "otpEmailMismatch": "This code was sent for a different email address.",
     "emailNotRegistered": "No account uses this email address.",
     "emailAlreadyVerified": "This email address is already confirmed.",
@@ -393,7 +394,8 @@
     "emailOptionalHint": "Only for password recovery and updates. You can add it later.",
     "emailResetHint": "We will send a one-time code to your email, then set the new password.",
     "emailResetSubmit": "Verify and update password",
-    "useAnotherPhone": "Change number"
+    "useAnotherPhone": "Change number",
+    "jerseyHint": "The shirt number you're known by. The number you play in for a team is your captain's to pick."
   },
   "otp": {
     "title": "Enter the code",
@@ -457,7 +459,26 @@
     "deleteCaptainNote": "You are a team captain. Hand your team to another captain or deactivate it first, or the deletion will be refused.",
     "deletePasswordHint": "Enter your password to confirm.",
     "deleteWithOtp": "Confirm with a code instead",
-    "deleteDone": "Your account has been deleted."
+    "deleteDone": "Your account has been deleted.",
+    "jerseyHint": "The shirt number you're known by.",
+    "ageLine": "Age {{age}}",
+    "complete": "Profile complete",
+    "incomplete": "Profile incomplete",
+    "incompleteFields": "Still needed: {{fields}}",
+    "field": {
+      "name": "name",
+      "phone": "mobile number",
+      "email": "email address",
+      "jerseyNumber": "jersey number"
+    },
+    "passwordTitle": "Password",
+    "passwordIntro": "Change the password you sign in with.",
+    "passwordSignsOut": "Changing your password signs you out on every device. Sign in again with the new one.",
+    "temporaryPassword": "This account still uses the temporary password it was created with. Choose your own to manage your squad.",
+    "temporaryPasswordHint": "The temporary one is the last 4 digits of your mobile number followed by your jersey number.",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "passwordChanged": "Password changed. Please sign in again."
   },
   "location": {
     "state": "State",
@@ -492,10 +513,12 @@
     "weight": "Weight must be between 30 and 200 kg",
     "stateUnknown": "Choose a state from the list",
     "districtNeedsState": "Choose the state first",
-    "districtNotInState": "That district is not in the selected state"
+    "districtNotInState": "That district is not in the selected state",
+    "searchMin": "Enter at least 2 characters"
   },
   "roles": {
     "super_admin": "Super Admin",
+    "manager": "Manager",
     "admin": "Admin",
     "captain": "Captain",
     "user": "User"
@@ -522,11 +545,11 @@
     "createTeamTitle": "Create your team",
     "createTeamSubtitle": "Set up a squad and start playing tournaments.",
     "myTeamTitle": "My team",
-    "myTeamSubtitle": "Squad, invitations and matches.",
+    "myTeamSubtitle": "Squad and matches.",
+    "organiserNoTeam": "This account runs tournaments, so it has no team of its own. The organiser tools are on the website.",
     "updateTitle": "Update KhelScore",
     "updateBody": "This version of the app is no longer supported. Install the latest version to continue.",
     "updateCta": "Update now",
-    "joinedTeam": "You're in the {{team}} squad.",
     "onWebsite": "On the website",
     "searchLabel": "Search",
     "loadingMore": "Loading more…",
@@ -579,7 +602,9 @@
     "substitution": "{{team}}: {{playerIn}} comes in for {{playerOut}}.",
     "injury": "{{player}} ({{team}}) is injured.",
     "raidDelayPoint_one": "Raid delay — {{count}} technical point to {{team}}.",
-    "raidDelayPoint_other": "Raid delay — {{count}} technical points to {{team}}."
+    "raidDelayPoint_other": "Raid delay — {{count}} technical points to {{team}}.",
+    "raidCancelled": "Last raid cancelled by controller.",
+    "nextRaidOverride": "The controller gave the next raid to {{team}}."
   },
   "stats": {
     "matches": "Matches",
@@ -894,7 +919,20 @@
     "playerActions": "Actions for {{name}}",
     "editJerseyRole": "Change jersey or role",
     "release": "Release from squad",
-    "releaseConfirm": "Release {{name}} from the squad? Their profile and match history are kept."
+    "releaseConfirm": "Release {{name}} from the squad? Their profile and match history are kept.",
+    "searchLabel": "Name or mobile number",
+    "searchHint": "Search KhelScore for the player. A mobile number finds the exact account.",
+    "search": "Search",
+    "searchResults": "Tap a player to add them.",
+    "noMatch": "Nobody on KhelScore matched \"{{query}}\". Add the player below.",
+    "noJersey": "No jersey number yet",
+    "jerseyLine": "Jersey #{{jersey}}",
+    "alreadyInSquad": "Already in your squad",
+    "hasAccount": "Already on KhelScore",
+    "addToSquad": "Add to squad",
+    "searchAgain": "Search again",
+    "playerLinked": "{{name}} already had a KhelScore account, so we added that one to your squad.",
+    "directPhoneHint": "Their Indian mobile number. Their account is created with it — nothing is sent anywhere."
   },
   "live": {
     "raiding": "{{player}} is raiding",
@@ -960,22 +998,7 @@
     "teamStats": "Team stats"
   },
   "teamInvite": {
-    "byPhone": "By phone number",
-    "withoutPhone": "Without a phone",
-    "phoneHint": "The player's mobile number. We'll check whether they already use KhelScore.",
-    "continue": "Continue",
-    "hasAccount": "Already on KhelScore",
-    "alreadyInSquad": "{{name}} is already in your squad.",
-    "addExistingHint": "Choose their jersey number and role to add them to your squad.",
-    "addToSquad": "Add to squad",
-    "noAccount": "Nobody uses {{phone}} on KhelScore yet. The player joins your squad now and gets a WhatsApp invitation to create an account.",
-    "send": "Add and send invitation",
-    "sent": "{{name}} was added. The WhatsApp invitation is on its way.",
-    "unavailable": "can't be added to a squad right now.",
-    "changeNumber": "Use another number",
     "title": "Invitations",
-    "subtitle": "Invited players are in your squad already. They join KhelScore from the WhatsApp link.",
-    "empty": "No open invitations.",
     "invitedTag": "Invited",
     "status": {
       "pending": "Waiting to join",
@@ -983,22 +1006,13 @@
       "accepted": "Joined",
       "cancelled": "Cancelled"
     },
-    "delivery": {
-      "none": "Not sent yet",
-      "sending": "Sending on WhatsApp…",
-      "sent": "Sent on WhatsApp {{when}}",
-      "failed": "Could not be sent. Try sending again.",
-      "undeliverable": "This number can't receive the WhatsApp invitation."
-    },
     "expires": "valid until {{date}}",
-    "resend": "Send again",
-    "resendFor": "Send the invitation to {{name}} again",
-    "resent": "A new invitation link is on its way to {{name}}. The old link no longer works.",
     "cancel": "Cancel invitation",
     "cancelFor": "Cancel the invitation of {{name}}",
     "cancelled": "Invitation for {{name}} cancelled. Their squad place is free again.",
     "cancelTitle": "Cancel invitation?",
-    "cancelConfirm": "{{name}} will be removed from your squad and their invitation link will stop working. You can invite them again later."
+    "cancelConfirm": "{{name}} will be removed from your squad and their invitation link will stop working. You can invite them again later.",
+    "subtitle": "Invitations sent before KhelScore stopped sending them. These players are in your squad already and can still join from their link."
   },
   "join": {
     "title": "Team invitation",
@@ -1047,5 +1061,35 @@
   },
   "dashboard": {
     "welcome": "Welcome, {{name}}"
+  },
+  "notice": {
+    "welcomeTitle": "Welcome to KhelScore!",
+    "welcomeText": "Your account is ready. Two things worth doing now:",
+    "welcomeProfile": "Complete your profile",
+    "welcomeProfileText": "Add your height, weight and birthday so your player page is complete.",
+    "welcomeTeams_one": "You're in a squad",
+    "welcomeTeams_other": "You're in {{count}} squads",
+    "welcomeTeamsText": "See your team, its squad and its matches.",
+    "completeProfile": "Complete profile",
+    "viewTeams_one": "View my team",
+    "viewTeams_other": "View my teams",
+    "later": "Later",
+    "reminderTitle": "Finish setting up your account",
+    "passwordTitle": "Set your own password",
+    "passwordText": "This account still uses a temporary password. Squad changes stay blocked until you change it.",
+    "profileTitle": "Complete your profile",
+    "profileText": "A few details are still missing from your profile.",
+    "profileMissing": "Still needed: {{fields}}",
+    "openProfile": "Open my profile"
+  },
+  "rankedMatches": {
+    "pageTitle": "Ranked matches",
+    "pageSubtitle": "Every match that counts towards the rankings, by competition and by day.",
+    "emptyTitle": "No ranked matches yet",
+    "emptyHint": "A match starts counting once an organiser marks it ranked.",
+    "friendlies": "Friendly matches",
+    "countedMatches_one": "{{count}} ranked match",
+    "countedMatches_other": "{{count}} ranked matches",
+    "linkLabel": "Which matches count"
   }
 }

@@ -20,7 +20,7 @@ import StateDistrictFields from '../../components/common/StateDistrictFields.jsx
 import TextField from '../../components/common/TextField.jsx';
 import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
-import { notify } from '../../store/noticeStore.js';
+import { PROMPTS, notify, useNoticeStore } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
@@ -173,15 +173,33 @@ function InvitationSummary({ invitations }) {
 function ProfileStep({ verified, onChangeNumber }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const invitedName = verified.invitations[0]?.playerName ?? '';
+  const showPrompt = useNoticeStore((s) => s.showPrompt);
+  const invited = verified.invitations[0];
+  const invitedName = invited?.playerName ?? '';
+  // An invitation from before the change already names a shirt number; it is
+  // only a suggestion and stays editable.
+  const invitedJersey =
+    invited?.jerseyNumber === null || invited?.jerseyNumber === undefined
+      ? ''
+      : String(invited.jerseyNumber);
   const registerAccount = useMutation({
     mutationFn: authApi.register,
     onSuccess: async ({ joinedTeams, ...session }) => {
       await startSession(session);
-      // The team the server says the account joined (newest invitation first).
-      // Team pages arrive with Phase M2; until then the app says so here.
+      // The team the server says the account joined (newest invitation first);
+      // nothing joined is the normal case now that invitations are retired.
       const team = joinedTeams?.[0];
-      notify.success(team ? t('app.joinedTeam', { team: team.name }) : t('auth.registerSuccess'));
+      notify.success(t('auth.registerSuccess'));
+      // The welcome panel, raised through the prompt queue so it lives above
+      // the whole app: this screen closes itself as soon as the session exists
+      // (useGuestScreen), and the store sees to it that the panel is never put
+      // up twice (store/noticeStore.js).
+      showPrompt({
+        accountId: session.user.id,
+        kind: PROMPTS.ONBOARDING,
+        teamCount: joinedTeams?.length ?? 0,
+        teamPath: team?.id ? `/team/${team.id}` : null,
+      });
     },
   });
   const {
@@ -194,6 +212,7 @@ function ProfileStep({ verified, onChangeNumber }) {
     resolver: zodResolver(registerProfileSchema),
     defaultValues: {
       name: invitedName,
+      jerseyNumber: invitedJersey,
       email: '',
       password: '',
       confirmPassword: '',
@@ -262,6 +281,14 @@ function ProfileStep({ verified, onChangeNumber }) {
         hint: invitedName ? t('auth.invitedNameHint') : undefined,
         autoComplete: 'name',
         textContentType: 'name',
+      })}
+      {/* Required: the shirt number a player is known by is part of who they
+          are on a kabaddi team, so sign-up asks for it. Birthday, height and
+          weight are not asked here — they belong on the profile. */}
+      {field('jerseyNumber', {
+        label: t('player.jerseyNumber'),
+        hint: t('auth.jerseyHint'),
+        keyboardType: 'number-pad',
       })}
       {field('email', {
         label: t('auth.emailOptional'),

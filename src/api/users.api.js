@@ -16,4 +16,15 @@ export const usersApi = {
   deleteAccount: (proof) => apiClient.post('/users/me/delete', proof).then(unwrap),
   updatePreferences: (changes) =>
     apiClient.patch('/users/me/notification-preferences', changes).then(unwrap),
+  // Replacing your own password, proving the current one. This is also how an
+  // account created with a temporary password gets a real one. It signs the
+  // account out everywhere, so the caller must re-authenticate afterwards.
+  changePassword: ({ currentPassword, password }) =>
+    apiClient.post('/users/me/password', { currentPassword, password }).then(unwrap),
+  // Finding a player who already has an account, by name or mobile number, so
+  // a captain adds that account instead of creating a second one for the same
+  // person. A POST body, so numbers stay out of request logs; the answer never
+  // carries a full phone number (`phoneMasked`).
+  search: ({ query, teamId }) =>
+    apiClient.post('/users/search', { query, ...(teamId ? { teamId } : {}) }).then(unwrap),
 };

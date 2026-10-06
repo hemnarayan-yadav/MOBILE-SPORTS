@@ -20,6 +20,11 @@ function timed(request, serverTimeOf = liveServerTime) {
 export const matchesApi = {
   // `{ items, pagination, serverTime }`
   list: (params) => timed(() => apiClient.get('/matches', { params }).then(unwrap), listServerTime),
+  // Matches that count towards rankings, already grouped by the competition
+  // they belong to and paged by group: `{ items, pagination, serverTime }`
+  // where each item is `{ tournament, matchCount, matches }`.
+  ranked: (params) =>
+    timed(() => apiClient.get('/matches/ranked', { params }).then(unwrap), listServerTime),
   get: (id) => timed(() => apiClient.get(`/matches/${id}`).then(unwrap)),
   headToHead: (teamA, teamB) =>
     apiClient.get('/matches/head-to-head', { params: { teamA, teamB } }).then(unwrap),

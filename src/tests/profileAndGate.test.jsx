@@ -6,7 +6,7 @@ jest.mock('expo-constants', () => ({
 
 import { configure, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Linking, Platform, Text } from 'react-native';
 import Profile from '../app/dashboard/profile.jsx';
@@ -35,6 +35,19 @@ const PROFILE = {
     email: false,
   },
   updatedAt: '2026-09-26T00:00:00.000Z',
+  mustChangePassword: false,
+  // The player half of the account, and what it still owes — both from the
+  // server (API users.serializer.serializeAccount, modules/users/profileState).
+  profile: {
+    playerId: 'p1',
+    jerseyNumber: 7,
+    heightCm: 175,
+    weightKg: 70,
+    dob: '1999-04-21',
+    age: 27,
+    photoUrl: null,
+  },
+  profileState: { profileComplete: true, missingFields: [], mustChangePassword: false },
 };
 let api;
 
@@ -44,15 +57,16 @@ beforeEach(() => {
 });
 afterEach(() => api?.restore());
 
-function profileApi() {
+function profileApi(account = PROFILE) {
   return fakeApi(({ method, url, body }) => {
-    if (url === '/users/me') return ok(PROFILE);
+    if (method === 'patch' && url === '/users/me') return ok({ ...account, ...body });
+    if (url === '/users/me') return ok(account);
     if (url === '/otp/config') return ok({ available: true, flow: 'code', channel: 'whatsapp' });
     if (url === '/media/config') return ok({ enabled: true, maxImageMb: 5, maxVideoMb: 50 });
     if (method === 'patch' && url === '/users/me/notification-preferences') {
       return ok({
-        ...PROFILE,
-        notificationPreferences: { ...PROFILE.notificationPreferences, ...body },
+        ...account,
+        notificationPreferences: { ...account.notificationPreferences, ...body },
       });
     }
     return ok(null);
@@ -78,6 +92,141 @@ describe('Profile', () => {
     expect(screen.getByText('+91 9876543210')).toBeTruthy();
     expect(screen.getByText('Number verified')).toBeTruthy();
     expect(screen.getByText('No email address added')).toBeTruthy();
+  });
+
+  // The jersey number is required data, the measurements are not, and the age
+  // is the server's — never recomputed here.
+  it('shows the jersey number, the measurements and the age the server derived', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    expect(await screen.findByLabelText('Jersey number')).toBeTruthy();
+    expect(screen.getByLabelText('Jersey number').props.value).toBe('7');
+    expect(screen.getByLabelText('Height (cm)').props.value).toBe('175');
+    expect(screen.getByLabelText('Weight (kg)').props.value).toBe('70');
+    expect(screen.getByText('Age 27')).toBeTruthy();
+    expect(screen.getByText('Profile complete')).toBeTruthy();
+  });
+
+  it('names what the profile is still missing, from profileState alone', async () => {
+    const owing = {
+      ...PROFILE,
+      profile: { ...PROFILE.profile, jerseyNumber: null, dob: null, age: null },
+      profileState: {
+        profileComplete: false,
+        missingFields: ['jerseyNumber'],
+        mustChangePassword: true,
+      },
+      mustChangePassword: true,
+    };
+    useAuthStore.getState().setSession({ user: owing, accessToken: 'at' });
+    api = profileApi(owing);
+    await renderWithQuery(<Profile />);
+
+    expect(await screen.findByText('Profile incomplete')).toBeTruthy();
+    expect(screen.getByText('Still needed: jersey number')).toBeTruthy();
+    expect(screen.getAllByText(/still uses the temporary password/).length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  it('saves the jersey number, height, weight and birthday in one request', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await fireEvent.changeText(await screen.findByLabelText('Jersey number'), '11');
+    await fireEvent.changeText(screen.getByLabelText('Weight (kg)'), '72');
+    await fireEvent.press(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      const call = api.calls.find((c) => c.method === 'patch' && c.url === '/users/me');
+      expect(call?.body).toMatchObject({
+        name: 'Asha Devi',
+        jerseyNumber: 11,
+        heightCm: 175,
+        weightKg: 72,
+        dob: '1999-04-21',
+      });
+      // The number is only ever changed through its own OTP flow.
+      expect(call.body.phone).toBeUndefined();
+    });
+  });
+
+  // An organiser (Admin, Manager, Super Admin) has no player profile, so the
+  // sports fields are not theirs to fill in.
+  it('shows no jersey number or measurements to a manager', async () => {
+    const manager = {
+      ...PROFILE,
+      role: 'manager',
+      email: 'manager@khelscore.in',
+      profile: { playerId: null, jerseyNumber: null, heightCm: null, weightKg: null, dob: null, age: null, photoUrl: null },
+      profileState: { profileComplete: true, missingFields: [], mustChangePassword: false },
+    };
+    useAuthStore.getState().setSession({ user: manager, accessToken: 'at' });
+    api = profileApi(manager);
+    await renderWithQuery(<Profile />);
+
+    expect(await screen.findByText('Signed in as Manager')).toBeTruthy();
+    expect(screen.queryByLabelText('Jersey number')).toBeNull();
+    expect(screen.queryByLabelText('Height (cm)')).toBeNull();
+    expect(screen.queryByLabelText('Weight (kg)')).toBeNull();
+  });
+
+  // Changing the password signs the account out everywhere, so the app says so,
+  // forgets the session on this device and sends the person to sign in again.
+  it('changes the password, then ends the session and asks for a fresh sign-in', async () => {
+    SecureStore.__store.set(REFRESH_KEY, 'rt-1');
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Change password' }));
+    expect(
+      await screen.findByText(/Changing your password signs you out on every device/),
+    ).toBeTruthy();
+
+    await fireEvent.changeText(screen.getByLabelText('Current password'), 'old12345');
+    await fireEvent.changeText(screen.getByLabelText('New password'), 'Kabaddi456');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi456');
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Change password' }).at(-1));
+
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/users/me/password')?.body).toEqual({
+        currentPassword: 'old12345',
+        password: 'Kabaddi456',
+      }),
+    );
+    expect(router.replace).toHaveBeenCalledWith('/auth/login');
+    await waitFor(() => expect(SecureStore.__store.has(REFRESH_KEY)).toBe(false));
+    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.ANONYMOUS);
+  });
+
+  it('never sends a password change whose confirmation does not match', async () => {
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Change password' }));
+    await fireEvent.changeText(screen.getByLabelText('Current password'), 'old12345');
+    await fireEvent.changeText(screen.getByLabelText('New password'), 'Kabaddi456');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi999');
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Change password' }).at(-1));
+
+    expect(await screen.findByText("Passwords don't match")).toBeTruthy();
+    expect(api.calls.some((c) => c.url === '/users/me/password')).toBe(false);
+  });
+
+  // The temporary-password reminder links straight here.
+  it('opens the password form straight away when the reminder sent them', async () => {
+    useLocalSearchParams.mockReturnValue({ changePassword: '1' });
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    expect(await screen.findByLabelText('Current password')).toBeTruthy();
+    useLocalSearchParams.mockReturnValue({});
   });
 
   it('saves a notification preference as soon as it is switched', async () => {

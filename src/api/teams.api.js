@@ -11,13 +11,16 @@ export const teamsApi = {
   setStatus: (id, status) => apiClient.patch(`/teams/${id}/status`, { status }).then(unwrap),
   registrations: (id) => apiClient.get(`/teams/${id}/registrations`).then(unwrap),
 
-  addPlayer: (teamId, payload) => apiClient.post(`/teams/${teamId}/players`, payload).then(unwrap),
-  // Phone numbers go in the body, never the URL. The API decides whether the
-  // number has an account (`match: user | none | unavailable`).
-  lookupPhone: (teamId, phone) =>
-    apiClient.post(`/teams/${teamId}/players/lookup`, { phone }).then(unwrap),
+  // An account that already exists, named either by its id (picked from
+  // POST /users/search) or by its number — exactly one of the two.
   addExistingUser: (teamId, payload) =>
     apiClient.post(`/teams/${teamId}/players/existing`, payload).then(unwrap),
+  // A player with no account yet: the account and the squad place are created
+  // together. Replaced inviting an unregistered player over WhatsApp. Phone
+  // numbers go in the body, never the URL, so they stay out of request logs.
+  // The answer says whether an account had to be created (`accountCreated`).
+  addDirectPlayer: (teamId, payload) =>
+    apiClient.post(`/teams/${teamId}/players/direct`, payload).then(unwrap),
   updateMember: (teamId, playerId, changes) =>
     apiClient.patch(`/teams/${teamId}/players/${playerId}`, changes).then(unwrap),
   releasePlayer: (teamId, playerId) =>

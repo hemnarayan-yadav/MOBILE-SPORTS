@@ -96,7 +96,14 @@ describe('the notifications screen', () => {
     );
     await renderWithQuery(<Notifications />);
 
-    const markAll = await screen.findByRole('button', { name: 'Mark all as read' });
+    // The button is in the list header, so it is on screen — disabled — before
+    // the first page says how many are unread. Waiting for the enabled one is
+    // what makes the press meaningful (same idiom as the OTP button in
+    // authScreens.test.jsx).
+    const markAll = await screen.findByRole('button', {
+      name: 'Mark all as read',
+      disabled: false,
+    });
     await fireEvent.press(markAll);
     await waitFor(() =>
       expect(api.calls.some((c) => c.url === '/notifications/read-all')).toBe(true),

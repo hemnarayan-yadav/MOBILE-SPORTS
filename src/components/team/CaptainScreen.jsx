@@ -10,7 +10,7 @@ import { useCaptainTeam } from '../../hooks/useCaptainTeam.js';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { ROLES, TEAM_STATUS } from '../../utils/constants.js';
+import { ORGANISER_ROLES, ROLES, TEAM_STATUS } from '../../utils/constants.js';
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
 import { BackHeader } from '../common/Layout.jsx';
@@ -54,7 +54,14 @@ export default function CaptainScreen({ title, subtitle, header, children }) {
         {status === AUTH_STATUS.UNKNOWN ? <LoadingState /> : null}
         {status === AUTH_STATUS.AUTHENTICATED && !teamId ? (
           <>
-            <EmptyState title={t('captain.noTeam')} hint={t('captain.noTeamHint')} />
+            {/* An organiser has no team of their own and no squad to manage in
+                the app, so it says so instead of inviting them to create one. */}
+            <EmptyState
+              title={t('captain.noTeam')}
+              hint={t(
+                ORGANISER_ROLES.includes(role) ? 'app.organiserNoTeam' : 'captain.noTeamHint',
+              )}
+            />
             {role === ROLES.USER ? (
               <Button onPress={() => router.push('/user/create-team')}>
                 {t('team.createSubmit')}

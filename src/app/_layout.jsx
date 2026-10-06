@@ -7,6 +7,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
+import { useAccountPrompts } from '../hooks/useAccountPrompts.js';
 import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
 import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
@@ -35,6 +36,7 @@ initMonitoring();
 // and one that arrives while the app is open is shown as a notice.
 function SessionBootstrap() {
   useAuthBootstrap();
+  useAccountPrompts();
   usePushRegistration();
   useNotificationTaps();
   useNotificationSocket();

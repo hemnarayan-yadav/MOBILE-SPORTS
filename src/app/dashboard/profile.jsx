@@ -3,18 +3,20 @@
 // OTP), notification preferences, language and theme, and signing out.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Redirect, useRouter } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Switch, View } from 'react-native';
 import { authApi } from '../../api/auth.api.js';
+import { endSession } from '../../api/client.js';
 import { qk } from '../../api/queryKeys.js';
 import { usersApi } from '../../api/users.api.js';
 import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
 import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.jsx';
+import DateField from '../../components/common/DateField.jsx';
 import ImageField from '../../components/common/ImageField.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
@@ -33,9 +35,11 @@ import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
-import { MANAGER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
+import { isoYearsAgo } from '../../utils/dates.js';
+import { ORGANISER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
 import {
+  changePasswordSchema,
   changePhoneSchema,
   profileSchemaFor,
   toLocationPayload,
@@ -61,13 +65,30 @@ const PREFERENCES = Object.freeze([
   { key: 'email', label: 'profile.pref.email', hint: 'profile.pref.emailHint' },
 ]);
 
-function toFormValues(profile) {
+// The ages the API accepts for a player (backend utils/validators.js), which
+// bound the date-of-birth calendar so it cannot offer a date the server would
+// refuse.
+const MIN_PLAYER_AGE = 10;
+const MAX_PLAYER_AGE = 60;
+
+// Text inputs hold strings, so a number or a missing value becomes one here.
+const toText = (value) => (value === null || value === undefined ? '' : String(value));
+
+// The account's own view of itself carries its player half under `profile`
+// (API users.serializer.serializeAccount): the jersey number, the
+// measurements, the birthday and the age the server derived from it.
+function toFormValues(account) {
+  const player = account.profile ?? {};
   return {
-    name: profile.name,
-    email: profile.email ?? '',
-    phone: profile.phone ?? '',
-    avatarUrl: profile.avatarUrl ?? '',
-    ...toLocationValues(profile.location),
+    name: account.name,
+    email: account.email ?? '',
+    phone: account.phone ?? '',
+    avatarUrl: account.avatarUrl ?? '',
+    jerseyNumber: toText(player.jerseyNumber),
+    heightCm: toText(player.heightCm),
+    weightKg: toText(player.weightKg),
+    dob: player.dob ? String(player.dob).slice(0, 10) : '',
+    ...toLocationValues(account.location),
   };
 }
 
@@ -111,6 +132,7 @@ function Status({ ok, yes, no }) {
 function ProfileForm({ profile }) {
   const { t } = useTranslation();
   const applyProfile = useApplyProfile();
+  const isPlayer = !ORGANISER_ROLES.includes(profile.role);
   const update = useMutation({
     mutationFn: usersApi.updateMe,
     onSuccess: (updated) => {
@@ -190,6 +212,78 @@ function ProfileForm({ profile }) {
           />
         )}
       />
+      {/* The player half of the account. An organiser (Admin, Manager, Super
+          Admin) has no player profile, so these are not shown to one and the
+          schema does not ask for them (utils/validation.profileSchemaFor). */}
+      {isPlayer ? (
+        <>
+          <Controller
+            control={control}
+            name="jerseyNumber"
+            render={({ field }) => (
+              <TextField
+                label={t('player.jerseyNumber')}
+                hint={t('profile.jerseyHint')}
+                keyboardType="number-pad"
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.jerseyNumber}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="dob"
+            render={({ field }) => (
+              <DateField
+                label={t('player.dob')}
+                placeholder={t('app.datePicker.pick')}
+                // The age is the server's (profile.age), calendar-correct and
+                // never computed here.
+                hint={
+                  profile.profile?.age === null || profile.profile?.age === undefined
+                    ? undefined
+                    : t('profile.ageLine', { age: profile.profile.age })
+                }
+                error={errors.dob}
+                value={field.value}
+                onChange={(value) => field.onChange(value)}
+                min={isoYearsAgo(MAX_PLAYER_AGE)}
+                max={isoYearsAgo(MIN_PLAYER_AGE)}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="heightCm"
+            render={({ field }) => (
+              <TextField
+                label={t('player.heightCm')}
+                keyboardType="number-pad"
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.heightCm}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="weightKg"
+            render={({ field }) => (
+              <TextField
+                label={t('player.weightKg')}
+                keyboardType="decimal-pad"
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.weightKg}
+              />
+            )}
+          />
+        </>
+      ) : null}
       <StateDistrictFields
         state={watch('state')}
         district={watch('district')}
@@ -323,7 +417,7 @@ function PhoneSection({ profile }) {
     : profile.phoneVerified
       ? t('profile.changePhone')
       : t('profile.verifyPhone');
-  const canRemove = Boolean(profile.phone) && MANAGER_ROLES.includes(profile.role);
+  const canRemove = Boolean(profile.phone) && ORGANISER_ROLES.includes(profile.role);
 
   return (
     <View style={styles.stack}>
@@ -361,6 +455,135 @@ function PhoneSection({ profile }) {
       </Sheet>
       {phoneVerification.dialog}
     </View>
+  );
+}
+
+// What the account still owes, straight from the server's own answer
+// (`profileState`). Nothing here is remembered by the app.
+function CompletionStatus({ profile }) {
+  const { t } = useTranslation();
+  const state = profile.profileState;
+  if (!state) return null;
+  return (
+    <View style={styles.stack} accessibilityLiveRegion="polite">
+      <Status
+        ok={state.profileComplete}
+        yes={t('profile.complete')}
+        no={t('profile.incomplete')}
+      />
+      {!state.profileComplete && state.missingFields?.length ? (
+        <AppText variant="small" tone="muted">
+          {t('profile.incompleteFields', {
+            fields: state.missingFields.map((field) => t(`profile.field.${field}`)).join(', '),
+          })}
+        </AppText>
+      ) : null}
+      {state.mustChangePassword ? (
+        <AppText variant="small" tone="warning">
+          {t('profile.temporaryPassword')}
+        </AppText>
+      ) : null}
+    </View>
+  );
+}
+
+// Replacing the password. The API signs the account out everywhere, so this
+// says so plainly, forgets the session on this device and sends the person to
+// sign in again with the password they just chose.
+function PasswordSection({ profile, openOnMount }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [editing, setEditing] = useState(openOnMount);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { currentPassword: '', password: '', confirmPassword: '' },
+  });
+
+  const change = useMutation({
+    mutationFn: usersApi.changePassword,
+    onSuccess: async () => {
+      setEditing(false);
+      // Leave the screen before the session ends, so the signed-out redirect
+      // never flashes, then forget the refresh token on this device.
+      router.replace('/auth/login');
+      notify.success(t('profile.passwordChanged'));
+      await endSession();
+      queryClient.clear();
+    },
+    onError: (error) => notify.error(t(apiErrorKey(error))),
+  });
+
+  const field = (name, label) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: input }) => (
+        <TextField
+          label={label}
+          secureTextEntry
+          autoCapitalize="none"
+          autoComplete={name === 'currentPassword' ? 'current-password' : 'new-password'}
+          value={input.value}
+          onChangeText={input.onChange}
+          onBlur={input.onBlur}
+          error={errors[name]}
+        />
+      )}
+    />
+  );
+
+  return (
+    <Section title={t('profile.passwordTitle')}>
+      {profile.mustChangePassword ? (
+        <>
+          <AppText variant="small" tone="warning">
+            {t('profile.temporaryPassword')}
+          </AppText>
+          <AppText variant="small" tone="muted">
+            {t('profile.temporaryPasswordHint')}
+          </AppText>
+        </>
+      ) : (
+        <AppText variant="small" tone="muted">
+          {t('profile.passwordIntro')}
+        </AppText>
+      )}
+      <Button variant="secondary" onPress={() => setEditing(true)}>
+        {t('profile.changePassword')}
+      </Button>
+      <Sheet
+        open={editing}
+        onClose={() => setEditing(false)}
+        title={t('profile.changePassword')}
+      >
+        {editing ? (
+          <View style={styles.stack}>
+            <AppText variant="small" tone="muted">
+              {t('profile.passwordSignsOut')}
+            </AppText>
+            {field('currentPassword', t('profile.currentPassword'))}
+            {field('password', t('auth.newPassword'))}
+            {field('confirmPassword', t('auth.confirmPassword'))}
+            <Button
+              onPress={handleSubmit((values) =>
+                change.mutate({
+                  currentPassword: values.currentPassword,
+                  password: values.password,
+                }),
+              )}
+              loading={change.isPending}
+            >
+              {t('profile.changePassword')}
+            </Button>
+          </View>
+        ) : null}
+      </Sheet>
+    </Section>
   );
 }
 
@@ -527,6 +750,10 @@ export default function Profile() {
   const router = useRouter();
   const status = useAuthStore((s) => s.status);
   const { logout } = useAuth();
+  // The temporary-password reminder links straight to the password form
+  // (components/common/NoticeHost.jsx).
+  const params = useLocalSearchParams();
+  const openPasswordSheet = params.changePassword === '1';
   // Back to the home screen first, then end the session, so this screen never
   // flashes its signed-out redirect.
   const signOut = () => {
@@ -552,10 +779,12 @@ export default function Profile() {
       {profile ? (
         <>
           <Section title={t('profile.details')}>
+            <CompletionStatus profile={profile} />
             <ProfileForm key={profile.updatedAt} profile={profile} />
             <EmailSection profile={profile} />
             <PhoneSection profile={profile} />
           </Section>
+          <PasswordSection profile={profile} openOnMount={openPasswordSheet} />
           <Section title={t('profile.notifications')}>
             <NotificationPreferences profile={profile} />
           </Section>

@@ -71,6 +71,12 @@ export function describeEvent(event, { t, playerName, teamName }) {
       });
     case 'injury':
       return t('commentary.injury', { team, player: playerName(event.player) });
+    // The controller's two corrections. They score nothing, so the feed says
+    // plainly what was changed and by whom.
+    case 'raid_cancelled':
+      return t('commentary.raidCancelled');
+    case 'next_raid_override':
+      return t('commentary.nextRaidOverride', { team });
     default:
       return '';
   }

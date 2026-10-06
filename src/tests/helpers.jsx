@@ -59,7 +59,7 @@ export const fail = (status, code) => ({
 export function resetSession() {
   SecureStore.__store.clear();
   useAuthStore.setState({ user: null, accessToken: null, status: 'unknown' });
-  useNoticeStore.setState({ notice: null });
+  useNoticeStore.setState({ notice: null, prompts: [], raised: {} });
 }
 
 export async function renderWithQuery(element) {

@@ -3,7 +3,7 @@
 // rules; messages are i18n keys, translated where the error is rendered. The
 // API remains the authority.
 import { z } from 'zod';
-import { MANAGER_ROLES } from './constants.js';
+import { ORGANISER_ROLES } from './constants.js';
 import { isKnownDistrict, isKnownState } from './india.js';
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -99,6 +99,40 @@ const requiredPhoneField = z
 // OTP flows are India-only, matching the API.
 const indianMobileField = requiredPhoneField.regex(INDIAN_MOBILE_PATTERN, 'validation.phoneIndia');
 
+// The shirt number a player is known by: asked for at sign-up and kept on the
+// profile, so it is defined before the schemas that need it.
+const jerseyField = requiredNumber(
+  z
+    .number({ required_error: 'validation.required', invalid_type_error: 'validation.jersey' })
+    .int('validation.jersey')
+    .min(0, 'validation.jersey')
+    .max(99, 'validation.jersey'),
+);
+
+// The measurements a player profile carries, shared by the player forms and the
+// account's own profile screen. All three are optional and never block profile
+// completion (API modules/users/profileState.js).
+const sportsFields = {
+  // "" means "not set", like the optional numbers below, so a caller with no
+  // birthday to give parses exactly as one that cleared it.
+  dob: z
+    .union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.date')])
+    .default(''),
+  heightCm: optionalNumber(
+    z
+      .number({ invalid_type_error: 'validation.number' })
+      .int()
+      .min(100, 'validation.height')
+      .max(250, 'validation.height'),
+  ),
+  weightKg: optionalNumber(
+    z
+      .number({ invalid_type_error: 'validation.number' })
+      .min(30, 'validation.weight')
+      .max(200, 'validation.weight'),
+  ),
+};
+
 const passwordsMatch = (values) => values.password === values.confirmPassword;
 const passwordMismatch = { path: ['confirmPassword'], message: 'validation.passwordMismatch' };
 
@@ -114,10 +148,14 @@ export const otpLoginSchema = z.object({ phone: indianMobileField });
 // genuinely optional.
 export const registerPhoneSchema = z.object({ phone: indianMobileField });
 
+// The jersey number is part of who a player is on a kabaddi team, so signing up
+// asks for it (API auth.validation.registerSchema). Birthday, height and weight
+// are not sign-up fields — they are filled in later, on the profile.
 export const registerProfileSchema = withLocation(
   z
     .object({
       name: nameField,
+      jerseyNumber: jerseyField,
       email: optionalField(emailField),
       password: passwordField,
       confirmPassword: z.string(),
@@ -137,13 +175,14 @@ export const phoneResetSchema = z
 
 export const changePhoneSchema = z.object({ phone: indianMobileField });
 
-// Which contact an account must keep depends on its role: managers are
-// recovered by email, everyone else is reached on the phone — and only for a
-// contact the account already has (mirrors contactRequirement() on the API).
+// Which contact an account must keep depends on its role: organisers (Admin,
+// Manager, Super Admin) are recovered by email, everyone else is reached on the
+// phone — and only for a contact the account already has (mirrors
+// contactRequirement() on the API).
 export function profileSchemaFor(role, { hasPhone = false, hasEmail = false } = {}) {
-  const manager = MANAGER_ROLES.includes(role);
-  const mustKeepEmail = manager && hasEmail;
-  const mustKeepPhone = !manager && hasPhone;
+  const organiser = ORGANISER_ROLES.includes(role);
+  const mustKeepEmail = organiser && hasEmail;
+  const mustKeepPhone = !organiser && hasPhone;
 
   return z
     .object({
@@ -151,6 +190,10 @@ export function profileSchemaFor(role, { hasPhone = false, hasEmail = false } = 
       email: mustKeepEmail ? emailField : optionalField(emailField),
       phone: mustKeepPhone ? requiredPhoneField : optionalField(phoneField),
       avatarUrl: optionalField(urlField),
+      // The player half of the account (PATCH /users/me writes it to the
+      // player profile). An organiser has no player profile, so the form does
+      // not show these and the schema does not ask for them.
+      ...(organiser ? {} : { jerseyNumber: jerseyField, ...sportsFields }),
       ...locationFields,
     })
     .refine((values) => Boolean(values.email || values.phone), {
@@ -159,6 +202,17 @@ export function profileSchemaFor(role, { hasPhone = false, hasEmail = false } = 
     })
     .superRefine(checkLocation);
 }
+
+// Replacing your own password: the current one is always required, including
+// for an account still holding the temporary password it was created with
+// (API POST /users/me/password).
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'validation.required'),
+    password: passwordField,
+    confirmPassword: z.string(),
+  })
+  .refine(passwordsMatch, passwordMismatch);
 
 export const teamSchema = withLocation(
   z.object({
@@ -184,56 +238,39 @@ export const teamSchema = withLocation(
   }),
 );
 
-const jerseyField = requiredNumber(
-  z
-    .number({ required_error: 'validation.required', invalid_type_error: 'validation.jersey' })
-    .int('validation.jersey')
-    .min(0, 'validation.jersey')
-    .max(99, 'validation.jersey'),
-);
 const roleField = z.enum(['raider', 'defender', 'all_rounder'], {
   errorMap: () => ({ message: 'validation.required' }),
 });
 
 const profileFields = {
   photoUrl: optionalUrl,
-  dob: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'validation.date')]),
-  heightCm: optionalNumber(
-    z
-      .number({ invalid_type_error: 'validation.number' })
-      .int()
-      .min(100, 'validation.height')
-      .max(250, 'validation.height'),
-  ),
-  weightKg: optionalNumber(
-    z
-      .number({ invalid_type_error: 'validation.number' })
-      .min(30, 'validation.weight')
-      .max(200, 'validation.weight'),
-  ),
+  ...sportsFields,
   hometown: text(80),
   bio: text(500),
   ...locationFields,
 };
 
 export const playerProfileSchema = withLocation(z.object({ name: nameField, ...profileFields }));
-export const playerSchema = withLocation(
+export const membershipSchema = z.object({ jerseyNumber: jerseyField, playingRole: roleField });
+
+// A player who has no account yet, added straight into the squad
+// (POST /teams/:teamId/players/direct). Name, number and jersey are required;
+// the state and district are not. This replaced inviting a player by WhatsApp.
+export const directPlayerSchema = withLocation(
   z.object({
     name: nameField,
+    phone: indianMobileField,
     jerseyNumber: jerseyField,
     playingRole: roleField,
-    ...profileFields,
+    ...locationFields,
   }),
 );
-export const membershipSchema = z.object({ jerseyNumber: jerseyField, playingRole: roleField });
-// A player invited by phone: only what the captain knows before they sign up.
-export const invitePlayerSchema = z.object({
-  name: nameField,
-  jerseyNumber: jerseyField,
-  playingRole: roleField,
+
+// Finding a player who already has an account, by name or by mobile number
+// (POST /users/search). Two characters is the API's own minimum.
+export const playerSearchSchema = z.object({
+  query: z.string().trim().min(2, 'app.searchMin').max(100, 'validation.tooLong'),
 });
-// Squad lookups by phone are India-only, like the OTP the invitee will use.
-export const phoneLookupSchema = z.object({ phone: indianMobileField });
 
 // Converts form strings to API payload values: "" → null for optional fields.
 export function blankToNull(values, keys) {

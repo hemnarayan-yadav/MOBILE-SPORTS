@@ -12,12 +12,11 @@ export const invitationsApi = {
   lookup: ({ phone, otpToken }) =>
     apiClient.post('/invitations/lookup', { phone, otpToken }).then(unwrap),
 
-  // For the team's captain. The API sends the link on WhatsApp and never
-  // returns a token; responses carry the invitation and its `delivery` state.
+  // For the team's captain. Inviting is retired — a captain now adds a player
+  // directly (teamsApi.addDirectPlayer) and the API has no create or resend
+  // endpoint any more. What is left serves the invitations sent before the
+  // change: they can still be listed and cancelled, and still be accepted.
   listForTeam: (teamId) => apiClient.get(`/teams/${teamId}/invitations`).then(unwrap),
-  create: (teamId, payload) => apiClient.post(`/teams/${teamId}/invitations`, payload).then(unwrap),
-  resend: (teamId, invitationId) =>
-    apiClient.post(`/teams/${teamId}/invitations/${invitationId}/resend`).then(unwrap),
   cancel: (teamId, invitationId) =>
     apiClient.delete(`/teams/${teamId}/invitations/${invitationId}`).then(unwrap),
 };

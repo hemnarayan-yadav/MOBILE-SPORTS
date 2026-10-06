@@ -65,6 +65,29 @@ describe('live match', () => {
     expect(within(row).getByText('2')).toBeTruthy();
   });
 
+  // The controller's two corrections. Neither scores anything, so the feed has
+  // to say in words what was changed.
+  it('reads the controller’s corrections in the feed', async () => {
+    const corrected = structuredClone(live);
+    corrected.live.events = [
+      ...corrected.live.events,
+      { type: 'raid_cancelled', half: 1, team: 'A', raidNumber: 4, at: '2026-09-15T10:12:00.000Z' },
+      {
+        type: 'next_raid_override',
+        half: 1,
+        team: 'B',
+        previousTeam: 'A',
+        at: '2026-09-15T10:13:00.000Z',
+      },
+    ];
+    await openMatch(corrected);
+
+    expect(screen.getByText('Last raid cancelled by controller.')).toBeTruthy();
+    expect(
+      screen.getByText(`The controller gave the next raid to ${corrected.teamB.name}.`),
+    ).toBeTruthy();
+  });
+
   it('says when the live connection is being restored', async () => {
     mockSocket.connected = false;
     await openMatch(live);

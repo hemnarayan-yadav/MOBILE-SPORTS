@@ -109,7 +109,8 @@
     "sectionManage": "मैनेज करें",
     "sectionPlatform": "प्लेटफ़ॉर्म",
     "sectionContent": "कंटेंट",
-    "sectionAccount": "अकाउंट"
+    "sectionAccount": "अकाउंट",
+    "rankedMatches": "रैंक वाले मैच"
   },
   "round": {
     "league": "लीग",
@@ -327,15 +328,15 @@
     "invitationNotFound": "यह बुलावे का लिंक सही नहीं है।",
     "noAccountForPhone": "इस नंबर से कोई KhelScore अकाउंट नहीं है।",
     "accountUnavailable": "इस अकाउंट को अभी टीम में नहीं जोड़ा जा सकता।",
+    "accountNotFound": "आपने जो खिलाड़ी चुना था, उसका अकाउंट अब नहीं है।",
+    "duplicateTeamMember": "यह खिलाड़ी पहले से लिस्ट में है",
+    "otpAuthNotAllowed": "यह अकाउंट ईमेल और पासवर्ड से साइन इन करता है।",
+    "passwordChangeRequired": "स्क्वाड संभालने से पहले अपना अस्थायी पासवर्ड बदलें।",
     "playerAlreadyInSquad": "यह खिलाड़ी पहले से आपकी टीम में है।",
     "playerInAnotherSquad": "यह खिलाड़ी पहले से दूसरी टीम में है।",
     "playerProfileDeleted": "इस खिलाड़ी की प्रोफ़ाइल हटा दी गई है। सपोर्ट से संपर्क करें।",
     "playerSportMismatch": "यह खिलाड़ी कोई दूसरा खेल खेलता है।",
-    "accountExists": "इस नंबर का KhelScore अकाउंट पहले से है। खिलाड़ी को सीधे जोड़ें।",
-    "invitationAlreadyPending": "इस नंबर का आपकी टीम में पहले से एक खुला बुलावा है।",
     "invitationNotPending": "यह बुलावा अब खुला नहीं है।",
-    "invitationResendTooSoon": "बुलावा अभी-अभी भेजा गया है। दोबारा भेजने से पहले एक मिनट रुकें।",
-    "invitationResendLimit": "यह बुलावा कई बार भेजा जा चुका है। इसे रद्द करके खिलाड़ी को फिर बुलाएं।",
     "otpEmailMismatch": "यह कोड किसी दूसरे ईमेल के लिए भेजा गया था।",
     "emailNotRegistered": "इस ईमेल से कोई अकाउंट नहीं है।",
     "emailAlreadyVerified": "यह ईमेल पहले ही पक्का हो चुका है।",
@@ -393,7 +394,8 @@
     "emailOptionalHint": "सिर्फ़ पासवर्ड रिकवरी और अपडेट के लिए। बाद में भी जोड़ सकते हैं।",
     "emailResetHint": "आपके ईमेल पर वन-टाइम कोड भेजेंगे, फिर नया पासवर्ड सेट करें।",
     "emailResetSubmit": "वेरिफाई करके पासवर्ड बदलें",
-    "useAnotherPhone": "नंबर बदलें"
+    "useAnotherPhone": "नंबर बदलें",
+    "jerseyHint": "वह नंबर जिससे आप पहचाने जाते हैं। टीम में खेलने वाला नंबर आपका कप्तान तय करता है।"
   },
   "otp": {
     "title": "कोड डालें",
@@ -457,7 +459,26 @@
     "deleteCaptainNote": "आप टीम कैप्टन हैं। पहले टीम किसी और कैप्टन को दें या टीम बंद करें, वरना डिलीट नहीं होगा।",
     "deletePasswordHint": "पुष्टि के लिए अपना पासवर्ड डालें।",
     "deleteWithOtp": "इसकी जगह कोड से पुष्टि करें",
-    "deleteDone": "आपका अकाउंट डिलीट हो गया है।"
+    "deleteDone": "आपका अकाउंट डिलीट हो गया है।",
+    "jerseyHint": "वह नंबर जिससे आप पहचाने जाते हैं।",
+    "ageLine": "उम्र {{age}}",
+    "complete": "प्रोफ़ाइल पूरी है",
+    "incomplete": "प्रोफ़ाइल अधूरी है",
+    "incompleteFields": "अभी बाकी: {{fields}}",
+    "field": {
+      "name": "नाम",
+      "phone": "मोबाइल नंबर",
+      "email": "ईमेल",
+      "jerseyNumber": "जर्सी नंबर"
+    },
+    "passwordTitle": "पासवर्ड",
+    "passwordIntro": "जिस पासवर्ड से आप साइन इन करते हैं, उसे बदलें।",
+    "passwordSignsOut": "पासवर्ड बदलने पर आप हर डिवाइस से साइन आउट हो जाएँगे। नए पासवर्ड से फिर साइन इन करें।",
+    "temporaryPassword": "इस अकाउंट में अभी शुरुआती अस्थायी पासवर्ड चल रहा है। स्क्वाड संभालने के लिए अपना पासवर्ड बनाएँ।",
+    "temporaryPasswordHint": "अस्थायी पासवर्ड यानी आपके मोबाइल नंबर के आखिरी 4 अंक और उसके बाद आपका जर्सी नंबर।",
+    "changePassword": "पासवर्ड बदलें",
+    "currentPassword": "अभी का पासवर्ड",
+    "passwordChanged": "पासवर्ड बदल गया। कृपया फिर साइन इन करें।"
   },
   "location": {
     "state": "राज्य",
@@ -492,10 +513,12 @@
     "weight": "वज़न 30 से 200 किलो के बीच होना चाहिए",
     "stateUnknown": "सूची में से राज्य चुनें",
     "districtNeedsState": "पहले राज्य चुनें",
-    "districtNotInState": "यह ज़िला चुने गए राज्य में नहीं है"
+    "districtNotInState": "यह ज़िला चुने गए राज्य में नहीं है",
+    "searchMin": "कम से कम 2 अक्षर डालें"
   },
   "roles": {
     "super_admin": "सुपर एडमिन",
+    "manager": "मैनेजर",
     "admin": "एडमिन",
     "captain": "कप्तान",
     "user": "यूज़र"
@@ -522,11 +545,11 @@
     "createTeamTitle": "अपनी टीम बनाएँ",
     "createTeamSubtitle": "स्क्वॉड सेट करें और टूर्नामेंट खेलना शुरू करें।",
     "myTeamTitle": "मेरी टीम",
-    "myTeamSubtitle": "स्क्वॉड, इनवाइट और मैच।",
+    "myTeamSubtitle": "स्क्वॉड और मैच।",
+    "organiserNoTeam": "यह अकाउंट टूर्नामेंट संभालता है, इसकी अपनी कोई टीम नहीं है। ऑर्गनाइज़र वाले टूल वेबसाइट पर हैं।",
     "updateTitle": "KhelScore अपडेट करें",
     "updateBody": "ऐप का यह वर्ज़न अब नहीं चलता। आगे बढ़ने के लिए नया वर्ज़न इंस्टॉल करें।",
     "updateCta": "अभी अपडेट करें",
-    "joinedTeam": "आप {{team}} की टीम में शामिल हो गए हैं।",
     "onWebsite": "वेबसाइट पर",
     "searchLabel": "खोजें",
     "loadingMore": "और लोड हो रहा है…",
@@ -579,7 +602,9 @@
     "substitution": "{{team}}: {{playerOut}} की जगह {{playerIn}} अंदर।",
     "injury": "{{player}} ({{team}}) को चोट लगी।",
     "raidDelayPoint_one": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
-    "raidDelayPoint_other": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।"
+    "raidDelayPoint_other": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
+    "raidCancelled": "कंट्रोलर ने पिछली रेड रद्द कर दी।",
+    "nextRaidOverride": "कंट्रोलर ने अगली रेड {{team}} को दी।"
   },
   "stats": {
     "matches": "मैच",
@@ -894,7 +919,20 @@
     "playerActions": "{{name}} के एक्शन",
     "editJerseyRole": "जर्सी या रोल बदलें",
     "release": "स्क्वॉड से रिलीज़ करें",
-    "releaseConfirm": "{{name}} को स्क्वॉड से रिलीज़ करें? प्रोफ़ाइल और मैच रिकॉर्ड बना रहेगा।"
+    "releaseConfirm": "{{name}} को स्क्वॉड से रिलीज़ करें? प्रोफ़ाइल और मैच रिकॉर्ड बना रहेगा।",
+    "searchLabel": "नाम या मोबाइल नंबर",
+    "searchHint": "खिलाड़ी को KhelScore पर खोजें। मोबाइल नंबर से सीधे वही अकाउंट मिलता है।",
+    "search": "खोजें",
+    "searchResults": "जोड़ने के लिए खिलाड़ी पर टैप करें।",
+    "noMatch": "\"{{query}}\" से KhelScore पर कोई नहीं मिला। नीचे खिलाड़ी को जोड़ें।",
+    "noJersey": "अभी जर्सी नंबर नहीं",
+    "jerseyLine": "जर्सी #{{jersey}}",
+    "alreadyInSquad": "पहले से आपके स्क्वाड में",
+    "hasAccount": "पहले से KhelScore पर",
+    "addToSquad": "स्क्वाड में जोड़ें",
+    "searchAgain": "फिर खोजें",
+    "playerLinked": "{{name}} का KhelScore अकाउंट पहले से था, वही आपके स्क्वाड में जोड़ दिया।",
+    "directPhoneHint": "उनका भारतीय मोबाइल नंबर। इसी से उनका अकाउंट बनेगा — कोई मैसेज कहीं नहीं जाएगा।"
   },
   "live": {
     "raiding": "{{player}} रेड पर है",
@@ -960,22 +998,7 @@
     "teamStats": "टीम के आंकड़े"
   },
   "teamInvite": {
-    "byPhone": "फ़ोन नंबर से",
-    "withoutPhone": "बिना फ़ोन के",
-    "phoneHint": "खिलाड़ी का मोबाइल नंबर। हम देखेंगे कि वे पहले से KhelScore पर हैं या नहीं।",
-    "continue": "आगे बढ़ें",
-    "hasAccount": "पहले से KhelScore पर हैं",
-    "alreadyInSquad": "{{name}} पहले से आपकी टीम में हैं।",
-    "addExistingHint": "टीम में जोड़ने के लिए उनका जर्सी नंबर और रोल चुनें।",
-    "addToSquad": "टीम में जोड़ें",
-    "noAccount": "{{phone}} अभी KhelScore पर किसी का नंबर नहीं है। खिलाड़ी अभी आपकी टीम में जुड़ जाएंगे और अकाउंट बनाने के लिए उन्हें WhatsApp पर बुलावा जाएगा।",
-    "send": "जोड़ें और बुलावा भेजें",
-    "sent": "{{name}} जुड़ गए। WhatsApp बुलावा भेजा जा रहा है।",
-    "unavailable": "अभी किसी टीम में नहीं जोड़ा जा सकता।",
-    "changeNumber": "दूसरा नंबर डालें",
     "title": "बुलावे",
-    "subtitle": "बुलाए गए खिलाड़ी आपकी टीम में पहले से हैं। वे WhatsApp लिंक से KhelScore पर जुड़ते हैं।",
-    "empty": "कोई खुला बुलावा नहीं।",
     "invitedTag": "बुलाया गया",
     "status": {
       "pending": "जुड़ने का इंतज़ार",
@@ -983,22 +1006,13 @@
       "accepted": "जुड़ गए",
       "cancelled": "रद्द"
     },
-    "delivery": {
-      "none": "अभी भेजा नहीं गया",
-      "sending": "WhatsApp पर भेजा जा रहा है…",
-      "sent": "WhatsApp पर भेजा गया {{when}}",
-      "failed": "भेजा नहीं जा सका। दोबारा भेजकर देखें।",
-      "undeliverable": "इस नंबर पर WhatsApp बुलावा नहीं पहुंच सकता।"
-    },
     "expires": "{{date}} तक मान्य",
-    "resend": "दोबारा भेजें",
-    "resendFor": "{{name}} को बुलावा दोबारा भेजें",
-    "resent": "{{name}} को नया बुलावा लिंक भेजा जा रहा है। पुराना लिंक अब काम नहीं करेगा।",
     "cancel": "बुलावा रद्द करें",
     "cancelFor": "{{name}} का बुलावा रद्द करें",
     "cancelled": "{{name}} का बुलावा रद्द हुआ। टीम में उनकी जगह खाली हो गई।",
     "cancelTitle": "बुलावा रद्द करें?",
-    "cancelConfirm": "{{name}} आपकी टीम से हट जाएंगे और उनका बुलावा लिंक काम करना बंद कर देगा। बाद में आप उन्हें फिर बुला सकते हैं।"
+    "cancelConfirm": "{{name}} आपकी टीम से हट जाएंगे और उनका बुलावा लिंक काम करना बंद कर देगा। बाद में आप उन्हें फिर बुला सकते हैं।",
+    "subtitle": "ये न्योते तब भेजे गए थे जब KhelScore न्योते भेजता था। ये खिलाड़ी आपके स्क्वाड में पहले से हैं और अपने लिंक से जुड़ सकते हैं।"
   },
   "join": {
     "title": "टीम का बुलावा",
@@ -1047,5 +1061,35 @@
   },
   "dashboard": {
     "welcome": "स्वागत है, {{name}}"
+  },
+  "notice": {
+    "welcomeTitle": "KhelScore में आपका स्वागत है!",
+    "welcomeText": "आपका अकाउंट तैयार है। अभी दो काम कर लेने चाहिए:",
+    "welcomeProfile": "प्रोफ़ाइल पूरी करें",
+    "welcomeProfileText": "अपनी हाइट, वज़न और जन्मदिन जोड़ें, जिससे आपका प्लेयर पेज पूरा दिखे।",
+    "welcomeTeams_one": "आप एक टीम में हैं",
+    "welcomeTeams_other": "आप {{count}} टीमों में हैं",
+    "welcomeTeamsText": "अपनी टीम, उसका स्क्वाड और मैच देखें।",
+    "completeProfile": "प्रोफ़ाइल पूरी करें",
+    "viewTeams_one": "मेरी टीम देखें",
+    "viewTeams_other": "मेरी टीमें देखें",
+    "later": "बाद में",
+    "reminderTitle": "अकाउंट का बाकी काम पूरा कर लें",
+    "passwordTitle": "अपना पासवर्ड बनाएँ",
+    "passwordText": "इस अकाउंट पर अभी अस्थायी पासवर्ड है। जब तक इसे नहीं बदलेंगे, स्क्वाड में बदलाव नहीं हो पाएगा।",
+    "profileTitle": "प्रोफ़ाइल पूरी करें",
+    "profileText": "आपकी प्रोफ़ाइल में कुछ जानकारी अभी बाकी है।",
+    "profileMissing": "अभी बाकी: {{fields}}",
+    "openProfile": "मेरी प्रोफ़ाइल खोलें"
+  },
+  "rankedMatches": {
+    "pageTitle": "रैंक वाले मैच",
+    "pageSubtitle": "हर वह मैच जो रैंकिंग में गिना जाता है — प्रतियोगिता और तारीख़ के हिसाब से।",
+    "emptyTitle": "अभी कोई रैंक वाला मैच नहीं",
+    "emptyHint": "जैसे ही आयोजक किसी मैच को रैंक वाला चुनते हैं, वह गिना जाने लगता है।",
+    "friendlies": "दोस्ताना मैच",
+    "countedMatches_one": "{{count}} रैंक वाला मैच",
+    "countedMatches_other": "{{count}} रैंक वाले मैच",
+    "linkLabel": "कौन से मैच गिने जाते हैं"
   }
 }

@@ -25,6 +25,7 @@ export const qk = Object.freeze({
   matches: {
     all: ['matches'],
     list: (params) => ['matches', 'list', params],
+    ranked: (params) => ['matches', 'ranked', params],
     detail: (id) => ['matches', 'detail', id],
     headToHead: (a, b) => ['matches', 'h2h', a, b],
   },
@@ -51,6 +52,10 @@ export const qk = Object.freeze({
     all: ['content'],
     news: (params) => ['content', 'news', params],
     article: (slug) => ['content', 'article', slug],
+  },
+  users: {
+    all: ['users'],
+    search: (params) => ['users', 'search', params],
   },
   otp: { config: ['otp', 'config'] },
   media: { config: ['media', 'config'] },

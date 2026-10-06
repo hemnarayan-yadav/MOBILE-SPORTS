@@ -1,7 +1,8 @@
 // The squad desk — adapted from
 // frontend/src/pages/dashboard/captain/SquadManagement.jsx: the squad list with
-// per-player actions, adding by phone or by hand, the playing seven, and the
-// open invitations underneath.
+// per-player actions, adding a player (found by name or number, created on the
+// spot when nobody is found), the playing seven, and whatever invitations the
+// team still has from before inviting was retired.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -48,15 +49,19 @@ function PlayingSeven({ team, onSaved }) {
     onError: (error) => notify.error(t(apiErrorKey(error))),
   });
 
-  const toggle = (playerId) =>
-    setSelected((current) => {
-      if (current.includes(playerId)) return current.filter((id) => id !== playerId);
-      if (current.length >= KABADDI.playersOnCourt) {
-        notify.info(t('squad.playingSevenFull'));
-        return current;
-      }
-      return [...current, playerId];
-    });
+  // The full-squad notice is raised here and not inside the updater: an updater
+  // runs during render, where telling another store to show something is both a
+  // React warning and a way to loop.
+  const toggle = (playerId) => {
+    const chosen = selected.includes(playerId);
+    if (!chosen && selected.length >= KABADDI.playersOnCourt) {
+      notify.info(t('squad.playingSevenFull'));
+      return;
+    }
+    setSelected((current) =>
+      chosen ? current.filter((id) => id !== playerId) : [...current, playerId],
+    );
+  };
 
   if (team.squad.length === 0) {
     return <EmptyState title={t('squad.emptyTitle')} hint={t('squad.emptyCaptain')} />;
@@ -118,7 +123,6 @@ function Squad({ team, view, onView }) {
   const onError = (error) => notify.error(t(apiErrorKey(error)));
 
   const [adding, setAdding] = useState(false);
-  const [addMode, setAddMode] = useState('phone');
   const [actionsFor, setActionsFor] = useState(null);
   const [editingMembership, setEditingMembership] = useState(null);
   const [editingProfileId, setEditingProfileId] = useState(null);
@@ -129,15 +133,6 @@ function Squad({ team, view, onView }) {
     openInvitations(invitations.data).map((invitation) => invitation.player?.id),
   );
 
-  const add = useMutation({
-    mutationFn: (values) => teamsApi.addPlayer(team.id, toPayload(values)),
-    onSuccess: (member) => {
-      notify.success(t('squad.playerAdded', { name: member.player.name }));
-      setAdding(false);
-      refreshTeam();
-    },
-    onError,
-  });
   const updateMember = useMutation({
     mutationFn: ({ playerId, values }) => teamsApi.updateMember(team.id, playerId, values),
     onSuccess: () => {
@@ -203,36 +198,18 @@ function Squad({ team, view, onView }) {
         </>
       )}
 
+      {/* Finding the player is the only way in: search by name or number, and
+          create them only when the search finds nobody
+          (components/team/AddByPhone.jsx). */}
       <Sheet open={adding} onClose={() => setAdding(false)} title={t('squad.addPlayer')}>
         {adding ? (
-          <View style={styles.stack}>
-            <SegmentedControl
-              label={t('squad.addPlayer')}
-              value={addMode}
-              onChange={setAddMode}
-              options={[
-                { value: 'phone', label: t('teamInvite.byPhone') },
-                { value: 'manual', label: t('teamInvite.withoutPhone') },
-              ]}
-            />
-            {addMode === 'phone' ? (
-              <AddByPhone
-                teamId={team.id}
-                onDone={() => {
-                  setAdding(false);
-                  refreshTeam();
-                  queryClient.invalidateQueries({ queryKey: qk.invitations.team(team.id) });
-                }}
-              />
-            ) : (
-              <PlayerForm
-                mode="add"
-                onSubmit={(values) => add.mutate(values)}
-                submitting={add.isPending}
-                submitLabel={t('squad.addPlayer')}
-              />
-            )}
-          </View>
+          <AddByPhone
+            teamId={team.id}
+            onDone={() => {
+              setAdding(false);
+              refreshTeam();
+            }}
+          />
         ) : null}
       </Sheet>
 

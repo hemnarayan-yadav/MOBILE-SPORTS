@@ -65,6 +65,38 @@ const INVITATION = {
   delivery: { status: 'sent', attempts: 1, sentAt: '2026-09-28T10:00:05.000Z', error: null },
 };
 
+// One POST /users/search result: the picture, the name and the jersey number
+// the row shows, and only a masked phone number.
+const MASKED_PHONE = '•••••3210';
+const FOUND = {
+  id: 'u9',
+  name: 'Suresh',
+  avatarUrl: 'https://img.example/suresh.jpg',
+  jerseyNumber: 9,
+  phoneMasked: MASKED_PHONE,
+  playerId: null,
+  inSquad: false,
+};
+
+// Every image source in a rendered tree, so a row's profile picture can be
+// asserted on without reaching into component internals.
+const imageUris = (node) => {
+  if (!node || typeof node !== 'object') return [];
+  const here = node.props?.source?.uri ? [node.props.source.uri] : [];
+  return [...here, ...[].concat(node.children ?? []).flatMap(imageUris)];
+};
+
+// Searching for somebody who does not exist, up to the direct-add form.
+const openDirectAddFor = async (name) => {
+  await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+  await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), name);
+  await fireEvent.changeText(await screen.findByLabelText('Full name'), name);
+  await fireEvent.changeText(screen.getByLabelText('Phone number'), '9812345611');
+};
+// The form's own button, which shares its wording with the one that opened it.
+const submitDirectAdd = () =>
+  fireEvent.press(screen.getAllByRole('button', { name: 'Add player' }).at(-1));
+
 let api;
 
 beforeEach(() => {
@@ -94,6 +126,8 @@ function captainApi(overrides = {}, team = TEAM) {
         return ok([]);
       case '/teams/t1/invitations':
         return ok([INVITATION]);
+      case '/users/search':
+        return ok({ items: [] });
       case '/matches':
         return ok({ items: [], pagination: { page: 1, totalPages: 1, total: 0 } });
       case '/media/config':
@@ -186,74 +220,143 @@ describe('The squad', () => {
     expect(screen.getByText('2 of 25 players')).toBeTruthy();
   });
 
-  it('adds an account that already exists, found by its number', async () => {
+  // Adding a player starts with a search by name or number: an account that
+  // already exists is added, never registered a second time. The row shows the
+  // picture, the name and the jersey number, and never a full phone number.
+  it('finds an account by name and adds it to the squad by its id', async () => {
     api = captainApi({
-      'post /teams/t1/players/lookup': () =>
-        ok({ match: 'user', inSquad: false, user: { id: 'u9', name: 'Suresh', avatarUrl: null } }),
+      'post /users/search': () => ok({ items: [FOUND] }),
       'post /teams/t1/players/existing': () => ok({ player: { id: 'p3', name: 'Suresh' } }, 201),
     });
-    await renderWithQuery(withNotices(<SquadManagement />));
+    const view = await renderWithQuery(withNotices(<SquadManagement />));
 
     await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9812345610');
-    await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
+    await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), 'Suresh');
 
-    expect(await screen.findByText('Suresh')).toBeTruthy();
-    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '11');
+    const row = await screen.findByLabelText('Suresh Jersey #9');
+    expect(screen.getByText(MASKED_PHONE)).toBeTruthy();
+    expect(screen.getByText('#9')).toBeTruthy();
+    expect(imageUris(view.toJSON())).toContain(FOUND.avatarUrl);
+    // Only the masked number is ever rendered.
+    expect(screen.queryByText(/9876543210/)).toBeNull();
+
+    await fireEvent.press(row);
+    await fireEvent.changeText(await screen.findByLabelText('Jersey number'), '11');
     await fireEvent.press(screen.getByRole('button', { name: 'Add to squad' }));
 
     await waitFor(() =>
       expect(api.calls.find((c) => c.url === '/teams/t1/players/existing')?.body).toEqual({
-        phone: '+919812345610',
+        userId: 'u9',
         jerseyNumber: 11,
         playingRole: 'raider',
       }),
     );
+    // Nothing in the squad flow sends an invitation any more.
+    expect(api.calls.some((c) => c.method === 'post' && c.url.endsWith('/invitations'))).toBe(
+      false,
+    );
   });
 
-  it('invites a number with no account, and the invitation carries no token', async () => {
+  // Finding the player is the only way in: the obsolete "Without a phone" tab,
+  // which made a squad place with no account behind it, is gone.
+  it('opens the add sheet straight into the search, with no tab to choose', async () => {
+    api = captainApi({});
+    await renderWithQuery(<SquadManagement />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+
+    expect(await screen.findByLabelText('Name or mobile number')).toBeTruthy();
+    expect(screen.queryByText('Without a phone')).toBeNull();
+    expect(screen.queryByText('Find the player')).toBeNull();
+    // No profile form until the search has found nobody.
+    expect(screen.queryByLabelText('Full name')).toBeNull();
+  });
+
+  it('keeps the direct-add form hidden while the search has results', async () => {
+    api = captainApi({ 'post /users/search': () => ok({ items: [FOUND] }) });
+    await renderWithQuery(<SquadManagement />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+    await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), 'Suresh');
+
+    await screen.findByLabelText('Suresh Jersey #9');
+    expect(screen.queryByLabelText('Full name')).toBeNull();
+  });
+
+  // Only when nobody is found does the direct-add form appear, and it creates
+  // the account and the squad place together — no invitation, no link.
+  it('offers the direct-add form only when nothing is found, and creates the player', async () => {
     api = captainApi({
-      'post /teams/t1/players/lookup': () => ok({ match: 'none' }),
-      'post /teams/t1/invitations': () =>
-        ok({ ...INVITATION, player: { id: 'p4', name: 'Manoj' } }, 201),
+      'post /users/search': () => ok({ items: [] }),
+      'post /teams/t1/players/direct': () =>
+        ok({ player: { id: 'p4', name: 'Manoj' }, accountCreated: true }, 201),
     });
     await renderWithQuery(withNotices(<SquadManagement />));
 
-    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9812345611');
-    await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-
-    await fireEvent.changeText(await screen.findByLabelText('Full name'), 'Manoj');
+    await openDirectAddFor('Manoj');
     await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
-    await fireEvent.press(screen.getByRole('button', { name: 'Add and send invitation' }));
+    await submitDirectAdd();
 
     const sent = await waitFor(() => {
-      const call = api.calls.find((c) => c.url === '/teams/t1/invitations' && c.method === 'post');
+      const call = api.calls.find((c) => c.url === '/teams/t1/players/direct');
       expect(call).toBeTruthy();
       return call;
     });
     expect(sent.body).toEqual({
-      phone: '+919812345611',
       name: 'Manoj',
+      phone: '+919812345611',
       jerseyNumber: 12,
       playingRole: 'raider',
+      location: { state: null, district: null },
     });
     expect(JSON.stringify(sent.body)).not.toContain('token');
+    expect(await screen.findByText('Manoj added to the squad')).toBeTruthy();
+  });
+
+  // A number that turns out to have an account is not an error: the API
+  // attaches that account and says it did not create one.
+  it('says so when the number already had an account', async () => {
+    api = captainApi({
+      'post /users/search': () => ok({ items: [] }),
+      'post /teams/t1/players/direct': () =>
+        ok({ player: { id: 'p4', name: 'Manoj' }, accountCreated: false }, 201),
+    });
+    await renderWithQuery(withNotices(<SquadManagement />));
+
+    await openDirectAddFor('Manoj');
+    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
+    await submitDirectAdd();
+
+    expect(await screen.findByText(/already had a KhelScore account/)).toBeTruthy();
+  });
+
+  // Searching by number and finding nobody carries the number into the form,
+  // so the captain never types it twice.
+  it('carries a searched mobile number into the direct-add form', async () => {
+    api = captainApi({ 'post /users/search': () => ok({ items: [] }) });
+    await renderWithQuery(<SquadManagement />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+    await fireEvent.changeText(
+      await screen.findByLabelText('Name or mobile number'),
+      '9812345611',
+    );
+
+    expect((await screen.findByLabelText('Phone number')).props.value).toBe('9812345611');
+    // A number is not a name, so the name is left for the captain to type.
+    expect(screen.getByLabelText('Full name').props.value).toBe('');
   });
 
   it('translates a jersey number already taken', async () => {
     api = captainApi({
-      'post /teams/t1/players/lookup': () => ok({ match: 'none' }),
-      'post /teams/t1/invitations': () => fail(409, 'JERSEY_NUMBER_TAKEN'),
+      'post /users/search': () => ok({ items: [] }),
+      'post /teams/t1/players/direct': () => fail(409, 'JERSEY_NUMBER_TAKEN'),
     });
     await renderWithQuery(withNotices(<SquadManagement />));
 
-    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9812345611');
-    await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-    await fireEvent.changeText(await screen.findByLabelText('Full name'), 'Manoj');
+    await openDirectAddFor('Manoj');
     await fireEvent.changeText(screen.getByLabelText('Jersey number'), '1');
-    await fireEvent.press(screen.getByRole('button', { name: 'Add and send invitation' }));
+    await submitDirectAdd();
 
     expect(
       await screen.findByText('This jersey number is already taken in the squad'),
@@ -321,17 +424,16 @@ describe('Invitations', () => {
     expect(screen.getByText('+91 9812345610')).toBeTruthy();
   });
 
-  it('resends and cancels, and cancelling asks first', async () => {
+  it('is read-only apart from cancelling, which asks first', async () => {
     api = captainApi({
-      'post /teams/t1/invitations/i1/resend': () => ok(INVITATION, 201),
       'delete /teams/t1/invitations/i1': () => ok({ ...INVITATION, status: 'cancelled' }),
     });
     await renderWithQuery(withNotices(<SquadManagement />));
 
-    await fireEvent.press(await screen.findByLabelText('Send the invitation to Ravi Kumar again'));
-    await waitFor(() =>
-      expect(api.calls.some((c) => c.url === '/teams/t1/invitations/i1/resend')).toBe(true),
-    );
+    await screen.findByText('Invitations');
+    // Sending is retired: no resend, and no delivery state to report.
+    expect(screen.queryByLabelText('Send the invitation to Ravi Kumar again')).toBeNull();
+    expect(screen.queryByText(/WhatsApp/)).toBeNull();
 
     await fireEvent.press(await screen.findByLabelText('Cancel the invitation of Ravi Kumar'));
     expect(api.calls.some((c) => c.method === 'delete')).toBe(false);
@@ -341,6 +443,14 @@ describe('Invitations', () => {
         api.calls.some((c) => c.method === 'delete' && c.url === '/teams/t1/invitations/i1'),
       ).toBe(true),
     );
+  });
+
+  it('shows no invitations section at all once a team has none', async () => {
+    api = captainApi({ '/teams/t1/invitations': () => ok([]) });
+    await renderWithQuery(<SquadManagement />);
+
+    expect(await screen.findByText('Ajay Singh')).toBeTruthy();
+    expect(screen.queryByText('Invitations')).toBeNull();
   });
 });
 
