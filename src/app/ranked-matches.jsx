@@ -14,6 +14,7 @@ import AppText from '../components/common/AppText.jsx';
 import Badge, { StatusBadge } from '../components/common/Badge.jsx';
 import { BackHeader, Card } from '../components/common/Layout.jsx';
 import PagedList from '../components/common/PagedList.jsx';
+import { WinMargin } from '../components/match/MatchResult.jsx';
 import TeamCrest from '../components/team/TeamCrest.jsx';
 import { usePagedQuery } from '../hooks/usePagedQuery.js';
 import { MIN_TOUCH, SPACING } from '../theme/tokens.js';
@@ -83,6 +84,7 @@ function MatchRow({ match }) {
           </AppText>
         </View>
       </View>
+      <WinMargin match={match} />
       {match.status === MATCH_STATUS.LIVE ? (
         <Badge tone="live">{t('match.live')}</Badge>
       ) : (

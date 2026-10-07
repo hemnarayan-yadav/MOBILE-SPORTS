@@ -13,6 +13,7 @@ import AppText from '../common/AppText.jsx';
 import Badge, { StatusBadge } from '../common/Badge.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 import MatchClock from './MatchClock.jsx';
+import { WinMargin } from './MatchResult.jsx';
 
 const DEFAULT_HALF_SECONDS = 20 * 60;
 
@@ -143,6 +144,7 @@ export default function MatchCard({ match }) {
         showScore={showScore}
         winner={completed && match.winner === match.teamB?.id}
       />
+      <WinMargin match={match} />
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <Footer match={match} />
         {match.venue ? (

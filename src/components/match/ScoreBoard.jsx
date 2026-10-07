@@ -14,6 +14,7 @@ import AppText from '../common/AppText.jsx';
 import Countdown from '../common/Countdown.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 import { MatchStatusBadge, halfSecondsOf, phaseKey } from './MatchCard.jsx';
+import { MatchResultBand } from './MatchResult.jsx';
 import MatchClock from './MatchClock.jsx';
 
 function TeamColumn({ team }) {
@@ -112,6 +113,8 @@ export default function ScoreBoard({ match, directory }) {
         </View>
         <TeamColumn team={match.teamB} />
       </View>
+
+      <MatchResultBand match={match} />
 
       {isLive ? <LivePanel match={match} live={live} directory={directory} /> : null}
 

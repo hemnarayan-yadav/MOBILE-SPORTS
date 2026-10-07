@@ -13,6 +13,7 @@ import Avatar from '../../components/common/Avatar.jsx';
 import Badge from '../../components/common/Badge.jsx';
 import { BackHeader, Card, Section, StatTile, TileGrid } from '../../components/common/Layout.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
+import { WinMargin } from '../../components/match/MatchResult.jsx';
 import { CareerStats, PlayingRoleBadge, PointsBars } from '../../components/player/PlayerBits.jsx';
 import TeamCrest from '../../components/team/TeamCrest.jsx';
 import { RADII, SPACING } from '../../theme/tokens.js';
@@ -90,6 +91,7 @@ function RecentMatches({ matches }) {
               {formatDate(m.playedAt)}
               {m.tournament ? ` · ${m.tournament.name}` : ''}
             </AppText>
+            <WinMargin match={m} />
           </View>
           {m.isMvp ? <Badge tone="brand">{t('match.mvp')}</Badge> : null}
           <AppText variant="score">{m.totalPoints}</AppText>

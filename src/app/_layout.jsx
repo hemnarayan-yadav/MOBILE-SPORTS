@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { useAccountPrompts } from '../hooks/useAccountPrompts.js';
@@ -67,15 +68,23 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <SessionBootstrap />
-      <UpdateGate>
-        <Stack
-          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
-        />
-      </UpdateGate>
-      <NoticeHost />
-    </QueryClientProvider>
+    // Everything that measures the screen hangs off this provider: the bottom
+    // tab bar, which has to sit above Android's gesture bar under edge-to-edge
+    // rather than behind it, and the `SafeAreaView` every screen is wrapped in.
+    // Without it the insets are missing and the tab bar is laid out underneath
+    // the system navigation. `initialWindowMetrics` gives the first frame the
+    // real insets, so nothing jumps while the app starts.
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+        <SessionBootstrap />
+        <UpdateGate>
+          <Stack
+            screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
+          />
+        </UpdateGate>
+        <NoticeHost />
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }

@@ -112,6 +112,19 @@ describe('completed match', () => {
     expect(screen.getAllByText(completed.mvp.name).length).toBeGreaterThan(0);
     expect(screen.getByText('Full time')).toBeTruthy();
   });
+
+  // The result in words, not two numbers left to be compared: Team 2 won 2–1.
+  it('announces the winner and the margin', async () => {
+    await openMatch(completed);
+    expect(screen.getByText('Winner')).toBeTruthy();
+    expect(screen.getByText('Team 2 won by 1 point')).toBeTruthy();
+  });
+
+  it('says a tie was a tie, naming nobody', async () => {
+    await openMatch({ ...completed, winner: null, isTie: true, teamBScore: completed.teamAScore });
+    expect(screen.queryByText('Winner')).toBeNull();
+    expect(screen.getAllByText('Match tied').length).toBeGreaterThan(0);
+  });
 });
 
 describe('sport registry', () => {

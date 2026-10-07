@@ -5,7 +5,7 @@
   },
   "src/api/matches.api.js": {
     "source": "src/api/matches.api.js",
-    "sha256": "d0be56a57c0be3c5a3f90227c4922f599cf9b7f3a5714e0a2c778ecb98d6064c"
+    "sha256": "e6f499003e05de8ab86d0abf3bdbde74d097f5224da68374e91c71a5d95f09a4"
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
@@ -17,11 +17,11 @@
   },
   "src/components/match/MatchCard.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "9d3b8e1db2b92c685cebb5e707ff1e5b0f86e99a21a0914326d3c27c10251962"
+    "sha256": "8e0a42004c7a93964a17d87e743bc242ff4ba5cea0b41a666c3995e3c211d5c1"
   },
   "src/components/match/MatchClock.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "9d3b8e1db2b92c685cebb5e707ff1e5b0f86e99a21a0914326d3c27c10251962"
+    "sha256": "8e0a42004c7a93964a17d87e743bc242ff4ba5cea0b41a666c3995e3c211d5c1"
   },
   "src/hooks/useLanguage.js": {
     "source": "src/hooks/useLanguage.js",
@@ -135,6 +135,10 @@
     "source": "src/utils/india.js",
     "sha256": "f04f2eca6ccef5b1bd85a984aeba8a4d20a2118a88d66b48f025a01e0074c740"
   },
+  "src/utils/matchResult.js": {
+    "source": "src/utils/matchResult.js",
+    "sha256": "dedd2bf589652a4737d1a9d77aaac0a8c1bf06792dd027d8b7909e1dc0a5ae39"
+  },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
     "sha256": "36ef7e9598d50d58c4706a8318a11d0d7bdd79fb80003d9b3d5fc636362329ad"
@@ -233,7 +237,7 @@
   },
   "src/components/match/ScoreBoard.jsx": {
     "source": "src/components/match/ScoreBoard.jsx",
-    "sha256": "afe02165a3ea2940240f87c1c2d823d9da108c13bd0ffaf61a5e66acae6c1f74"
+    "sha256": "a07cd1dc54f27eec7e7d370a5e4c8122a2f055e4bd715eaa12609e6203810514"
   },
   "src/components/match/MatchSections.jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
@@ -285,7 +289,7 @@
   },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
-    "sha256": "69c67444f6cb539b835a082e35fdc278dc36db89563010acb719a22be66ffc4d"
+    "sha256": "68d6fae35b42db6fb8b4d04f1b4035cf805f69b2e018d1f25eec82fd9200979e"
   },
   "src/app/news/index.jsx": {
     "source": "src/pages/public/News.jsx",
@@ -401,6 +405,6 @@
   },
   "src/app/ranked-matches.jsx": {
     "source": "src/pages/public/RankedMatches.jsx",
-    "sha256": "3602431d468ee4ae3eaf67aae2d9d56043cda509837a9a5561e9ee9b6532ab0d"
+    "sha256": "1840d0891716f8b6452915e414f93129e8ed7851c7eea079859c1dba61f3eae2"
   }
 }
