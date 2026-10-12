@@ -141,7 +141,7 @@
   },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
-    "sha256": "36ef7e9598d50d58c4706a8318a11d0d7bdd79fb80003d9b3d5fc636362329ad"
+    "sha256": "41af7bff7cffbca39958a824179c7044bf41fc88de76218b9e0e926017004650"
   },
   "src/utils/mediaFile.js": {
     "source": "src/utils/mediaFile.js",
@@ -153,7 +153,7 @@
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "07f03bc24f9384cf0031c12defbda597fbdbaa407ee2229f1e223da1e914245d"
+    "sha256": "6efe936e8fe55ba15672163269faa04026d575152c139b285d4e98243708e299"
   },
   "src/app/auth/forgot-password.jsx": {
     "source": "src/pages/auth/ForgotPassword.jsx",
@@ -161,7 +161,7 @@
   },
   "src/app/dashboard/profile.jsx": {
     "source": "src/pages/dashboard/Profile.jsx",
-    "sha256": "92e1f5077d00a71a5159d50acb412446f19d0e7c71469b186802800db6ed00d1"
+    "sha256": "2604cc84396597085c4009015432e83c71ab0c53ecfc1df15d3800513449e7f1"
   },
   "src/api/teams.api.js": {
     "source": "src/api/teams.api.js",
@@ -329,7 +329,7 @@
   },
   "src/components/player/PlayerForm.jsx": {
     "source": "src/components/player/PlayerForm.jsx",
-    "sha256": "72af023e00ec2b5dd2f277236ec8fbea0d270ff60bc0df3fb6d11d22e748fde3"
+    "sha256": "7ed4e84606674bea1d1fc229f9cb2f79cf4d699f16922d65944613732d7ec776"
   },
   "src/components/team/SquadBits.jsx": {
     "source": "src/components/team/Squad.jsx",

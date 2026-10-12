@@ -72,7 +72,7 @@ const FOUND = {
   id: 'u9',
   name: 'Suresh',
   avatarUrl: 'https://img.example/suresh.jpg',
-  jerseyNumber: 9,
+  jerseyNumber: '9',
   phoneMasked: MASKED_PHONE,
   playerId: null,
   inSquad: false,
@@ -247,7 +247,7 @@ describe('The squad', () => {
     await waitFor(() =>
       expect(api.calls.find((c) => c.url === '/teams/t1/players/existing')?.body).toEqual({
         userId: 'u9',
-        jerseyNumber: 11,
+        jerseyNumber: '11',
         playingRole: 'raider',
       }),
     );
@@ -272,7 +272,9 @@ describe('The squad', () => {
     expect(screen.queryByLabelText('Full name')).toBeNull();
   });
 
-  it('keeps the direct-add form hidden while the search has results', async () => {
+  // A matching name is no proof it is the same person, so the captain is always
+  // offered a new member — but only on request, so the results are seen first.
+  it('offers a new member alongside the results, and opens the form on request', async () => {
     api = captainApi({ 'post /users/search': () => ok({ items: [FOUND] }) });
     await renderWithQuery(<SquadManagement />);
 
@@ -281,11 +283,18 @@ describe('The squad', () => {
 
     await screen.findByLabelText('Suresh Jersey #9');
     expect(screen.queryByLabelText('Full name')).toBeNull();
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Add new member' }));
+
+    // The name that was searched for carries into the form, and nothing has
+    // been created: the account from the results was not touched.
+    expect((await screen.findByLabelText('Full name')).props.value).toBe('Suresh');
+    expect(api.calls.some((c) => c.url.includes('/players/'))).toBe(false);
   });
 
-  // Only when nobody is found does the direct-add form appear, and it creates
-  // the account and the squad place together — no invitation, no link.
-  it('offers the direct-add form only when nothing is found, and creates the player', async () => {
+  // Finding nobody opens the direct-add form by itself, and it creates the
+  // account and the squad place together — no invitation, no link.
+  it('opens the direct-add form when nothing is found, and creates the player', async () => {
     api = captainApi({
       'post /users/search': () => ok({ items: [] }),
       'post /teams/t1/players/direct': () =>
@@ -305,7 +314,7 @@ describe('The squad', () => {
     expect(sent.body).toEqual({
       name: 'Manoj',
       phone: '+919812345611',
-      jerseyNumber: 12,
+      jerseyNumber: '12',
       playingRole: 'raider',
       location: { state: null, district: null },
     });
@@ -347,20 +356,25 @@ describe('The squad', () => {
     expect(screen.getByLabelText('Full name').props.value).toBe('');
   });
 
-  it('translates a jersey number already taken', async () => {
+  // Two players may wear the same number, so the only thing the API still
+  // refuses here is a number it cannot use at all.
+  it('keeps a jersey number exactly as it was typed, leading zero and all', async () => {
     api = captainApi({
       'post /users/search': () => ok({ items: [] }),
-      'post /teams/t1/players/direct': () => fail(409, 'JERSEY_NUMBER_TAKEN'),
+      'post /teams/t1/players/direct': () =>
+        ok({ player: { id: 'p4', name: 'Manoj' }, accountCreated: true }, 201),
     });
     await renderWithQuery(withNotices(<SquadManagement />));
 
     await openDirectAddFor('Manoj');
-    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '1');
+    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '08');
     await submitDirectAdd();
 
-    expect(
-      await screen.findByText('This jersey number is already taken in the squad'),
-    ).toBeTruthy();
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/teams/t1/players/direct')?.body.jerseyNumber).toBe(
+        '08',
+      ),
+    );
   });
 
   it('says the squad is full at 25 and will not open the add sheet', async () => {

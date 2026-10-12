@@ -225,6 +225,7 @@ function ProfileForm({ profile }) {
                 label={t('player.jerseyNumber')}
                 hint={t('profile.jerseyHint')}
                 keyboardType="number-pad"
+                maxLength={2}
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}

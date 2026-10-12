@@ -85,9 +85,6 @@ const optionalNumber = (schema) =>
     (value) => (value === '' || value === null || value === undefined ? null : Number(value)),
     z.union([z.null(), schema]),
   );
-const requiredNumber = (schema) =>
-  z.preprocess((value) => (value === '' ? undefined : Number(value)), schema);
-
 // <PhoneField /> already composes E.164 from the picked country code, so this
 // only checks the result.
 const requiredPhoneField = z
@@ -100,13 +97,18 @@ const requiredPhoneField = z
 const indianMobileField = requiredPhoneField.regex(INDIAN_MOBILE_PATTERN, 'validation.phoneIndia');
 
 // The shirt number a player is known by: asked for at sign-up and kept on the
-// profile, so it is defined before the schemas that need it.
-const jerseyField = requiredNumber(
+// profile, so it is defined before the schemas that need it. Text, not a
+// number, so the shirt keeps its leading zero — "08" is the number worn, not 8
+// — and the API stores exactly what was typed. A number that reaches the schema
+// from saved data is read as its digits.
+const JERSEY_PATTERN = /^\d{1,2}$/;
+const jerseyField = z.preprocess(
+  (value) => (typeof value === 'number' ? String(value) : value),
   z
-    .number({ required_error: 'validation.required', invalid_type_error: 'validation.jersey' })
-    .int('validation.jersey')
-    .min(0, 'validation.jersey')
-    .max(99, 'validation.jersey'),
+    .string({ required_error: 'validation.required' })
+    .trim()
+    .min(1, 'validation.required')
+    .regex(JERSEY_PATTERN, 'validation.jersey'),
 );
 
 // The measurements a player profile carries, shared by the player forms and the

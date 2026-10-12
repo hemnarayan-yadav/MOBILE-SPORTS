@@ -49,7 +49,7 @@ function authApi(overrides = {}) {
       case '/invitations/lookup':
         return ok({
           invitations: [
-            { team: { id: 't1', name: 'Gaon Warriors' }, playerName: 'Asha Devi', jerseyNumber: 7 },
+            { team: { id: 't1', name: 'Gaon Warriors' }, playerName: 'Asha Devi', jerseyNumber: '7' },
           ],
         });
       case '/auth/register':
@@ -158,7 +158,7 @@ describe('Create account', () => {
     expect(await screen.findByText('Account created. Welcome to KhelScore!')).toBeTruthy();
     expect(api.calls.find((c) => c.url === '/auth/register').body).toEqual({
       name: 'Asha Devi',
-      jerseyNumber: 7,
+      jerseyNumber: '7',
       email: '',
       phone: '+919876543210',
       password: 'Kabaddi123',
@@ -191,7 +191,7 @@ describe('Create account', () => {
     await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
     await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
     await waitFor(() =>
-      expect(api.calls.find((c) => c.url === '/auth/register')?.body.jerseyNumber).toBe(12),
+      expect(api.calls.find((c) => c.url === '/auth/register')?.body.jerseyNumber).toBe('12'),
     );
   });
 

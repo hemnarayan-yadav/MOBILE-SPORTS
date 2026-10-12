@@ -71,12 +71,16 @@ describe('account forms (ported from the web)', () => {
 
   // The jersey number is required at sign-up, and the birthday, height and
   // weight are not sign-up fields at all (API auth.validation.registerSchema).
-  it('requires a jersey number in 0..99 at sign-up, and nothing else about the body', () => {
+  it('requires a one or two digit jersey number at sign-up, and nothing else about the body', () => {
     expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '' }).success).toBe(false);
     expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '100' }).success).toBe(false);
     expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '0' }).success).toBe(true);
+    // The zero is part of the number on the shirt, so it is kept as typed.
+    expect(
+      registerProfileSchema.parse({ ...signUp, jerseyNumber: '08' }).jerseyNumber,
+    ).toBe('08');
     const parsed = registerProfileSchema.parse({ ...signUp, dob: '1999-04-21', heightCm: '175' });
-    expect(parsed.jerseyNumber).toBe(7);
+    expect(parsed.jerseyNumber).toBe('7');
     expect(parsed.dob).toBeUndefined();
     expect(parsed.heightCm).toBeUndefined();
   });

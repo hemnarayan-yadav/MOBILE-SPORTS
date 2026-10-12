@@ -143,6 +143,7 @@ export default function PlayerForm({
             label={t('player.jerseyNumber')}
             error={errors.jerseyNumber}
             keyboardType="number-pad"
+            maxLength={2}
           />
           <View style={styles.role}>
             <AppText variant="label">{t('player.playingRole')}</AppText>

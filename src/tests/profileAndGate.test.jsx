@@ -40,7 +40,7 @@ const PROFILE = {
   // server (API users.serializer.serializeAccount, modules/users/profileState).
   profile: {
     playerId: 'p1',
-    jerseyNumber: 7,
+    jerseyNumber: '7',
     heightCm: 175,
     weightKg: 70,
     dob: '1999-04-21',
@@ -144,7 +144,7 @@ describe('Profile', () => {
       const call = api.calls.find((c) => c.method === 'patch' && c.url === '/users/me');
       expect(call?.body).toMatchObject({
         name: 'Asha Devi',
-        jerseyNumber: 11,
+        jerseyNumber: '11',
         heightCm: 175,
         weightKg: 72,
         dob: '1999-04-21',

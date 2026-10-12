@@ -3,8 +3,10 @@
 //
 // Adding a player to the squad. Search first, by name or by mobile number: an
 // account that already exists is added to the squad, so the same person is
-// never registered twice. Only when nothing is found does the direct-add form
-// appear, which creates the account and the squad place together.
+// never registered twice. A matching name is no proof it is the same person,
+// though, so adding a new member is always on offer alongside the results — it
+// creates the account and the squad place together, and the API still refuses a
+// second account for a number that already has one.
 //
 // Inviting a player over WhatsApp is retired — there is no link, no resend and
 // no delivery state here any more. Invitations sent before the change can still
@@ -87,7 +89,7 @@ function ResultRow({ item, onPick }) {
 // A player with no account yet. Name, number and jersey are required; the state
 // and district are not. If the number turns out to have an account after all,
 // the API attaches it instead of creating a second one and says so.
-function DirectAddForm({ teamId, query, onDone }) {
+function DirectAddForm({ teamId, query, found, onDone }) {
   const { t } = useTranslation();
   // A ten-digit search carries over into the number; anything else into the
   // name, so the captain never types what they just searched for twice.
@@ -136,7 +138,7 @@ function DirectAddForm({ teamId, query, onDone }) {
   return (
     <View style={styles.stack}>
       <AppText variant="small" tone="muted" accessibilityLiveRegion="polite">
-        {t('squad.noMatch', { query })}
+        {found ? t('squad.addNewMemberHint') : t('squad.noMatch', { query })}
       </AppText>
       <Controller
         control={control}
@@ -172,6 +174,7 @@ function DirectAddForm({ teamId, query, onDone }) {
           <TextField
             label={t('player.jerseyNumber')}
             keyboardType="number-pad"
+            maxLength={2}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
@@ -264,6 +267,9 @@ export default function AddByPhone({ teamId, onDone }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState(null);
+  // Asked for explicitly when the search did find somebody. Typing again puts
+  // the choice back, so the new results are seen before the form reopens.
+  const [addingNew, setAddingNew] = useState(false);
   const trimmed = useDebouncedValue(query.trim());
   const enabled = trimmed.length >= MIN_QUERY_LENGTH;
 
@@ -285,9 +291,11 @@ export default function AddByPhone({ teamId, onDone }) {
   }
 
   const items = search.data?.items ?? [];
-  // The direct-add form is the fallback, not a choice: it only appears once a
-  // finished search has found nobody.
-  const nothingFound = enabled && search.isSuccess && items.length === 0;
+  const searched = enabled && search.isSuccess;
+  const nothingFound = searched && items.length === 0;
+  // The form opens itself when nothing matched, and on request when something
+  // did; either way only after a finished search.
+  const showNewMember = nothingFound || (searched && addingNew);
   // Nothing found needs no hint: the direct-add form says so itself.
   const hint = !trimmed
     ? 'squad.searchHint'
@@ -299,7 +307,14 @@ export default function AddByPhone({ teamId, onDone }) {
 
   return (
     <View style={styles.stack}>
-      <SearchField value={query} onChange={setQuery} placeholder={t('squad.searchLabel')} />
+      <SearchField
+        value={query}
+        onChange={(value) => {
+          setQuery(value);
+          setAddingNew(false);
+        }}
+        placeholder={t('squad.searchLabel')}
+      />
       {hint ? (
         <AppText variant="small" tone="muted">
           {t(hint)}
@@ -312,7 +327,14 @@ export default function AddByPhone({ teamId, onDone }) {
       {items.map((item) => (
         <ResultRow key={item.id} item={item} onPick={setPicked} />
       ))}
-      {nothingFound ? <DirectAddForm teamId={teamId} query={trimmed} onDone={onDone} /> : null}
+      {searched && !showNewMember ? (
+        <Button variant="secondary" onPress={() => setAddingNew(true)}>
+          {t('squad.addNewMember')}
+        </Button>
+      ) : null}
+      {showNewMember ? (
+        <DirectAddForm teamId={teamId} query={trimmed} found={items.length > 0} onDone={onDone} />
+      ) : null}
     </View>
   );
 }

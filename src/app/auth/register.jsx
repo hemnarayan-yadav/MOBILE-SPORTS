@@ -289,6 +289,7 @@ function ProfileStep({ verified, onChangeNumber }) {
         label: t('player.jerseyNumber'),
         hint: t('auth.jerseyHint'),
         keyboardType: 'number-pad',
+        maxLength: 2,
       })}
       {field('email', {
         label: t('auth.emailOptional'),
