@@ -55,7 +55,9 @@ describe('account forms (ported from the web)', () => {
     confirmPassword: 'kabaddi12',
   };
 
-  it('requires matching passwords with a letter and a digit', () => {
+  // Six characters, and nothing about letters or digits (owner's decision,
+  // 2026-10-14; the API's rule is the same).
+  it('requires matching passwords of at least six characters', () => {
     expect(registerProfileSchema.safeParse(signUp).success).toBe(true);
     expect(registerProfileSchema.safeParse({ ...signUp, confirmPassword: 'other123' }).success).toBe(
       false,
@@ -66,6 +68,10 @@ describe('account forms (ported from the web)', () => {
         password: 'onlyletters',
         confirmPassword: 'onlyletters',
       }).success,
+    ).toBe(true);
+    expect(
+      registerProfileSchema.safeParse({ ...signUp, password: 'short', confirmPassword: 'short' })
+        .success,
     ).toBe(false);
   });
 

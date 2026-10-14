@@ -498,8 +498,7 @@
     "required": "This field is required",
     "emailInvalid": "Enter a valid email address",
     "phoneInvalid": "Enter a valid number with country code, e.g. +919876543210",
-    "passwordMin": "Password must be at least 8 characters",
-    "passwordComplexity": "Password must contain at least one letter and one number",
+    "passwordMin": "Password must be at least 6 characters",
     "passwordMismatch": "Passwords don't match",
     "nameMin": "Name must be at least 2 characters",
     "nameMax": "Name is too long",
@@ -586,7 +585,9 @@
       "pick": "Pick a date",
       "exactSpan": "Or an exact span"
     },
-    "noMatches": "No matches"
+    "noMatches": "No matches",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",

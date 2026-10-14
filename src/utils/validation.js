@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { ORGANISER_ROLES } from './constants.js';
 import { isKnownDistrict, isKnownState } from './india.js';
 
-const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MIN_LENGTH = 6;
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 100;
 const PHONE_PATTERN = /^\+[1-9]\d{7,14}$/;
@@ -29,10 +29,8 @@ const phoneField = z
   .transform(normalizePhone)
   .refine((value) => PHONE_PATTERN.test(value), 'validation.phoneInvalid');
 
-const passwordField = z
-  .string()
-  .min(PASSWORD_MIN_LENGTH, 'validation.passwordMin')
-  .refine((value) => /[A-Za-z]/.test(value) && /\d/.test(value), 'validation.passwordComplexity');
+// Length only, mirroring the API: no letter-and-digit rule.
+const passwordField = z.string().min(PASSWORD_MIN_LENGTH, 'validation.passwordMin');
 
 const urlField = z
   .string()
