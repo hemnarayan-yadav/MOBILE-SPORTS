@@ -5,7 +5,7 @@
   },
   "src/api/matches.api.js": {
     "source": "src/api/matches.api.js",
-    "sha256": "e6f499003e05de8ab86d0abf3bdbde74d097f5224da68374e91c71a5d95f09a4"
+    "sha256": "9f40aa77f1b1e1716fd0b8d7fadc67648e738ce527a07e0155bf7760c6defb18"
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
@@ -201,11 +201,15 @@
   },
   "src/sports/kabaddi/LivePanel.jsx": {
     "source": "src/components/live/RaidClock.jsx",
-    "sha256": "3149745867fcb07eceb0d39e3e1d5eb29aa24b1649bb3fb1ceb1575c46e95ba5"
+    "sha256": "b094f27cc48b80ce2d7da4f37222e8227efb687875189a15ef18ec8e9e610866"
   },
   "src/utils/cloudinary.js": {
     "source": "src/utils/cloudinary.js",
-    "sha256": "6eebeb073bd25e1dd2c005bc2a6fb5331d518ca3961ba8d19b7d3161f265ff91"
+    "sha256": "85ef867c934d86c2d4a6ee155a6bdca61a44cc4220b23ca69094af292b937055"
+  },
+  "src/utils/image.js": {
+    "source": "src/utils/image.js",
+    "sha256": "4f3a0a9b61b82e87b6af63aff40dfc15de9975bf7a269df01034e389467589fa"
   },
   "src/components/common/Badge.jsx": {
     "source": "src/components/common/Badge.jsx",
@@ -213,7 +217,7 @@
   },
   "src/components/common/Avatar.jsx": {
     "source": "src/components/common/Avatar.jsx",
-    "sha256": "37aa0b6c54accfb95bcd3a29acfffac9f7817d2a16f8c3589ec6b02b6c1f1bb2"
+    "sha256": "d23d891404b1302257a06b6ab440885c0589da534c24af3a6a50624939ddbcb1"
   },
   "src/components/common/FollowButton.jsx": {
     "source": "src/components/common/FollowButton.jsx",
@@ -229,7 +233,7 @@
   },
   "src/components/team/TeamCrest.jsx": {
     "source": "src/components/team/TeamCrest.jsx",
-    "sha256": "5ba5f3857833b684c5eacb252e1bb395a7d87f65828348b85043727134bf83d9"
+    "sha256": "d8a025f09f6b09e6250be249679f27145b5028ac0b7bbe6d44c0868f65f6eb26"
   },
   "src/components/team/TeamBits.jsx": {
     "source": "src/components/team/Squad.jsx",
@@ -241,7 +245,7 @@
   },
   "src/components/match/MatchSections.jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "7305237a4e492a1fccd59b7f96202ebc16168c1de1a818bdb6153125283eecb2"
+    "sha256": "b129b60277532d098c9352212b6b3dc95de52057932c9cba8a7ace7763b3105c"
   },
   "src/components/player/PlayerBits.jsx": {
     "source": "src/components/player/PlayerBits.jsx",
@@ -249,11 +253,11 @@
   },
   "src/components/tournament/TournamentBits.jsx": {
     "source": "src/components/tournament/TournamentBits.jsx",
-    "sha256": "b69c9c9ee1a122ce6431aae413e0e68f578fadfaa12c556419d1092fc05694ba"
+    "sha256": "6658871eb8287d65195afc834998710c5ccca09c00e14d4a367db0e7a9678caa"
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
-    "sha256": "db31d36f84a82c80cf921bff0b77f530b2ec7f7b0f2b2a966b0151966bf694c3"
+    "sha256": "e470b4bd2c479b1c82e179e1af8e47b23e89b7df843f1a20b47c4cb5bb70fab5"
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
@@ -269,11 +273,11 @@
   },
   "src/app/match/[id].jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "7305237a4e492a1fccd59b7f96202ebc16168c1de1a818bdb6153125283eecb2"
+    "sha256": "b129b60277532d098c9352212b6b3dc95de52057932c9cba8a7ace7763b3105c"
   },
   "src/app/tournament/[id].jsx": {
     "source": "src/pages/public/TournamentDetails.jsx",
-    "sha256": "efdd6969b90e1ba4104f969ebcfc119a34e6de24f1aeac31d03c2b143c1c5847"
+    "sha256": "5f1833c418d46892eb395883a3ebf7c15462ae656a2fb427bc183f743c5fba12"
   },
   "src/app/team/[id].jsx": {
     "source": "src/pages/public/TeamProfile.jsx",
@@ -293,11 +297,11 @@
   },
   "src/app/news/index.jsx": {
     "source": "src/pages/public/News.jsx",
-    "sha256": "45ad310460e9ec47a32d6ef53641955d91cfc8b55588448802025e70648d0659"
+    "sha256": "bffbd064fde4e5b268cd043d19b0cdf2aa4c10ff18b4d4c98c8c9a3b9434673b"
   },
   "src/app/news/[slug].jsx": {
     "source": "src/pages/public/News.jsx",
-    "sha256": "45ad310460e9ec47a32d6ef53641955d91cfc8b55588448802025e70648d0659"
+    "sha256": "bffbd064fde4e5b268cd043d19b0cdf2aa4c10ff18b4d4c98c8c9a3b9434673b"
   },
   "src/app/dashboard/following.jsx": {
     "source": "src/pages/dashboard/Following.jsx",
@@ -317,11 +321,11 @@
   },
   "src/components/common/ImageField.jsx": {
     "source": "src/components/common/ImageField.jsx",
-    "sha256": "98d7a573f28f049fa06bc9c0b32900b11ba861b9201efea95d0dbc048563672c"
+    "sha256": "b28817faca791cb8cbb408a562c28eb0c9afc40f80beb55a97915512bcf973db"
   },
   "src/components/common/ConfirmDialog.jsx": {
     "source": "src/components/common/ConfirmDialog.jsx",
-    "sha256": "f9ae9c9bbe64c6b483f4ec724a2ef18439f3e4ba62aa22a8ea85aead95417b8f"
+    "sha256": "b91183036429991255773d73fcc808be7e536da32e1ffb8c1e6190b58cbc9059"
   },
   "src/components/team/TeamForm.jsx": {
     "source": "src/components/team/TeamForm.jsx",

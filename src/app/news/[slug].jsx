@@ -13,7 +13,7 @@ import { BackHeader } from '../../components/common/Layout.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { IMAGE_WIDTH, cloudinaryImage } from '../../utils/cloudinary.js';
+import { IMAGE_WIDTH, sizedImage } from '../../utils/image.js';
 import { formatDate } from '../../utils/format.js';
 
 export default function Article() {
@@ -42,9 +42,9 @@ export default function Article() {
           <>
             {post.coverUrl ? (
               <Image
-                source={{ uri: cloudinaryImage(post.coverUrl, { width: IMAGE_WIDTH.hero }) }}
+                source={{ uri: sizedImage(post.coverUrl, { width: IMAGE_WIDTH.hero }) }}
                 style={styles.cover}
-                resizeMode="cover"
+                resizeMode="contain"
                 accessibilityIgnoresInvertColors
               />
             ) : null}

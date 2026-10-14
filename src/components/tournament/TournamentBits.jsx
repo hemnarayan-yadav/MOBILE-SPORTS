@@ -5,7 +5,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { IMAGE_WIDTH, cloudinaryImage } from '../../utils/cloudinary.js';
+import { IMAGE_WIDTH, sizedImage } from '../../utils/image.js';
 import { formatDate, formatNumber, formatPercent } from '../../utils/format.js';
 import { locationLabel } from '../../utils/india.js';
 import { rankTone } from '../../utils/medals.js';
@@ -35,9 +35,9 @@ export function TournamentCard({ tournament }) {
       <View style={[styles.banner, { backgroundColor: colors.ink }]}>
         {tournament.bannerUrl ? (
           <Image
-            source={{ uri: cloudinaryImage(tournament.bannerUrl, { width: IMAGE_WIDTH.card }) }}
+            source={{ uri: sizedImage(tournament.bannerUrl, { width: IMAGE_WIDTH.card }) }}
             style={[StyleSheet.absoluteFill, styles.bannerImage]}
-            resizeMode="cover"
+            resizeMode="contain"
             accessibilityIgnoresInvertColors
           />
         ) : null}
@@ -80,9 +80,9 @@ export function TournamentHero({ tournament, actions }) {
     <View style={[styles.hero, { backgroundColor: colors.ink }]}>
       {tournament.bannerUrl ? (
         <Image
-          source={{ uri: cloudinaryImage(tournament.bannerUrl, { width: IMAGE_WIDTH.hero }) }}
+          source={{ uri: sizedImage(tournament.bannerUrl, { width: IMAGE_WIDTH.hero }) }}
           style={[StyleSheet.absoluteFill, styles.heroImage]}
-          resizeMode="cover"
+          resizeMode="contain"
           accessibilityIgnoresInvertColors
         />
       ) : null}

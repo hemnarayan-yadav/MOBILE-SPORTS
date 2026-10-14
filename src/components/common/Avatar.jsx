@@ -1,7 +1,7 @@
 // Adapted from frontend/src/components/common/Avatar.jsx.
 import { Image, StyleSheet, View } from 'react-native';
 import { useTheme } from '../../theme/useTheme.js';
-import { cloudinaryImage } from '../../utils/cloudinary.js';
+import { sizedImage } from '../../utils/image.js';
 import { initials } from '../../utils/format.js';
 import AppText from './AppText.jsx';
 
@@ -15,8 +15,9 @@ export default function Avatar({ src, name = '', size = 'md' }) {
     <View style={[styles.box, box, { borderColor: colors.border }]} accessible={false}>
       {src ? (
         <Image
-          source={{ uri: cloudinaryImage(src, { width: px, crop: 'fill' }) }}
+          source={{ uri: sizedImage(src, { width: px }) }}
           style={{ width: px, height: px }}
+          resizeMode="contain"
           accessibilityIgnoresInvertColors
         />
       ) : (

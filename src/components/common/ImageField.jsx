@@ -22,7 +22,6 @@ import { FieldMessages } from './TextField.jsx';
 
 const SIZE = 72;
 const WIDE_KINDS = new Set(['team_banner', 'tournament_banner', 'news_cover', 'gallery']);
-const CONTAIN_KINDS = new Set(['team_logo', 'sponsor_logo']);
 const FILE_ERRORS = Object.freeze({
   UNSUPPORTED_FILE_TYPE: 'errors.unsupportedFileType',
   FILE_TOO_LARGE: 'media.tooLarge',
@@ -58,7 +57,7 @@ export default function ImageField({
   const upload = useMutation({
     mutationFn: (file) => mediaApi.upload(kind, file),
     onSuccess: (asset) => {
-      onChange(asset.url);
+      onChange(asset.optimized?.url ?? asset.url);
       notify.success(t('media.uploaded'));
     },
     onError: (failure) => notify.error(t(apiErrorKey(failure))),
@@ -96,7 +95,7 @@ export default function ImageField({
             <Image
               source={{ uri: value }}
               style={styles.image}
-              resizeMode={CONTAIN_KINDS.has(kind) ? 'contain' : 'cover'}
+              resizeMode="contain"
               accessibilityIgnoresInvertColors
             />
           ) : (

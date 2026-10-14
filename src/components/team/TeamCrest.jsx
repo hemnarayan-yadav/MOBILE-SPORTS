@@ -3,7 +3,7 @@
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../theme/useTheme.js';
-import { cloudinaryImage } from '../../utils/cloudinary.js';
+import { sizedImage } from '../../utils/image.js';
 import AppText from '../common/AppText.jsx';
 
 const SIZES = Object.freeze({ xs: 28, sm: 36, md: 48, lg: 64, xl: 88 });
@@ -17,7 +17,7 @@ export default function TeamCrest({ team, size = 'md' }) {
     return (
       <View style={[styles.logo, { width: px, height: px, borderColor: colors.border }]}>
         <Image
-          source={{ uri: cloudinaryImage(team.logoUrl, { width: px }) }}
+          source={{ uri: sizedImage(team.logoUrl, { width: px }) }}
           style={styles.fill}
           resizeMode="contain"
           accessibilityIgnoresInvertColors

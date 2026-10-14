@@ -11,7 +11,7 @@ import PagedList from '../../components/common/PagedList.jsx';
 import { usePagedQuery } from '../../hooks/usePagedQuery.js';
 import { SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { IMAGE_WIDTH, cloudinaryImage } from '../../utils/cloudinary.js';
+import { IMAGE_WIDTH, sizedImage } from '../../utils/image.js';
 import { formatDate } from '../../utils/format.js';
 
 const PAGE_SIZE = 9;
@@ -23,9 +23,9 @@ function PostCard({ post }) {
       <Card style={styles.card}>
         {post.coverUrl ? (
           <Image
-            source={{ uri: cloudinaryImage(post.coverUrl, { width: IMAGE_WIDTH.card }) }}
+            source={{ uri: sizedImage(post.coverUrl, { width: IMAGE_WIDTH.card }) }}
             style={styles.cover}
-            resizeMode="cover"
+            resizeMode="contain"
             accessibilityIgnoresInvertColors
           />
         ) : null}

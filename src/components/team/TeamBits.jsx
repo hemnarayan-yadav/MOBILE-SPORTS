@@ -5,7 +5,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { IMAGE_WIDTH, cloudinaryImage } from '../../utils/cloudinary.js';
+import { IMAGE_WIDTH, sizedImage } from '../../utils/image.js';
 import { KABADDI, PLAYING_ROLES } from '../../utils/constants.js';
 import AppText from '../common/AppText.jsx';
 import Badge, { StatusBadge } from '../common/Badge.jsx';
@@ -52,9 +52,9 @@ export function TeamHero({ team, actions }) {
     <View style={[styles.hero, { backgroundColor: colors.ink }]}>
       {team.bannerUrl ? (
         <Image
-          source={{ uri: cloudinaryImage(team.bannerUrl, { width: IMAGE_WIDTH.hero }) }}
+          source={{ uri: sizedImage(team.bannerUrl, { width: IMAGE_WIDTH.hero }) }}
           style={[StyleSheet.absoluteFill, styles.heroImage]}
-          resizeMode="cover"
+          resizeMode="contain"
           accessibilityIgnoresInvertColors
         />
       ) : null}
