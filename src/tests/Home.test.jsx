@@ -123,19 +123,28 @@ describe('Home (matches preview)', () => {
     await renderHome();
     await screen.findByText('Matches');
 
+    // The button shows the mode it is in — a sun in Light, a moon in Dark —
+    // and names it in words only to a screen reader.
+    expect(screen.getByTestId('ionicon-sunny-outline')).toBeTruthy();
+    expect(screen.queryByText('Light')).toBeNull();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Theme: Light. Tap to change' }));
     expect(useUiStore.getState().theme).toBe('dark');
     expect(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' })).toBeTruthy();
+    expect(screen.getByTestId('ionicon-moon-outline')).toBeTruthy();
+    expect(screen.queryByTestId('ionicon-sunny-outline')).toBeNull();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' }));
     expect(useUiStore.getState().theme).toBe('light');
+    expect(screen.getByTestId('ionicon-sunny-outline')).toBeTruthy();
   });
 
-  it('offers a sign-in icon when signed out and an account icon when signed in', async () => {
+  it('shows the same person icon signed out and signed in, and still goes to both places', async () => {
     matchesApi.list.mockResolvedValue({ items: [] });
     useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS, user: null });
     await renderHome();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Sign in' }));
+    expect(await screen.findByTestId('ionicon-person-circle-outline')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
     expect(router.push).toHaveBeenCalledWith('/auth/login');
 
     await act(() =>
@@ -144,6 +153,8 @@ describe('Home (matches preview)', () => {
         user: { id: 'u1', name: 'Asha', role: 'user' },
       }),
     );
+    // The same glyph — only the label and where it leads change.
+    expect(screen.getByTestId('ionicon-person-circle-outline')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Account' }));
     expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
   });

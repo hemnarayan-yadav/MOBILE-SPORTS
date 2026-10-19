@@ -287,6 +287,69 @@ describe('Create account', () => {
   });
 });
 
+// The show/hide button is in <TextField>, so every password field in the app
+// has it; it is drawn whether the field is empty or full and never depends on
+// the value, the focus or the error state.
+describe('show/hide password', () => {
+  it('stays on the field whether it is empty or filled, and reveals without changing the value', async () => {
+    api = authApi();
+    await renderWithQuery(<Login />);
+
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
+    // There before a single character is typed.
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeTruthy();
+
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
+
+    // And still there with the field filled.
+    await fireEvent.press(screen.getByRole('button', { name: 'Show password' }));
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(false);
+    expect(screen.getByLabelText('Password').props.value).toBe('Kabaddi123');
+    expect(screen.getByTestId('ionicon-eye-off-outline')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Hide password' }));
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
+    expect(screen.getByLabelText('Password').props.value).toBe('Kabaddi123');
+    expect(screen.getByTestId('ionicon-eye-outline')).toBeTruthy();
+  });
+
+  it('gives the sign-up password and its confirmation a button each, and signing up still works', async () => {
+    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
+    await renderWithQuery(<Register />);
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+
+    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
+    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
+    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
+    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
+
+    const [reveal, revealConfirm] = screen.getAllByRole('button', { name: 'Show password' });
+    expect(revealConfirm).toBeTruthy();
+    await fireEvent.press(reveal);
+
+    // One revealed, the other left hidden, and neither value touched.
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(false);
+    expect(screen.getByLabelText('Confirm password').props.secureTextEntry).toBe(true);
+    expect(screen.getByLabelText('Confirm password').props.value).toBe('Kabaddi123');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/auth/register')?.body.password).toBe('Kabaddi123'),
+    );
+  });
+
+  it('leaves the number and the code fields without one', async () => {
+    api = authApi();
+    await renderWithQuery(<Login />);
+
+    expect(screen.getAllByRole('button', { name: /password/i })).toHaveLength(1);
+    expect(screen.getByLabelText('Email or phone number').props.secureTextEntry).toBe(false);
+  });
+});
+
 describe('Forgot password', () => {
   it('resets by phone code and offers the way back to sign in', async () => {
     api = authApi();

@@ -40,9 +40,11 @@ const LEADER_LIMIT = 3;
 const LIVE_REFRESH_MS = 60_000;
 const TABS = Object.freeze([MATCH_STATUS.LIVE, MATCH_STATUS.UPCOMING, MATCH_STATUS.COMPLETED]);
 
-// A person icon when signed in (goes to the profile), a login icon when signed
-// out (goes to sign-in). Nothing while the stored session is still being
-// restored, so the icon does not flicker.
+// The same person icon whether or not anyone is signed in — it is the way to
+// the account either way, and a different glyph per state only made the header
+// change shape on sign-in. Where it goes and what it is called still differ:
+// the profile for a signed-in account, sign-in for a visitor. Nothing while the
+// stored session is still being restored, so the icon does not flicker.
 function AccountIconButton() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -50,7 +52,6 @@ function AccountIconButton() {
   const status = useAuthStore((s) => s.status);
   if (status === AUTH_STATUS.UNKNOWN) return null;
   const signedIn = status === AUTH_STATUS.AUTHENTICATED;
-  const iconName = signedIn ? 'person-circle-outline' : 'log-in-outline';
   const label = t(signedIn ? 'app.accountLabel' : 'app.signInLabel');
   return (
     <Pressable
@@ -60,7 +61,7 @@ function AccountIconButton() {
       hitSlop={8}
       style={[styles.iconButton, { backgroundColor: colors.surface2 }]}
     >
-      <Ionicons name={iconName} size={22} color={colors.text} />
+      <Ionicons name="person-circle-outline" size={22} color={colors.text} />
     </Pressable>
   );
 }

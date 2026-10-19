@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import AppText from './AppText.jsx';
+import { FieldFocusContext } from './fieldFocus.js';
 
 // A bottom sheet over the current screen, the app's counterpart of the web's
 // <Sheet>. The system back gesture and the scrim close it (`onClose`).
@@ -41,7 +42,10 @@ export default function Sheet({ open, onClose, title, children }) {
               </AppText>
             </Pressable>
           </View>
-          {children}
+          {/* A field in here belongs to the sheet, not to the form screen
+              underneath: the panel lifts itself, so the screen behind must not
+              scroll to a field nobody can see. */}
+          <FieldFocusContext.Provider value={null}>{children}</FieldFocusContext.Provider>
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>

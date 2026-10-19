@@ -360,6 +360,8 @@
     "identifierPlaceholder": "you@example.com or +919876543210",
     "password": "Password",
     "confirmPassword": "Confirm password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "name": "Name",
     "email": "Email",
     "phone": "Phone number",
@@ -585,9 +587,7 @@
       "pick": "Pick a date",
       "exactSpan": "Or an exact span"
     },
-    "noMatches": "No matches",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "noMatches": "No matches"
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",

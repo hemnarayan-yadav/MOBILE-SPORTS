@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../hooks/useLanguage.js';
@@ -40,21 +41,22 @@ export function LanguageSwitcher() {
 }
 
 // Toggles Light ↔ Dark. Launch-readiness item #3 dropped System from the app,
-// so the button names the current mode in words rather than an icon.
+// so there are only the two. The button shows the mode it is in — a sun in
+// Light, a moon in Dark — as the web's toggle does (frontend Controls.jsx,
+// THEME_ICONS). The spoken label still names the mode in words.
+const THEME_ICONS = Object.freeze({ light: 'sunny-outline', dark: 'moon-outline' });
+
 export function ThemeToggle() {
   const { t } = useTranslation();
   const { colors, scheme, toggle } = useTheme();
-  const label = t(`theme.${scheme}`);
   return (
     <Pressable
       onPress={toggle}
       accessibilityRole="button"
-      accessibilityLabel={t('theme.toggle', { theme: label })}
+      accessibilityLabel={t('theme.toggle', { theme: t(`theme.${scheme}`) })}
       style={[styles.group, styles.segment, { backgroundColor: colors.surface2 }]}
     >
-      <AppText variant="label" weight="bold">
-        {label}
-      </AppText>
+      <Ionicons name={THEME_ICONS[scheme]} size={20} color={colors.text} />
     </Pressable>
   );
 }

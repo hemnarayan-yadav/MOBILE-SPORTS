@@ -2,17 +2,22 @@
 // in the app so far is an OTP number, which is India-only, so the dialling code
 // is shown, not picked: +91 and ten digits. The value handed to the form is
 // E.164 — exactly what the API stores.
+import { useRef } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { DEFAULT_COUNTRY, countryByCode, joinPhone, splitPhone } from '../../utils/countries.js';
 import AppText from './AppText.jsx';
+import { useFieldFocus } from './fieldFocus.js';
 import { FieldMessages } from './TextField.jsx';
 
 export default function PhoneField({ label, hint, error, value, onChange }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  // Reported to the scrolling frame so the keyboard never covers this field.
+  const onFieldFocus = useFieldFocus();
+  const input = useRef(null);
   const country = countryByCode(DEFAULT_COUNTRY);
   const national = splitPhone(value).national;
   return (
@@ -32,7 +37,9 @@ export default function PhoneField({ label, hint, error, value, onChange }) {
           <AppText weight="semibold">{country.dial}</AppText>
         </View>
         <TextInput
+          ref={input}
           accessibilityLabel={label}
+          onFocus={() => onFieldFocus?.(input.current)}
           value={national}
           onChangeText={(text) => onChange(joinPhone(DEFAULT_COUNTRY, text))}
           keyboardType="number-pad"
