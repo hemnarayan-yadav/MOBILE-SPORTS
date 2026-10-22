@@ -1,9 +1,16 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
 import AppText from './AppText.jsx';
+
+// How long the retry button keeps its spinner even when the attempt settles at
+// once. A failed refetch re-renders the same error state, so without a visible
+// answer the press reads as a dead control — which is how Play review saw it
+// (rejected 2026-10-22, "unresponsive UI elements, such as buttons or icons").
+const RETRY_FEEDBACK_MS = 600;
 
 export function LoadingState() {
   const { t } = useTranslation();
@@ -36,6 +43,36 @@ export function EmptyState({ title, hint }) {
 export function ErrorState({ error, onRetry }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const [retrying, setRetrying] = useState(false);
+  // The press can outlive the screen (a retry that succeeds navigates away),
+  // so the spinner is only cleared while this state still exists.
+  const alive = useRef(true);
+  useEffect(
+    () => () => {
+      alive.current = false;
+    },
+    [],
+  );
+
+  const handleRetry = useCallback(async () => {
+    if (retrying) return;
+    setRetrying(true);
+    try {
+      // `refetch()` settles rather than throwing, but a caller may hand us
+      // anything; a rejection here must not become an unhandled rejection.
+      await Promise.all([
+        Promise.resolve()
+          .then(onRetry)
+          .catch(() => {}),
+        new Promise((resolve) => {
+          setTimeout(resolve, RETRY_FEEDBACK_MS);
+        }),
+      ]);
+    } finally {
+      if (alive.current) setRetrying(false);
+    }
+  }, [onRetry, retrying]);
+
   return (
     <View style={styles.box} accessibilityLiveRegion="polite">
       <AppText weight="semibold" style={styles.center}>
@@ -46,16 +83,22 @@ export function ErrorState({ error, onRetry }) {
       </AppText>
       {onRetry ? (
         <Pressable
-          onPress={onRetry}
+          onPress={handleRetry}
+          disabled={retrying}
           accessibilityRole="button"
+          accessibilityState={{ busy: retrying, disabled: retrying }}
           style={({ pressed }) => [
             styles.retry,
-            { backgroundColor: colors.brandBtn, opacity: pressed ? 0.85 : 1 },
+            { backgroundColor: colors.brandBtn, opacity: pressed || retrying ? 0.85 : 1 },
           ]}
         >
-          <AppText weight="semibold" tone="onBrand">
-            {t('common.retry')}
-          </AppText>
+          {retrying ? (
+            <ActivityIndicator color={colors.onBrand} />
+          ) : (
+            <AppText weight="semibold" tone="onBrand">
+              {t('common.retry')}
+            </AppText>
+          )}
         </Pressable>
       ) : null}
     </View>

@@ -37,6 +37,31 @@ const LIVE_MATCH = {
   clock: { elapsedMs: 300_000, runningSince: null },
 };
 
+const UPCOMING_MATCH = {
+  id: 'm2',
+  status: 'upcoming',
+  tournament: { id: 't1', name: 'Village Cup' },
+  round: 'league',
+  roundLabel: null,
+  teamA: { id: 'c', name: 'Dhamdha Risers' },
+  teamB: { id: 'd', name: 'Hirmi' },
+  teamAScore: null,
+  teamBScore: null,
+  scheduledAt: '2026-11-02T10:00:00.000Z',
+};
+
+const COMPLETED_MATCH = {
+  id: 'm3',
+  status: 'completed',
+  tournament: { id: 't1', name: 'Village Cup' },
+  round: 'league',
+  roundLabel: null,
+  teamA: { id: 'e', name: 'Allbaras' },
+  teamB: { id: 'f', name: 'Hirmi' },
+  teamAScore: 19,
+  teamBScore: 18,
+};
+
 const EMPTY_OVERVIEW = {
   best_raider: { entries: [] },
   best_defender: { entries: [] },
@@ -85,10 +110,68 @@ describe('Home (matches preview)', () => {
     expect(screen.getByText('15:00')).toBeTruthy(); // 20-minute half, 5 minutes played, paused
   });
 
-  it('says so when nothing is live', async () => {
+  // Live is the right tab to open on while a match is on the mat, and an empty
+  // one every other hour of the day. Home now walks the tabs and opens on the
+  // first that has something. Play review saw an app whose every section was
+  // empty (rejected 2026-10-22); landing on a dead tab by default is the same
+  // impression for anyone opening the app between matches.
+  it('falls through to upcoming when nothing is live', async () => {
+    matchesApi.list.mockImplementation(({ status }) =>
+      Promise.resolve(
+        status === 'upcoming'
+          ? { items: [UPCOMING_MATCH], pagination: { total: 1 } }
+          : { items: [], pagination: { total: 0 } },
+      ),
+    );
+    await renderHome();
+
+    expect(await screen.findByText('Dhamdha Risers')).toBeTruthy();
+    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 5 });
+    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'upcoming', limit: 5 });
+  });
+
+  it('falls through again to the last 24 hours when live and upcoming are both empty', async () => {
+    matchesApi.list.mockImplementation(({ status }) =>
+      Promise.resolve(
+        status === 'completed'
+          ? { items: [COMPLETED_MATCH], pagination: { total: 1 } }
+          : { items: [], pagination: { total: 0 } },
+      ),
+    );
+    await renderHome();
+
+    expect(await screen.findByText('Allbaras')).toBeTruthy();
+    expect(matchesApi.list).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'completed', limit: 5 }),
+    );
+  });
+
+  it('settles on upcoming, not completed, when every tab is empty', async () => {
     matchesApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
     await renderHome();
+
+    // "Check back soon" is a kinder place to leave a reader than "nothing
+    // finished today", and the walk must stop rather than cycle for ever.
+    expect(await screen.findByText('No upcoming matches')).toBeTruthy();
+    expect(screen.queryByText('No matches are live right now')).toBeNull();
+  });
+
+  it('stays on the tab the reader picked, even when it is empty', async () => {
+    matchesApi.list.mockImplementation(({ status }) =>
+      Promise.resolve(
+        status === 'upcoming'
+          ? { items: [UPCOMING_MATCH], pagination: { total: 1 } }
+          : { items: [], pagination: { total: 0 } },
+      ),
+    );
+    await renderHome();
+    expect(await screen.findByText('Dhamdha Risers')).toBeTruthy();
+
+    await fireEvent.press(screen.getByText('Live'));
+
+    // Their choice outranks the fallback: it must not bounce them back.
     expect(await screen.findByText('No matches are live right now')).toBeTruthy();
+    expect(screen.queryByText('Dhamdha Risers')).toBeNull();
   });
 
   it('shows a translated error, never the server text, and retries', async () => {

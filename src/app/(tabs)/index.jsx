@@ -5,7 +5,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -155,6 +155,15 @@ function TeamShortcut() {
 function MatchesSection() {
   const { t } = useTranslation();
   const [tab, setTab] = useState(MATCH_STATUS.LIVE);
+  // Live is the right tab to open on when a match is on the mat, and an empty
+  // one every other hour. So the first load walks TABS in order and stops at
+  // the first tab that has something to show. It gives way the moment the
+  // reader picks a tab themselves, and never moves them again afterwards.
+  const [seeking, setSeeking] = useState(true);
+  const pickTab = useCallback((next) => {
+    setSeeking(false);
+    setTab(next);
+  }, []);
   const params = useMemo(
     () =>
       tab === MATCH_STATUS.COMPLETED
@@ -167,6 +176,24 @@ function MatchesSection() {
     queryFn: () => matchesApi.list(params),
     refetchInterval: tab === MATCH_STATUS.LIVE ? LIVE_REFRESH_MS : false,
   });
+  const found = (query.data?.items ?? []).length > 0;
+  useEffect(() => {
+    if (!seeking || query.isPending || query.isError) return;
+    if (found) {
+      setSeeking(false);
+      return;
+    }
+    const next = TABS[TABS.indexOf(tab) + 1];
+    if (next) {
+      setTab(next);
+      return;
+    }
+    // Nothing anywhere: "coming soon" is a kinder empty tab to land on than
+    // "nothing finished today".
+    setTab(MATCH_STATUS.UPCOMING);
+    setSeeking(false);
+  }, [seeking, found, tab, query.isPending, query.isError]);
+
   const tabs = TABS.map((id) => ({
     id,
     label:
@@ -176,7 +203,7 @@ function MatchesSection() {
   }));
   return (
     <Section title={t('home.matchesTitle')} actionTo="/matches" actionLabel={t('common.viewAll')}>
-      <TabStrip tabs={tabs} value={tab} onChange={setTab} label={t('home.matchesTitle')} />
+      <TabStrip tabs={tabs} value={tab} onChange={pickTab} label={t('home.matchesTitle')} />
       {query.isPending ? (
         <LoadingState />
       ) : query.isError ? (

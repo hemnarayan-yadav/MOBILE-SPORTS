@@ -95,7 +95,7 @@ export default function ImageField({
             <Image
               source={{ uri: value }}
               style={styles.image}
-              resizeMode="contain"
+              resizeMode={round ? 'cover' : 'contain'}
               accessibilityIgnoresInvertColors
             />
           ) : (

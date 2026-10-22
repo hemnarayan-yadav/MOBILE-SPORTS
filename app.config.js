@@ -126,6 +126,15 @@ module.exports = () => {
     },
     plugins: [
       'expo-router',
+      // minSdk 26 (Android 8.0), raised from the Expo default of 24.
+      // api.khelscore.in presents Let's Encrypt's current chain, which a client
+      // can only validate through ISRG Root X1 — present in Android's trust
+      // store from 7.1.1 only, and the old cross-sign that covered earlier
+      // releases has expired. On Android 7.x every HTTPS call therefore fails
+      // the TLS handshake and the app shows nothing but "Can't reach the
+      // server", which is how Play review saw it (rejected 2026-10-22). 7.1.0
+      // and 7.1.1 share API 25, so 26 is the lowest level that is certainly safe.
+      ['expo-build-properties', { android: { minSdkVersion: 26 } }],
       // Push notifications. Without an EAS project id and Firebase credentials
       // the app simply reports push unavailable (src/lib/push/expoPush.js).
       'expo-notifications',

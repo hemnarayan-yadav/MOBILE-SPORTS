@@ -217,7 +217,7 @@
   },
   "src/components/common/Avatar.jsx": {
     "source": "src/components/common/Avatar.jsx",
-    "sha256": "d23d891404b1302257a06b6ab440885c0589da534c24af3a6a50624939ddbcb1"
+    "sha256": "703bbf26af66875b6b44736703f7518fa466132bf207179f884f40f7ddeb44f7"
   },
   "src/components/common/FollowButton.jsx": {
     "source": "src/components/common/FollowButton.jsx",
@@ -321,7 +321,7 @@
   },
   "src/components/common/ImageField.jsx": {
     "source": "src/components/common/ImageField.jsx",
-    "sha256": "b28817faca791cb8cbb408a562c28eb0c9afc40f80beb55a97915512bcf973db"
+    "sha256": "11ca6484b39181a82bff6291994f11eaffc89766a8ac3e7e80abe76b7e0abfbf"
   },
   "src/components/common/ConfirmDialog.jsx": {
     "source": "src/components/common/ConfirmDialog.jsx",

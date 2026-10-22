@@ -17,7 +17,7 @@ export default function Avatar({ src, name = '', size = 'md' }) {
         <Image
           source={{ uri: sizedImage(src, { width: px }) }}
           style={{ width: px, height: px }}
-          resizeMode="contain"
+          resizeMode="cover"
           accessibilityIgnoresInvertColors
         />
       ) : (
