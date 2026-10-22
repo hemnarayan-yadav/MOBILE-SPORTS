@@ -15,6 +15,7 @@ import { qk } from '../../api/queryKeys.js';
 import { usersApi } from '../../api/users.api.js';
 import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
+import ConfirmDialog from '../../components/common/ConfirmDialog.jsx';
 import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.jsx';
 import DateField from '../../components/common/DateField.jsx';
 import ImageField from '../../components/common/ImageField.jsx';
@@ -755,9 +756,14 @@ export default function Profile() {
   // (components/common/NoticeHost.jsx).
   const params = useLocalSearchParams();
   const openPasswordSheet = params.changePassword === '1';
+  // The button sits right below Delete account and wears the same danger
+  // colour, so it asks first — signing back in costs a password, or an OTP
+  // when that password has been forgotten.
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
   // Back to the home screen first, then end the session, so this screen never
   // flashes its signed-out redirect.
   const signOut = () => {
+    setConfirmingLogout(false);
     router.dismissTo('/');
     logout.mutate();
   };
@@ -803,9 +809,24 @@ export default function Profile() {
         </>
       ) : null}
       {status === AUTH_STATUS.AUTHENTICATED ? (
-        <Button variant="danger" onPress={signOut} loading={logout.isPending}>
-          {t('nav.logout')}
-        </Button>
+        <>
+          <Button
+            variant="danger"
+            onPress={() => setConfirmingLogout(true)}
+            loading={logout.isPending}
+          >
+            {t('nav.logout')}
+          </Button>
+          <ConfirmDialog
+            open={confirmingLogout}
+            title={t('nav.logout')}
+            message={t('app.logoutConfirm')}
+            confirmLabel={t('nav.logout')}
+            loading={logout.isPending}
+            onCancel={() => setConfirmingLogout(false)}
+            onConfirm={signOut}
+          />
+        </>
       ) : null}
     </Screen>
   );

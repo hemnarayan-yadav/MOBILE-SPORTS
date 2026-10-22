@@ -151,7 +151,7 @@ const open = async () => {
 describe('the date field', () => {
   it('shows the placeholder until a date is picked', async () => {
     await renderWithQuery(<Field />);
-    expect(screen.getByText('Pick a date')).toBeTruthy();
+    expect(await screen.findByText('Pick a date')).toBeTruthy();
   });
 
   it('shows a chosen date in the reader’s format, not the stored one', async () => {

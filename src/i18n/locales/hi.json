@@ -538,6 +538,7 @@
     "remove": "हटाएँ"
   },
   "app": {
+    "logoutConfirm": "KhelScore से लॉग आउट करें? दोबारा साइन इन करना पड़ेगा।",
     "account": "अकाउंट",
     "signInLabel": "साइन इन",
     "accountLabel": "अकाउंट",

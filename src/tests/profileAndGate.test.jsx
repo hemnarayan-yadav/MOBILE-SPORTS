@@ -242,13 +242,38 @@ describe('Profile', () => {
     );
   });
 
-  it('signs out: home first, then the session is revoked and wiped from the device', async () => {
+  // The button sits under Delete account and wears the same danger colour, so
+  // it asks first. Once the sheet is open there are two "Log out" buttons —
+  // the screen's and the sheet's — and the last one is the sheet's.
+  const confirmLogout = async () => {
+    await fireEvent.press(await screen.findByRole('button', { name: 'Log out' }));
+    expect(await screen.findByText(/Log out of KhelScore\?/)).toBeTruthy();
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Log out' }).at(-1));
+  };
+
+  it('asks before signing out, and stays signed in when the question is dismissed', async () => {
     SecureStore.__store.set(REFRESH_KEY, 'rt-1');
     useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
     api = profileApi();
     await renderWithQuery(<Profile />);
 
     await fireEvent.press(await screen.findByRole('button', { name: 'Log out' }));
+    expect(await screen.findByText(/Log out of KhelScore\?/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(router.dismissTo).not.toHaveBeenCalled();
+    expect(api.calls.find((c) => c.url === '/auth/logout')).toBeUndefined();
+    expect(SecureStore.__store.has(REFRESH_KEY)).toBe(true);
+    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.AUTHENTICATED);
+  });
+
+  it('signs out: home first, then the session is revoked and wiped from the device', async () => {
+    SecureStore.__store.set(REFRESH_KEY, 'rt-1');
+    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
+    api = profileApi();
+    await renderWithQuery(<Profile />);
+
+    await confirmLogout();
     expect(router.dismissTo).toHaveBeenCalledWith('/');
     await waitFor(() => expect(SecureStore.__store.has(REFRESH_KEY)).toBe(false));
     expect(api.calls.find((c) => c.url === '/auth/logout').body).toEqual({ refreshToken: 'rt-1' });

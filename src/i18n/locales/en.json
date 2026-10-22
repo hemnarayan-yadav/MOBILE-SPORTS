@@ -538,6 +538,7 @@
     "remove": "Remove"
   },
   "app": {
+    "logoutConfirm": "Log out of KhelScore? You'll need to sign in again.",
     "account": "Account",
     "signInLabel": "Sign in",
     "accountLabel": "Account",
