@@ -120,18 +120,30 @@ export function NoticeCard({ notice }) {
 export function NewsCard({ item }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const router = useRouter();
+  // Two kinds of headline share this list. Ours is an article on KhelScore and
+  // opens inside the app; a publisher's opens their page. The server says
+  // which (`kind`) rather than leaving the card to guess from the URL — and
+  // the badge below says so to the reader, because a list where tapping does
+  // two different things is only confusing if it looks like one thing.
+  const ours = item.kind === 'khelscore';
 
-  const open = () =>
+  const open = () => {
+    if (ours) {
+      router.push(`/news/${item.slug}`);
+      return;
+    }
     // An in-app browser rather than leaving the app: the reader comes straight
     // back with the system Back gesture.
     WebBrowser.openBrowserAsync(item.url, {
       toolbarColor: colors.surface,
       controlsColor: colors.brand,
     }).catch(() => {});
+  };
 
   return (
     <Pressable
-      accessibilityRole="link"
+      accessibilityRole={ours ? 'button' : 'link'}
       accessibilityLabel={item.title}
       onPress={open}
       style={({ pressed }) => [
@@ -144,14 +156,30 @@ export function NewsCard({ item }) {
       ]}
     >
       <View style={styles.row}>
-        <View style={[styles.thumb, styles.thumbBlank, { backgroundColor: colors.brandSoft }]}>
-          <Ionicons name="newspaper-outline" size={22} color={colors.brandStrong} />
-        </View>
+        {item.coverUrl ? (
+          <Image
+            source={{ uri: item.coverUrl }}
+            style={[styles.newsThumb, { borderColor: colors.border }]}
+            resizeMode="cover"
+            accessibilityIgnoresInvertColors
+          />
+        ) : (
+          <View style={[styles.newsThumb, styles.thumbBlank, { backgroundColor: colors.brandSoft }]}>
+            <Ionicons name="newspaper-outline" size={22} color={colors.brandStrong} />
+          </View>
+        )}
         <View style={styles.body}>
           <AppText weight="semibold" numberOfLines={3} style={styles.headline}>
             {item.title}
           </AppText>
           <View style={styles.meta}>
+            {ours ? (
+              <View style={[styles.badge, { backgroundColor: colors.brandSoft }]}>
+                <AppText variant="small" weight="semibold" style={{ color: colors.brandStrong }}>
+                  {t('nav.brand')}
+                </AppText>
+              </View>
+            ) : null}
             <AppText variant="small" tone="muted" numberOfLines={1} style={styles.metaText}>
               {item.source ? t('notices.readOnSource', { source: item.source }) : ''}
             </AppText>
@@ -167,7 +195,7 @@ export function NewsCard({ item }) {
             ) : null}
           </View>
         </View>
-        <Ionicons name="open-outline" size={15} color={colors.muted} />
+        {ours ? null : <Ionicons name="open-outline" size={15} color={colors.muted} />}
       </View>
     </Pressable>
   );
@@ -187,11 +215,19 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'transparent',
   },
+  newsThumb: {
+    width: THUMB_WIDTH,
+    height: THUMB_WIDTH,
+    borderRadius: RADII.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'transparent',
+  },
   thumbBlank: { alignItems: 'center', justifyContent: 'center' },
   body: { flex: 1, gap: SPACING.xs },
   headline: { lineHeight: 21 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
   metaText: { flexShrink: 1 },
+  badge: { paddingHorizontal: SPACING.sm, paddingVertical: 1, borderRadius: RADII.full },
   prizes: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs, marginTop: SPACING.xs },
   prizeChip: {
     paddingHorizontal: SPACING.sm,

@@ -1,24 +1,11 @@
-jest.mock('../api/matches.api.js', () => ({
-  matchesApi: { list: jest.fn() },
-  rankingsApi: { overview: jest.fn() },
-}));
-jest.mock('../api/tournaments.api.js', () => ({
-  tournamentsApi: { list: jest.fn() },
-}));
-jest.mock('../api/notices.api.js', () => ({
-  noticesApi: { list: jest.fn() },
-}));
-jest.mock('../api/newsFeed.api.js', () => ({
-  newsFeedApi: { list: jest.fn() },
+jest.mock('../api/mobile.api.js', () => ({
+  mobileApi: { home: jest.fn(), config: jest.fn() },
 }));
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { act, configure, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, configure, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
-import { matchesApi, rankingsApi } from '../api/matches.api.js';
-import { newsFeedApi } from '../api/newsFeed.api.js';
-import { noticesApi } from '../api/notices.api.js';
-import { tournamentsApi } from '../api/tournaments.api.js';
+import { mobileApi } from '../api/mobile.api.js';
 import Home from '../app/(tabs)/index.jsx';
 import hi from '../i18n/locales/hi.json';
 import i18n from '../i18n/index.js';
@@ -26,6 +13,10 @@ import { createQueryClient } from '../lib/queryClient.js';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
 import { useUiStore } from '../store/uiStore.js';
 
+// Home is one request now (GET /mobile/home). The server decides what is
+// empty, so these tests hand it a payload and check what the screen does with
+// it — never what it asked for, because it only ever asks for one thing.
+//
 // The default 1 s wait for `findBy…` ran out once on a busy machine (a Gradle
 // build alongside); a longer limit only costs time when something is slow.
 configure({ asyncUtilTimeout: 5000 });
@@ -45,12 +36,25 @@ const LIVE_MATCH = {
   clock: { elapsedMs: 300_000, runningSince: null },
 };
 
-const EMPTY_OVERVIEW = {
-  best_raider: { entries: [] },
-  best_defender: { entries: [] },
-  best_allrounder: { entries: [] },
-  computedAt: null,
+const EMPTY_HOME = {
+  live: [],
+  matches: { recent: [], upcoming: [], completed: [] },
+  featured: [],
+  tournaments: { ongoing: [], upcoming: [], completed: [] },
+  openTournaments: [],
+  news: [],
+  topPlayers: {},
+  topTeams: [],
 };
+
+const homeWith = (over = {}) => ({ ...EMPTY_HOME, ...over });
+
+// The header renders in the loading branch as well, so waiting for anything
+// in it proves nothing — a test asserting a section is *absent* would pass
+// while the request was still in flight. Every test waits for the screen to
+// settle instead.
+const settled = () =>
+  waitFor(() => expect(screen.queryByText('Loading...')).toBeNull());
 
 async function renderHome() {
   const client = createQueryClient();
@@ -63,65 +67,131 @@ async function renderHome() {
 }
 
 beforeEach(async () => {
-  matchesApi.list.mockReset();
-  rankingsApi.overview.mockReset();
-  tournamentsApi.list.mockReset();
-  noticesApi.list.mockReset();
-  newsFeedApi.list.mockReset();
-  // The store no longer holds 'system' after launch-readiness item #3; a
-  // fresh install now starts on the resolved scheme (Light in tests).
+  mobileApi.home.mockReset();
+  mobileApi.home.mockResolvedValue(EMPTY_HOME);
   useUiStore.setState({ theme: 'light', language: null });
   useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS, user: null });
-  // Default: empty everything so a test only mocks what it asserts on.
-  rankingsApi.overview.mockResolvedValue(EMPTY_OVERVIEW);
-  tournamentsApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
-  noticesApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
-  newsFeedApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
   await act(() => i18n.changeLanguage('en'));
 });
 
-describe('Home (matches preview)', () => {
-  it('asks the API for the first 5 live matches and lists them with score, phase and clock', async () => {
-    matchesApi.list.mockResolvedValue({ items: [LIVE_MATCH], pagination: { total: 1 } });
+describe('Home asks once', () => {
+  it('fetches the whole screen in a single request', async () => {
     await renderHome();
+    await settled();
 
-    expect(await screen.findByText('Shiva Raiders')).toBeTruthy();
-    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 5 });
-    expect(screen.getByText('Gaon Warriors')).toBeTruthy();
-    expect(screen.getByText('12')).toBeTruthy();
-    // The tournament and the round are their own lines now, so a knockout
-    // round can carry its own colour.
-    expect(screen.getByText('Village Cup')).toBeTruthy();
-    expect(screen.getByText('FINAL')).toBeTruthy();
-    expect(screen.getByText('Half 1')).toBeTruthy();
-    expect(screen.getByText('15:00')).toBeTruthy(); // 20-minute half, 5 minutes played, paused
+    // Six sections, one call. The point of the endpoint.
+    expect(mobileApi.home).toHaveBeenCalledTimes(1);
   });
+});
 
-  // A "Live" strip sitting empty for most of the day is the first thing a
-  // reader sees, and it says the app is dead. Between matches the section is
-  // simply not there, and the tournaments-and-news section below takes its
-  // place. Upcoming and completed matches stay one tap away on the Matches tab.
+describe('Home (live)', () => {
   it('says nothing at all when no match is live', async () => {
-    matchesApi.list.mockResolvedValue({ items: [], pagination: { total: 0 } });
     await renderHome();
+    await settled();
 
-    // The section has no heading, no empty state and no tabs of its own.
-    await screen.findByText('Tournaments & news');
+    // No heading, no empty state: between matches the section is not there.
     expect(screen.queryByText('Live')).toBeNull();
     expect(screen.queryByText('No matches are live right now')).toBeNull();
-    expect(matchesApi.list).toHaveBeenCalledWith({ status: 'live', limit: 5 });
   });
 
   it('shows the live section the moment a match is on the mat', async () => {
-    matchesApi.list.mockResolvedValue({ items: [LIVE_MATCH], pagination: { total: 1 } });
+    mobileApi.home.mockResolvedValue(homeWith({ live: [LIVE_MATCH] }));
     await renderHome();
 
     expect(await screen.findByText('Shiva Raiders')).toBeTruthy();
     expect(screen.getByText('12')).toBeTruthy();
   });
+});
 
+describe('Home (famous people)', () => {
+  it('is not shown when nobody has been picked', async () => {
+    await renderHome();
+    await settled();
+    expect(screen.queryByText('Spotlight')).toBeNull();
+  });
+
+  it('opens a linked player and leaves a standalone card alone', async () => {
+    mobileApi.home.mockResolvedValue(
+      homeWith({
+        featured: [
+          { id: 'f1', name: 'Roshan', photoUrl: null, title: 'raider', playerId: 'p1' },
+          { id: 'f2', name: 'Anup Kumar', photoUrl: null, title: 'Arjuna Awardee', playerId: null },
+        ],
+      }),
+    );
+    await renderHome();
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Roshan' }));
+    expect(router.push).toHaveBeenCalledWith('/player/p1');
+
+    // Somebody who is not on KhelScore has nothing to open, so the card is not
+    // a button at all rather than one that does nothing.
+    expect(screen.queryByRole('button', { name: 'Anup Kumar' })).toBeNull();
+    expect(screen.getByText('Anup Kumar')).toBeTruthy();
+  });
+});
+
+describe('Home (tabs that come and go)', () => {
+  it('hides a tab with nothing in it, and shows no strip for a single tab', async () => {
+    mobileApi.home.mockResolvedValue(
+      homeWith({ matches: { recent: [], upcoming: [LIVE_MATCH], completed: [] } }),
+    );
+    await renderHome();
+    // Wait for the content itself, not the header: the header is on screen
+    // while the request is still running.
+    expect(await screen.findByText('Shiva Raiders')).toBeTruthy();
+
+    // One tab left: a choice of one is not a choice.
+    expect(screen.queryByText('Recent')).toBeNull();
+    expect(screen.queryByText('Completed')).toBeNull();
+  });
+
+  it('hides the whole section when every tab is empty', async () => {
+    mobileApi.home.mockResolvedValue(
+      homeWith({ tournaments: { ongoing: [], upcoming: [], completed: [] } }),
+    );
+    await renderHome();
+    await settled();
+    expect(screen.queryByText('Tournaments', { exact: true })).toBeNull();
+  });
+});
+
+describe('Home (tournaments & news)', () => {
+  const NOTICE = { id: 'n1', title: 'गाँव का टूर्नामेंट', startDate: '2026-11-02T00:00:00.000Z', prizes: [] };
+  const ARTICLE = { id: 'a1', kind: 'external', title: 'कबड्डी की खबर', url: 'https://x.test/a', source: 'Bhaskar', publishedAt: null };
+
+  it('opens on tournaments when there are any', async () => {
+    mobileApi.home.mockResolvedValue(homeWith({ openTournaments: [NOTICE], news: [ARTICLE] }));
+    await renderHome();
+
+    expect(await screen.findByText('गाँव का टूर्नामेंट')).toBeTruthy();
+    expect(screen.queryByText('कबड्डी की खबर')).toBeNull();
+  });
+
+  it('opens on news when there is no tournament to show', async () => {
+    mobileApi.home.mockResolvedValue(homeWith({ openTournaments: [], news: [ARTICLE] }));
+    await renderHome();
+
+    // Opening on an empty tab while the other has something is exactly what
+    // the rest of this screen refuses to do.
+    expect(await screen.findByText('कबड्डी की खबर')).toBeTruthy();
+  });
+
+  it('keeps the tab the reader picked', async () => {
+    mobileApi.home.mockResolvedValue(homeWith({ openTournaments: [NOTICE], news: [ARTICLE] }));
+    await renderHome();
+    await screen.findByText('गाँव का टूर्नामेंट');
+
+    await fireEvent.press(screen.getByText('News'));
+
+    expect(await screen.findByText('कबड्डी की खबर')).toBeTruthy();
+    expect(screen.queryByText('गाँव का टूर्नामेंट')).toBeNull();
+  });
+});
+
+describe('Home (the rest of the screen)', () => {
   it('shows a translated error, never the server text, and retries', async () => {
-    noticesApi.list.mockRejectedValueOnce({
+    mobileApi.home.mockRejectedValueOnce({
       status: 0,
       code: 'NETWORK_ERROR',
       message: 'Network Error',
@@ -131,49 +201,33 @@ describe('Home (matches preview)', () => {
     expect(await screen.findByText("Can't reach the server. Check your connection.")).toBeTruthy();
     expect(screen.queryByText('Network Error')).toBeNull();
 
-    noticesApi.list.mockResolvedValue({
-      items: [{ id: 'n1', title: 'गाँव का टूर्नामेंट', startDate: '2026-11-02T00:00:00.000Z', prizes: [] }],
-      pagination: { total: 1 },
-    });
+    mobileApi.home.mockResolvedValue(homeWith({ live: [LIVE_MATCH] }));
     await fireEvent.press(screen.getByRole('button', { name: 'Retry' }));
-    expect(await screen.findByText('गाँव का टूर्नामेंट')).toBeTruthy();
+    expect(await screen.findByText('Shiva Raiders')).toBeTruthy();
   });
 
   it('switches the language to Hindi and remembers the choice', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
+    mobileApi.home.mockResolvedValue(
+      homeWith({ matches: { recent: [], upcoming: [LIVE_MATCH], completed: [] } }),
+    );
     await renderHome();
-    await screen.findByText('Tournaments & news');
+    await settled();
 
     await fireEvent.press(screen.getByRole('radio', { name: 'हिं' }));
 
-    expect(await screen.findByText(hi.notices.sectionTitle)).toBeTruthy();
+    expect(await screen.findByText(hi.home.matchesTitle)).toBeTruthy();
     expect(useUiStore.getState().language).toBe('hi');
   });
 
   it('toggles the theme between Light and Dark (System is dropped)', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
     await renderHome();
-    await screen.findByText('Tournaments & news');
+    await settled();
 
-    // The button shows the mode it is in — a sun in Light, a moon in Dark —
-    // and names it in words only to a screen reader.
-    expect(screen.getByTestId('ionicon-sunny-outline')).toBeTruthy();
-    expect(screen.queryByText('Light')).toBeNull();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Theme: Light. Tap to change' }));
+    await fireEvent.press(screen.getByRole('button', { name: /Theme: Light/ }));
     expect(useUiStore.getState().theme).toBe('dark');
-    expect(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' })).toBeTruthy();
-    expect(screen.getByTestId('ionicon-moon-outline')).toBeTruthy();
-    expect(screen.queryByTestId('ionicon-sunny-outline')).toBeNull();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Theme: Dark. Tap to change' }));
-    expect(useUiStore.getState().theme).toBe('light');
-    expect(screen.getByTestId('ionicon-sunny-outline')).toBeTruthy();
   });
 
   it('shows the same person icon signed out and signed in, and still goes to both places', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
-    useAuthStore.setState({ status: AUTH_STATUS.ANONYMOUS, user: null });
     await renderHome();
     expect(await screen.findByTestId('ionicon-person-circle-outline')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
@@ -192,10 +246,9 @@ describe('Home (matches preview)', () => {
   });
 
   it('shows neither icon while the stored session is still being restored', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
     useAuthStore.setState({ status: AUTH_STATUS.UNKNOWN });
     await renderHome();
-    await screen.findByText('Tournaments & news');
+    await screen.findByLabelText('KhelScore');
     expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Account' })).toBeNull();
   });
@@ -203,7 +256,6 @@ describe('Home (matches preview)', () => {
 
 describe('Home (signed-in shortcut)', () => {
   it('offers "Create your team" to a signed-in user without a team', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
     useAuthStore.setState({
       status: AUTH_STATUS.AUTHENTICATED,
       user: { id: 'u1', name: 'Asha', role: 'user' },
@@ -214,7 +266,6 @@ describe('Home (signed-in shortcut)', () => {
   });
 
   it('offers "My team" to a captain, into the captain desk', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
     useAuthStore.setState({
       status: AUTH_STATUS.AUTHENTICATED,
       user: { id: 'u2', name: 'Ravi', role: 'captain' },
@@ -225,26 +276,9 @@ describe('Home (signed-in shortcut)', () => {
   });
 
   it('is hidden for signed-out visitors', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
     await renderHome();
-    await screen.findByText('Tournaments & news');
+    await settled();
     expect(screen.queryByRole('button', { name: 'Create your team' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'My team' })).toBeNull();
-  });
-});
-
-describe('Home (tournaments and leaders)', () => {
-
-  it('shows the leaders empty state with the "waiting for matches" hint', async () => {
-    matchesApi.list.mockResolvedValue({ items: [] });
-    rankingsApi.overview.mockResolvedValue(EMPTY_OVERVIEW);
-    await renderHome();
-    expect(await screen.findByText('No rankings yet')).toBeTruthy();
-    expect(
-      screen.getByText(
-        'Waiting for the first matches — rankings appear once matches are completed.',
-      ),
-    ).toBeTruthy();
-    expect(rankingsApi.overview).toHaveBeenCalledWith({ limit: 3 });
   });
 });

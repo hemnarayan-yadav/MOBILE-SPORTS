@@ -17,7 +17,8 @@
     "confirm": "पक्का करें",
     "done": "हो गया",
     "missing": "बाकी है",
-    "saveChanges": "सेव करें"
+    "saveChanges": "सेव करें",
+    "share": "शेयर करें"
   },
   "theme": {
     "label": "थीम",
@@ -64,7 +65,10 @@
       "players": "खिलाड़ी",
       "matchesPlayed": "मैच खेले गए"
     },
-    "newsTitle": "ताज़ा खबरें"
+    "newsTitle": "ताज़ा खबरें",
+    "featuredTitle": "स्पॉटलाइट",
+    "topTeamsTitle": "टॉप टीमें",
+    "tabRecent": "हाल के"
   },
   "nav": {
     "brand": "KhelScore",
@@ -218,7 +222,8 @@
       "officialSubstitutionRule": "खिलाड़ी बदलना सिर्फ़ टाइमआउट या इंटरवल में।"
     },
     "heading": "{{teamA}} बनाम {{teamB}} — कबड्डी मैच",
-    "headingTournament": "{{teamA}} बनाम {{teamB}} — {{tournament}}"
+    "headingTournament": "{{teamA}} बनाम {{teamB}} — {{tournament}}",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "errors": {
     "notFound": "पेज नहीं मिला",
@@ -781,7 +786,8 @@
     },
     "championTitle": "विजेता",
     "championNamed": "विजेता: {{team}}",
-    "playerOfTournament": "प्लेयर ऑफ़ द टूर्नामेंट"
+    "playerOfTournament": "प्लेयर ऑफ़ द टूर्नामेंट",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "team": {
     "pageTitle": "टीमें",
@@ -840,7 +846,8 @@
     "statusUpdated": "टीम का स्टेटस बदल गया",
     "delete": "टीम हटाएं",
     "deleteConfirm": "{{name}} हटाएं? टीम हर जगह से छिप जाएगी, खिलाड़ी रिलीज़ होंगे और कप्तान आम अकाउंट बन जाएगा।",
-    "deletedToast": "टीम हटा दी गई"
+    "deletedToast": "टीम हटा दी गई",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "player": {
     "pageTitle": "खिलाड़ी",
@@ -874,7 +881,8 @@
     "saved": "खिलाड़ी की प्रोफ़ाइल सेव हो गई",
     "delete": "खिलाड़ी हटाएं",
     "deleteConfirm": "{{name}} को हटाएं? प्रोफ़ाइल छिप जाएगी और स्क्वॉड से रिलीज़ होगी।",
-    "deleted": "खिलाड़ी हटा दिया गया"
+    "deleted": "खिलाड़ी हटा दिया गया",
+    "shareLabel": "{{name}} की प्रोफ़ाइल शेयर करें"
   },
   "news": {
     "pageTitle": "खबरें",

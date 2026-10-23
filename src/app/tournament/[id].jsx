@@ -20,6 +20,7 @@ import {
   TabStrip,
   TileGrid,
 } from '../../components/common/Layout.jsx';
+import ShareButton from '../../components/common/ShareButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import TeamCrest from '../../components/team/TeamCrest.jsx';
@@ -211,7 +212,16 @@ export default function TournamentScreen() {
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <BackHeader />
+        <View style={styles.topBar}>
+          <BackHeader />
+          {tournament ? (
+            <ShareButton
+              path={`/tournament/${tournament.id}`}
+              title={tournament.name}
+              label={t('tournament.shareLabel', { name: tournament.name })}
+            />
+          ) : null}
+        </View>
         {query.isPending ? <LoadingState /> : null}
         {query.isError ? <ErrorState error={query.error} onRetry={() => query.refetch()} /> : null}
         {tournament ? (
@@ -240,6 +250,7 @@ export default function TournamentScreen() {
 }
 
 const styles = StyleSheet.create({
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },

@@ -12,6 +12,7 @@ import { qk } from '../../api/queryKeys.js';
 import Badge from '../../components/common/Badge.jsx';
 import FollowButton from '../../components/common/FollowButton.jsx';
 import { BackHeader, TabStrip } from '../../components/common/Layout.jsx';
+import ShareButton from '../../components/common/ShareButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import {
   HeadToHead,
@@ -108,10 +109,22 @@ export default function MatchScreen() {
     body = <MatchView match={query.data} connected={connected} />;
   }
 
+  const match = query.data;
+  const matchTitle = match ? `${match.teamA?.name ?? ''} vs ${match.teamB?.name ?? ''}`.trim() : '';
+
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <BackHeader />
+        <View style={styles.topBar}>
+          <BackHeader />
+          {match ? (
+            <ShareButton
+              path={`/match/${match.id}`}
+              title={matchTitle}
+              label={t('match.shareLabel', { name: matchTitle })}
+            />
+          ) : null}
+        </View>
         {body}
       </ScrollView>
     </SafeAreaView>
@@ -119,6 +132,7 @@ export default function MatchScreen() {
 }
 
 const styles = StyleSheet.create({
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   actions: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },

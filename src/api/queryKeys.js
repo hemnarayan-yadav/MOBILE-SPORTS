@@ -48,6 +48,7 @@ export const qk = Object.freeze({
     list: ['follows', 'list'],
     status: (type, id) => ['follows', 'status', type, id],
   },
+  home: ['home'],
   newsFeed: {
     all: ['news-feed'],
     list: (params) => ['news-feed', 'list', params],

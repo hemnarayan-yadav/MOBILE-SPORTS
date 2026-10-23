@@ -9,7 +9,7 @@
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
-    "sha256": "03801fc1f9ffa2bb259a612ecbb75f8db2ac0b25ffa9e9ab2b50ec1eed3cc777"
+    "sha256": "8e45a0a645678348cd8c426997c02f34387355fe0f6bcce78ef00d6e615a8cce"
   },
   "src/assets/logo/khelscoreFull.js": {
     "source": "src/assets/logo/khelscore-full.svg",
@@ -165,7 +165,7 @@
   },
   "src/api/teams.api.js": {
     "source": "src/api/teams.api.js",
-    "sha256": "3af79e6f2b7928bdb1d2655b8381bf552689175e8d2f6859aaa89c5e3d4fa4ca"
+    "sha256": "134307cfb934fba567be884811bc42d1234f9e0600d3ba5346106f4ed2fe3693"
   },
   "src/api/tournaments.api.js": {
     "source": "src/api/tournaments.api.js",

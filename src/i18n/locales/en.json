@@ -17,7 +17,8 @@
     "confirm": "Confirm",
     "done": "Done",
     "missing": "Missing",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "share": "Share"
   },
   "theme": {
     "label": "Theme",
@@ -64,7 +65,10 @@
       "players": "Players tracked",
       "matchesPlayed": "Matches played"
     },
-    "newsTitle": "Latest news"
+    "newsTitle": "Latest news",
+    "featuredTitle": "Spotlight",
+    "topTeamsTitle": "Top teams",
+    "tabRecent": "Recent"
   },
   "nav": {
     "brand": "KhelScore",
@@ -218,7 +222,8 @@
       "officialSubstitutionRule": "Substitutions only during a timeout or the interval."
     },
     "heading": "{{teamA}} vs {{teamB}} — kabaddi match",
-    "headingTournament": "{{teamA}} vs {{teamB}} — {{tournament}}"
+    "headingTournament": "{{teamA}} vs {{teamB}} — {{tournament}}",
+    "shareLabel": "Share {{name}}"
   },
   "errors": {
     "notFound": "Page not found",
@@ -781,7 +786,8 @@
     },
     "championTitle": "Champions",
     "championNamed": "Winner: {{team}}",
-    "playerOfTournament": "Player of the Tournament"
+    "playerOfTournament": "Player of the Tournament",
+    "shareLabel": "Share {{name}}"
   },
   "team": {
     "pageTitle": "Teams",
@@ -840,7 +846,8 @@
     "statusUpdated": "Team status updated",
     "delete": "Delete team",
     "deleteConfirm": "Delete {{name}}? It will be hidden everywhere, its squad released and its captain returned to a regular account.",
-    "deletedToast": "Team deleted"
+    "deletedToast": "Team deleted",
+    "shareLabel": "Share {{name}}"
   },
   "player": {
     "pageTitle": "Players",
@@ -874,7 +881,8 @@
     "saved": "Player profile saved",
     "delete": "Delete player",
     "deleteConfirm": "Delete {{name}}? The profile will be hidden and released from any squad.",
-    "deleted": "Player deleted"
+    "deleted": "Player deleted",
+    "shareLabel": "Share {{name}}'s profile"
   },
   "news": {
     "pageTitle": "News",
