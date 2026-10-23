@@ -5,20 +5,23 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { matchesApi, rankingsApi } from '../../api/matches.api.js';
+import { newsFeedApi } from '../../api/newsFeed.api.js';
+import { noticesApi } from '../../api/notices.api.js';
 import { qk } from '../../api/queryKeys.js';
-import { tournamentsApi } from '../../api/tournaments.api.js';
 import AppText from '../../components/common/AppText.jsx';
 import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.jsx';
 import { TabStrip } from '../../components/common/Layout.jsx';
 import Logo from '../../components/common/Logo.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
-import { LeaderboardList, TournamentCard } from '../../components/tournament/TournamentBits.jsx';
+import AutoCarousel from '../../components/notice/AutoCarousel.jsx';
+import { NewsCard, NoticeCard } from '../../components/notice/NoticeBits.jsx';
+import { LeaderboardList } from '../../components/tournament/TournamentBits.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
@@ -29,16 +32,18 @@ import {
   ROLES,
 } from '../../utils/constants.js';
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 // A short preview on Home keeps the payload light on low-end Androids — full
 // lists live on the tab screens (paged).
 const PREVIEW_LIMIT = 5;
-const TOURNAMENT_LIMIT = 4;
 const LEADER_LIMIT = 3;
 // The live block matches the web's cadence; an open match page is pushed live
 // over its socket.
 const LIVE_REFRESH_MS = 60_000;
-const TABS = Object.freeze([MATCH_STATUS.LIVE, MATCH_STATUS.UPCOMING, MATCH_STATUS.COMPLETED]);
+const NOTICE_TAB = Object.freeze({ TOURNAMENTS: 'tournaments', NEWS: 'news' });
+// Cards on screen at once, and how many are fetched for the carousel to
+// move through before anyone has to open the full screen.
+const HOME_CARDS = 2;
+const CAROUSEL_POOL = 8;
 
 // The same person icon whether or not anyone is signed in — it is the way to
 // the account either way, and a different glyph per state only made the header
@@ -152,100 +157,103 @@ function TeamShortcut() {
   );
 }
 
-function MatchesSection() {
+// Live matches, and **only** when something is live. A "Live" tab sitting
+// empty for most of the day is the first thing a reader sees and says the app
+// is dead; between matches the section below takes its place instead. Upcoming
+// and completed matches stay one tap away on the Matches tab.
+function LiveSection() {
   const { t } = useTranslation();
-  const [tab, setTab] = useState(MATCH_STATUS.LIVE);
-  // Live is the right tab to open on when a match is on the mat, and an empty
-  // one every other hour. So the first load walks TABS in order and stops at
-  // the first tab that has something to show. It gives way the moment the
-  // reader picks a tab themselves, and never moves them again afterwards.
-  const [seeking, setSeeking] = useState(true);
-  const pickTab = useCallback((next) => {
-    setSeeking(false);
-    setTab(next);
-  }, []);
-  const params = useMemo(
-    () =>
-      tab === MATCH_STATUS.COMPLETED
-        ? { status: tab, from: new Date(Date.now() - DAY_MS).toISOString(), limit: PREVIEW_LIMIT }
-        : { status: tab, limit: PREVIEW_LIMIT },
-    [tab],
-  );
+  const params = { status: MATCH_STATUS.LIVE, limit: PREVIEW_LIMIT };
   const query = useQuery({
     queryKey: qk.matches.list(params),
     queryFn: () => matchesApi.list(params),
-    refetchInterval: tab === MATCH_STATUS.LIVE ? LIVE_REFRESH_MS : false,
+    refetchInterval: LIVE_REFRESH_MS,
   });
-  const found = (query.data?.items ?? []).length > 0;
-  useEffect(() => {
-    if (!seeking || query.isPending || query.isError) return;
-    if (found) {
-      setSeeking(false);
-      return;
-    }
-    const next = TABS[TABS.indexOf(tab) + 1];
-    if (next) {
-      setTab(next);
-      return;
-    }
-    // Nothing anywhere: "coming soon" is a kinder empty tab to land on than
-    // "nothing finished today".
-    setTab(MATCH_STATUS.UPCOMING);
-    setSeeking(false);
-  }, [seeking, found, tab, query.isPending, query.isError]);
 
-  const tabs = TABS.map((id) => ({
-    id,
-    label:
-      id === MATCH_STATUS.COMPLETED
-        ? t('home.tabCompleted24h')
-        : t(`match.tab${id[0].toUpperCase()}${id.slice(1)}`),
-  }));
+  const live = query.data?.items ?? [];
+  // Nothing on the mat, nothing to say. No empty state, no heading: the
+  // section is simply not there.
+  if (live.length === 0) return null;
+
   return (
-    <Section title={t('home.matchesTitle')} actionTo="/matches" actionLabel={t('common.viewAll')}>
-      <TabStrip tabs={tabs} value={tab} onChange={pickTab} label={t('home.matchesTitle')} />
-      {query.isPending ? (
-        <LoadingState />
-      ) : query.isError ? (
-        <ErrorState error={query.error} onRetry={() => query.refetch()} />
-      ) : (query.data?.items ?? []).length === 0 ? (
-        <EmptyState title={t(`match.empty.${tab}`)} hint={t('match.emptyHint')} />
-      ) : (
-        <View style={styles.stack}>
-          {(query.data?.items ?? []).slice(0, PREVIEW_LIMIT).map((match) => (
-            <MatchCard key={match.id} match={match} />
-          ))}
-        </View>
-      )}
+    <Section title={t('match.tabLive')} actionTo="/matches" actionLabel={t('common.viewAll')}>
+      <View style={styles.stack}>
+        {live.slice(0, PREVIEW_LIMIT).map((match) => (
+          <MatchCard key={match.id} match={match} />
+        ))}
+      </View>
     </Section>
   );
 }
 
-function TournamentsSection() {
+// What Kabaddi is happening that this reader is not already part of: tournaments
+// other people are running, and news from elsewhere. One section, two tabs,
+// because they answer the same question in two ways.
+// What Kabaddi is happening that this reader is not already part of:
+// tournaments other people are running, and news from elsewhere.
+//
+// Two cards at a time, moving on by themselves (AutoCarousel). A section on
+// Home has to earn its height: five cards pushed everything below it off the
+// screen, and two that change are more worth glancing at than five that do
+// not. "View all" is there for anyone who wants the rest.
+function NoticesSection() {
   const { t } = useTranslation();
-  const params = { limit: TOURNAMENT_LIMIT };
-  const query = useQuery({
-    queryKey: qk.tournaments.list(params),
-    queryFn: () => tournamentsApi.list(params),
+  const [tab, setTab] = useState(NOTICE_TAB.TOURNAMENTS);
+  const tournaments = tab === NOTICE_TAB.TOURNAMENTS;
+
+  const noticeParams = { phase: 'upcoming', limit: CAROUSEL_POOL };
+  const newsParams = { limit: CAROUSEL_POOL };
+  const noticeQuery = useQuery({
+    queryKey: qk.notices.list(noticeParams),
+    queryFn: () => noticesApi.list(noticeParams),
+    // The other tab is not fetched until somebody asks for it.
+    enabled: tournaments,
   });
+  const newsQuery = useQuery({
+    queryKey: qk.newsFeed.list(newsParams),
+    queryFn: () => newsFeedApi.list(newsParams),
+    enabled: !tournaments,
+  });
+
+  const query = tournaments ? noticeQuery : newsQuery;
+  const items = query.data?.items ?? [];
+
   return (
     <Section
-      title={t('app.tournamentsSectionTitle')}
-      actionTo="/tournaments"
+      title={t('notices.sectionTitle')}
+      actionTo="/notices"
       actionLabel={t('common.viewAll')}
     >
+      <TabStrip
+        label={t('notices.sectionTitle')}
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { id: NOTICE_TAB.TOURNAMENTS, label: t('notices.tabTournaments') },
+          { id: NOTICE_TAB.NEWS, label: t('notices.tabNews') },
+        ]}
+      />
       {query.isPending ? (
         <LoadingState />
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => query.refetch()} />
-      ) : (query.data?.items ?? []).length === 0 ? (
-        <EmptyState title={t('app.tournamentsEmpty')} hint={t('app.tournamentsEmptyHint')} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          title={t(tournaments ? 'notices.emptyTitle' : 'notices.newsEmptyTitle')}
+          hint={t(tournaments ? 'notices.emptyHint' : 'notices.newsEmptyHint')}
+        />
       ) : (
-        <View style={styles.stack}>
-          {(query.data?.items ?? []).slice(0, TOURNAMENT_LIMIT).map((tournament) => (
-            <TournamentCard key={tournament.id} tournament={tournament} />
-          ))}
-        </View>
+        <AutoCarousel
+          // Keyed by tab so switching starts at the first card rather than
+          // halfway through the other tab's list.
+          key={tab}
+          items={items}
+          perPage={HOME_CARDS}
+          keyExtractor={(item) => item.id}
+          renderItem={(item) =>
+            tournaments ? <NoticeCard notice={item} /> : <NewsCard item={item} />
+          }
+        />
       )}
     </Section>
   );
@@ -292,8 +300,8 @@ export default function Home() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Header />
         <TeamShortcut />
-        <MatchesSection />
-        <TournamentsSection />
+        <LiveSection />
+        <NoticesSection />
         <LeadersSection />
       </ScrollView>
     </SafeAreaView>

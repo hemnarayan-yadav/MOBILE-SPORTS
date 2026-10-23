@@ -48,6 +48,16 @@ export const qk = Object.freeze({
     list: ['follows', 'list'],
     status: (type, id) => ['follows', 'status', type, id],
   },
+  newsFeed: {
+    all: ['news-feed'],
+    list: (params) => ['news-feed', 'list', params],
+  },
+  notices: {
+    all: ['notices'],
+    list: (params) => ['notices', 'list', params],
+    item: (id) => ['notices', 'item', id],
+    mine: (params) => ['notices', 'mine', params],
+  },
   content: {
     all: ['content'],
     news: (params) => ['content', 'news', params],
