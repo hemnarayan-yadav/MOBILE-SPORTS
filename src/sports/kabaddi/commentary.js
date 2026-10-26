@@ -33,6 +33,12 @@ function raidSentence(raid, { t, playerName, teamName }) {
     const key = raid.superTackle ? 'commentary.superTackle' : 'commentary.tackled';
     return t(key, { raider, tacklers });
   }
+  // The raider walked out of play. Scored like a tackle nobody made, so it is
+  // neither an empty raid (which is what it used to be called here) nor a
+  // tackle: the defence takes the point and the raider is out.
+  if (raid.outcome === 'self_out') {
+    return t('commentary.raiderSelfOut', { raider });
+  }
   if (raid.outcome === 'successful') {
     if (raid.touchPoints > 0 && raid.bonusPoint)
       return t('commentary.touchBonus', { raider, count: raid.touchPoints });
@@ -71,6 +77,15 @@ export function describeEvent(event, { t, playerName, teamName }) {
       });
     case 'injury':
       return t('commentary.injury', { team, player: playerName(event.player) });
+    // A player walks out of play outside a raid's own outcome — a defender, or
+    // anyone while no raid is on. The other side takes the point.
+    case 'self_out':
+      return t('commentary.selfOut', {
+        team,
+        player: playerName(event.player),
+        opponent: teamName(event.pointsTo),
+        count: event.points ?? 1,
+      });
     // The controller's two corrections. They score nothing, so the feed says
     // plainly what was changed and by whom.
     case 'raid_cancelled':

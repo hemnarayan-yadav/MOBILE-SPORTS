@@ -443,7 +443,9 @@
       "registrations": "रजिस्ट्रेशन",
       "registrationsHint": "टूर्नामेंट एंट्री और उन पर फ़ैसले",
       "email": "ईमेल पर भी भेजें",
-      "emailHint": "याद दिलाना, नतीजे और रजिस्ट्रेशन के फ़ैसले ईमेल पर भी"
+      "emailHint": "याद दिलाना, नतीजे और रजिस्ट्रेशन के फ़ैसले ईमेल पर भी",
+      "announcements": "KhelScore की घोषणाएं",
+      "announcementsHint": "नए टूर्नामेंट और KhelScore की खबरें"
     },
     "phoneVerified": "नंबर पक्का है",
     "phoneNotVerified": "नंबर पक्का नहीं है",
@@ -517,7 +519,7 @@
     "date": "सही तारीख डालें",
     "foundedYear": "1900 से इस साल के बीच का साल डालें",
     "height": "लंबाई 100 से 250 सेमी के बीच होनी चाहिए",
-    "jersey": "जर्सी नंबर 1 या 2 अंकों का होना चाहिए",
+    "jersey": "जर्सी नंबर 1 से 3 अंकों का होना चाहिए",
     "number": "नंबर डालें",
     "shortName": "2–5 अक्षर या अंक लिखें",
     "teamNameMin": "टीम का नाम कम से कम 2 अक्षर का होना चाहिए",
@@ -613,6 +615,9 @@
     "timeout": "{{team}} ने टाइम-आउट लिया।",
     "substitution": "{{team}}: {{playerOut}} की जगह {{playerIn}} अंदर।",
     "injury": "{{player}} ({{team}}) को चोट लगी।",
+    "raiderSelfOut": "{{raider}} ख़ुद बाहर चले गए — रेड गई।",
+    "selfOut_one": "{{player}} ख़ुद बाहर चले गए — {{opponent}} को {{count}} अंक।",
+    "selfOut_other": "{{player}} ख़ुद बाहर चले गए — {{opponent}} को {{count}} अंक।",
     "raidDelayPoint_one": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidDelayPoint_other": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidCancelled": "कंट्रोलर ने पिछली रेड रद्द कर दी।",
@@ -657,6 +662,7 @@
     "scope": "रैंकिंग दिखाएं",
     "allTime": "सारे टूर्नामेंट (अब तक)",
     "teamStandings": "टीम तालिका",
+    "rankOf": "रैंक {{rank}}: {{name}}",
     "category": {
       "best_raider": "बेस्ट रेडर",
       "best_defender": "बेस्ट डिफेंडर",
@@ -827,6 +833,12 @@
     "banner": "बैनर फ़ोटो",
     "city": "शहर",
     "homeGround": "होम ग्राउंड",
+    "staff": "कोच और टीम मैनेजर",
+    "staffHint": "ऐच्छिक। मोबाइल नंबर सबको नहीं दिखता — सिर्फ आपको और KhelScore स्टाफ को।",
+    "coachName": "कोच",
+    "coachPhone": "कोच का मोबाइल",
+    "teamManagerName": "टीम मैनेजर",
+    "teamManagerPhone": "टीम मैनेजर का मोबाइल",
     "foundedYear": "स्थापना का साल",
     "description": "जानकारी",
     "createTitle": "अपनी टीम जोड़ें",
@@ -883,6 +895,17 @@
     "deleteConfirm": "{{name}} को हटाएं? प्रोफ़ाइल छिप जाएगी और स्क्वॉड से रिलीज़ होगी।",
     "deleted": "खिलाड़ी हटा दिया गया",
     "shareLabel": "{{name}} की प्रोफ़ाइल शेयर करें"
+  },
+  "jerseys": {
+    "title": "टूर्नामेंट जर्सी नंबर",
+    "subtitle": "इस टूर्नामेंट में टीम के नंबर। खाली छोड़ने पर स्क्वाड वाला नंबर चलेगा।",
+    "linkLabel": "जर्सी",
+    "worn": "पहले पहने:",
+    "inThisTournament": "इस टूर्नामेंट का नंबर",
+    "fallsBackTo": "{{number}} से खेलेगा (स्क्वाड नंबर)",
+    "numberFor": "{{name}} का जर्सी नंबर",
+    "emptySquad": "इस स्क्वाड में अभी कोई खिलाड़ी नहीं",
+    "saved": "जर्सी नंबर सेव हुए"
   },
   "news": {
     "pageTitle": "खबरें",
@@ -988,7 +1011,10 @@
     "registration_approved": "{{teamName}} {{tournamentName}} में शामिल!",
     "registration_rejected": "{{tournamentName}} के लिए {{teamName}} का रजिस्ट्रेशन मंज़ूर नहीं हुआ",
     "tournament_assigned": "अब आप {{tournamentName}} मैनेज करेंगे",
-    "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया"
+    "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया",
+    "tournament_published": "KhelScore पर {{tournamentName}} शुरू हुआ",
+    "news_published": "KhelScore खबर: {{title}}",
+    "contact_message_received": "{{senderName}} का नया संदेश: {{subject}}"
   },
   "notifications": {
     "title": "नोटिफिकेशन",

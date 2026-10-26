@@ -10,7 +10,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { SPACING } from '../../theme/tokens.js';
-import { PLAYING_ROLES } from '../../utils/constants.js';
+import { JERSEY_MAX_LENGTH, PLAYING_ROLES } from '../../utils/constants.js';
 import { isoYearsAgo } from '../../utils/dates.js';
 import {
   membershipSchema,
@@ -143,7 +143,7 @@ export default function PlayerForm({
             label={t('player.jerseyNumber')}
             error={errors.jerseyNumber}
             keyboardType="number-pad"
-            maxLength={2}
+            maxLength={JERSEY_MAX_LENGTH}
           />
           <View style={styles.role}>
             <AppText variant="label">{t('player.playingRole')}</AppText>

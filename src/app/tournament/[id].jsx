@@ -133,17 +133,25 @@ function Standings({ tournamentId }) {
   );
 }
 
+// The API's largest page (MAX_PAGE_SIZE), so a big competition still arrives
+// whole on a screen that does not page yet.
+const TEAMS_PAGE_SIZE = 100;
+
 function Teams({ tournamentId }) {
   const { t } = useTranslation();
   const router = useRouter();
+  // The entry list is paged on the API; the screen shows the first page, which
+  // is every team of an ordinary competition. (The app's own paging comes with
+  // the mobile pass.)
+  const params = { limit: TEAMS_PAGE_SIZE };
   const query = useQuery({
-    queryKey: qk.tournaments.teams(tournamentId, {}),
-    queryFn: () => tournamentsApi.teams(tournamentId),
+    queryKey: qk.tournaments.teams(tournamentId, params),
+    queryFn: () => tournamentsApi.teams(tournamentId, params),
   });
   return (
-    <QueryBlock query={query} isEmpty={(d) => d.length === 0} emptyTitle={t('tournament.noTeams')}>
-      {(registrations) =>
-        registrations.map((registration) => (
+    <QueryBlock query={query} isEmpty={(d) => d.items.length === 0} emptyTitle={t('tournament.noTeams')}>
+      {(data) =>
+        data.items.map((registration) => (
           <Pressable
             key={registration.id}
             onPress={() => router.push(`/team/${registration.team.id}`)}

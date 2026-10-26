@@ -13,6 +13,12 @@ export const medalOf = (rank) => MEDALS[rank] ?? null;
 // Ranks 4–10: off the podium, still at the top of the table.
 export const isHighlighted = (rank) => rank > PODIUM && rank <= TOP_TEN;
 
+// The rim the leaderboard draws around a player's picture. The podium's is in
+// the frame artwork (components/ranking/RankFrame.jsx), so only 4–10 need one
+// of their own here — the owner's rule of 2026-10-26: crowns for the podium
+// only, a different border for the rest of the ten.
+export const rankRing = (rank) => (isHighlighted(rank) ? 'highlight' : 'default');
+
 // A style cannot mix colours in React Native the way `bg-gold/10` does, so the
 // rim and the row tint are the medal at a low opacity, built once here instead
 // of at each call site.

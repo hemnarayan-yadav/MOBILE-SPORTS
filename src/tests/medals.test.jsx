@@ -7,7 +7,7 @@ import {
 } from '../components/tournament/TournamentBits.jsx';
 import { ChampionLine } from '../components/tournament/ChampionBanner.jsx';
 import { COLORS } from '../theme/tokens.js';
-import { PODIUM, TOP_TEN, isHighlighted, medalOf, rankTone } from '../utils/medals.js';
+import { PODIUM, TOP_TEN, isHighlighted, medalOf, rankRing, rankTone } from '../utils/medals.js';
 import { roundTone } from '../utils/rounds.js';
 import { renderWithQuery, resetSession } from './helpers.jsx';
 
@@ -33,6 +33,15 @@ function contrast(a, b) {
 }
 
 beforeEach(resetSession);
+
+describe('the rim around a picture', () => {
+  it('marks 4 to 10 and nobody else', () => {
+    expect(rankRing(3)).toBe('default');
+    expect(rankRing(4)).toBe('highlight');
+    expect(rankRing(TOP_TEN)).toBe('highlight');
+    expect(rankRing(TOP_TEN + 1)).toBe('default');
+  });
+});
 
 describe('who is on the podium', () => {
   it('names the three medals in order', () => {
@@ -171,6 +180,24 @@ describe('the badge', () => {
 });
 
 describe('a player leaderboard', () => {
+  // The owner's rule of 2026-10-26: the crown frames are the podium's, and
+  // everybody else in the ten is told apart by the rim around their picture.
+  it('crowns the top three, who need no badge, and rims 4 to 10', async () => {
+    await renderWithQuery(
+      <LeaderboardList entries={[1, 2, 3, 4, 11].map(entry)} category="best_raider" />,
+    );
+
+    // The frame carries its own numeral, so the row has no rank badge: the
+    // only "1" on the podium rows is inside the artwork.
+    expect(screen.getByLabelText('Rank 1: Player 1')).toBeTruthy();
+    expect(screen.getByLabelText('Rank 3: Player 3')).toBeTruthy();
+    expect(screen.queryByText('1')).toBeNull();
+    // 4 and 11 keep the numbered badge.
+    expect(screen.getByText('4')).toBeTruthy();
+    expect(screen.getByText('11')).toBeTruthy();
+    expect(screen.queryByLabelText('Rank 4: Player 4')).toBeNull();
+  });
+
   it('medals the top three, bands 4 to 10 and leaves the rest plain', async () => {
     await renderWithQuery(
       <LeaderboardList entries={[1, 2, 3, 4, 11].map(entry)} category="best_raider" />,

@@ -24,6 +24,7 @@ import { PROMPTS, notify, useNoticeStore } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
+import { JERSEY_MAX_LENGTH } from '../../utils/constants.js';
 import { formatPhone } from '../../utils/countries.js';
 import {
   registerPhoneSchema,
@@ -289,7 +290,7 @@ function ProfileStep({ verified, onChangeNumber }) {
         label: t('player.jerseyNumber'),
         hint: t('auth.jerseyHint'),
         keyboardType: 'number-pad',
-        maxLength: 2,
+        maxLength: JERSEY_MAX_LENGTH,
       })}
       {field('email', {
         label: t('auth.emailOptional'),

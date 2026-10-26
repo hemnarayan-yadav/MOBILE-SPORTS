@@ -10,6 +10,7 @@ import { teamSchema, toLocationPayload, toLocationValues } from '../../utils/val
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
 import ImageField from '../common/ImageField.jsx';
+import PhoneField from '../common/PhoneField.jsx';
 import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField from '../common/TextField.jsx';
 
@@ -24,10 +25,22 @@ export const EMPTY_TEAM_VALUES = Object.freeze({
   description: '',
   logoUrl: '',
   bannerUrl: '',
+  coachName: '',
+  coachPhone: '',
+  teamManagerName: '',
+  teamManagerPhone: '',
 });
 
 // Text inputs hold strings, so a number (the founding year) becomes one here.
 const toFormValue = (value) => (value === null || value === undefined ? '' : String(value));
+
+// The coach and the team's own manager: nested on the API, flat in the form.
+// A visitor is given the name alone, so a form built from a team somebody else
+// manages simply has no number to show.
+const toStaffValues = (prefix, staff) => ({
+  [`${prefix}Name`]: staff?.name ?? '',
+  [`${prefix}Phone`]: staff?.phone ?? '',
+});
 
 export function toTeamFormValues(team) {
   if (!team) return EMPTY_TEAM_VALUES;
@@ -35,8 +48,10 @@ export function toTeamFormValues(team) {
     ...Object.fromEntries(
       Object.keys(EMPTY_TEAM_VALUES).map((key) => [key, toFormValue(team[key])]),
     ),
-    // The API nests the pair; the form holds it flat.
+    // The API nests these; the form holds them flat.
     ...toLocationValues(team.location),
+    ...toStaffValues('coach', team.coach),
+    ...toStaffValues('teamManager', team.teamManager),
   };
 }
 
@@ -81,9 +96,23 @@ export default function TeamForm({
     setValue('district', district, { shouldDirty: true });
   };
 
-  // The form holds the location flat; the API takes it nested.
-  const submit = ({ state, district, ...values }) =>
-    onSubmit({ ...values, location: toLocationPayload({ state, district }) });
+  // The form holds the location and the two staff halves flat; the API takes
+  // them nested.
+  const submit = ({
+    state,
+    district,
+    coachName,
+    coachPhone,
+    teamManagerName,
+    teamManagerPhone,
+    ...values
+  }) =>
+    onSubmit({
+      ...values,
+      location: toLocationPayload({ state, district }),
+      coach: { name: coachName || null, phone: coachPhone || null },
+      teamManager: { name: teamManagerName || null, phone: teamManagerPhone || null },
+    });
 
   return (
     <View style={styles.form}>
@@ -165,6 +194,53 @@ export default function TeamForm({
         multiline
         numberOfLines={4}
         inputStyle={styles.textarea}
+      />
+
+      {/* Nobody has to fill this in: a team may name a coach today, add the
+          number later, or never name either. The numbers are not public. */}
+      <AppText variant="label" tone="muted">
+        {t('team.staff')}
+      </AppText>
+      <AppText variant="small" tone="muted">
+        {t('team.staffHint')}
+      </AppText>
+      <Field
+        control={control}
+        name="coachName"
+        label={t('team.coachName')}
+        error={errors.coachName}
+        autoCapitalize="words"
+      />
+      <Controller
+        control={control}
+        name="coachPhone"
+        render={({ field }) => (
+          <PhoneField
+            label={t('team.coachPhone')}
+            value={field.value}
+            onChange={field.onChange}
+            error={errors.coachPhone}
+          />
+        )}
+      />
+      <Field
+        control={control}
+        name="teamManagerName"
+        label={t('team.teamManagerName')}
+        error={errors.teamManagerName}
+        autoCapitalize="words"
+      />
+      <Controller
+        control={control}
+        name="teamManagerPhone"
+        render={({ field }) => (
+          <PhoneField
+            label={t('team.teamManagerPhone')}
+            value={field.value}
+            onChange={field.onChange}
+            error={errors.teamManagerPhone}
+          />
+        )}
       />
 
       <Button onPress={handleSubmit(submit)} loading={submitting}>

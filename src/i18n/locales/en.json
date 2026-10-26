@@ -443,7 +443,9 @@
       "registrations": "Registrations",
       "registrationsHint": "Tournament entry requests and decisions",
       "email": "Email me too",
-      "emailHint": "Also send reminders, results and registration decisions by email"
+      "emailHint": "Also send reminders, results and registration decisions by email",
+      "announcements": "KhelScore announcements",
+      "announcementsHint": "New tournaments and news from KhelScore"
     },
     "phoneVerified": "Number verified",
     "phoneNotVerified": "Number not verified",
@@ -517,7 +519,7 @@
     "date": "Enter a valid date",
     "foundedYear": "Enter a year between 1900 and this year",
     "height": "Height must be between 100 and 250 cm",
-    "jersey": "Jersey number must be 1 or 2 digits",
+    "jersey": "Jersey number must be 1 to 3 digits",
     "number": "Enter a number",
     "shortName": "Use 2–5 letters or digits",
     "teamNameMin": "Team name must be at least 2 characters",
@@ -613,6 +615,9 @@
     "timeout": "{{team}} take a timeout.",
     "substitution": "{{team}}: {{playerIn}} comes in for {{playerOut}}.",
     "injury": "{{player}} ({{team}}) is injured.",
+    "raiderSelfOut": "{{raider}} walked out of play — the raid is lost.",
+    "selfOut_one": "{{player}} walks out — {{count}} point to {{opponent}}.",
+    "selfOut_other": "{{player}} walks out — {{count}} points to {{opponent}}.",
     "raidDelayPoint_one": "Raid delay — {{count}} technical point to {{team}}.",
     "raidDelayPoint_other": "Raid delay — {{count}} technical points to {{team}}.",
     "raidCancelled": "Last raid cancelled by controller.",
@@ -657,6 +662,7 @@
     "scope": "Show rankings for",
     "allTime": "All tournaments (all time)",
     "teamStandings": "Team standings",
+    "rankOf": "Rank {{rank}}: {{name}}",
     "category": {
       "best_raider": "Best raider",
       "best_defender": "Best defender",
@@ -827,6 +833,12 @@
     "banner": "Banner image",
     "city": "City",
     "homeGround": "Home ground",
+    "staff": "Coach & team manager",
+    "staffHint": "Optional. Phone numbers are not shown publicly — only you and KhelScore staff can see them.",
+    "coachName": "Coach",
+    "coachPhone": "Coach mobile",
+    "teamManagerName": "Team manager",
+    "teamManagerPhone": "Team manager mobile",
     "foundedYear": "Founded year",
     "description": "Description",
     "createTitle": "Register your team",
@@ -883,6 +895,17 @@
     "deleteConfirm": "Delete {{name}}? The profile will be hidden and released from any squad.",
     "deleted": "Player deleted",
     "shareLabel": "Share {{name}}'s profile"
+  },
+  "jerseys": {
+    "title": "Tournament jersey numbers",
+    "subtitle": "The numbers this squad wears in this competition. Leave one empty to keep the squad’s number.",
+    "linkLabel": "Jerseys",
+    "worn": "Worn before:",
+    "inThisTournament": "Worn in this tournament",
+    "fallsBackTo": "Plays as {{number}} (squad number)",
+    "numberFor": "Jersey number for {{name}}",
+    "emptySquad": "This squad has no players yet",
+    "saved": "Jersey numbers saved"
   },
   "news": {
     "pageTitle": "News",
@@ -988,7 +1011,10 @@
     "registration_approved": "{{teamName}} is in {{tournamentName}}!",
     "registration_rejected": "{{teamName}}'s registration for {{tournamentName}} was not approved",
     "tournament_assigned": "You now manage {{tournamentName}}",
-    "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin"
+    "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin",
+    "tournament_published": "{{tournamentName}} is open on KhelScore",
+    "news_published": "KhelScore news: {{title}}",
+    "contact_message_received": "New message from {{senderName}}: {{subject}}"
   },
   "notifications": {
     "title": "Notifications",
