@@ -8,7 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Switch, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { authApi } from '../../api/auth.api.js';
 import { endSession } from '../../api/client.js';
 import { qk } from '../../api/queryKeys.js';
@@ -37,7 +37,7 @@ import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
 import { isoYearsAgo } from '../../utils/dates.js';
-import { ORGANISER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
+import { JERSEY_MAX_LENGTH, ORGANISER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
 import {
   changePasswordSchema,
@@ -61,6 +61,11 @@ const PREFERENCES = Object.freeze([
     key: 'registrations',
     label: 'profile.pref.registrations',
     hint: 'profile.pref.registrationsHint',
+  },
+  {
+    key: 'announcements',
+    label: 'profile.pref.announcements',
+    hint: 'profile.pref.announcementsHint',
   },
   { key: 'push', label: 'app.prefPush', hint: 'app.prefPushHint' },
   { key: 'email', label: 'profile.pref.email', hint: 'profile.pref.emailHint' },
@@ -127,6 +132,36 @@ function Status({ ok, yes, no }) {
     <AppText variant="small" weight="semibold" tone={ok ? 'success' : 'warning'}>
       {ok ? yes : no}
     </AppText>
+  );
+}
+
+// Numbers already worn, offered beside the field. A number already in the
+// field is not offered again, and somebody who has worn only one has nothing
+// to choose from, so the row disappears rather than repeating what is there.
+function SavedJerseys({ numbers, current, onPick }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const options = numbers.filter((number) => number !== current);
+  if (options.length === 0) return null;
+  return (
+    <View style={styles.savedJerseys}>
+      <AppText variant="small" tone="muted">
+        {t('jerseys.worn')}
+      </AppText>
+      {options.map((number) => (
+        <Pressable
+          key={number}
+          onPress={() => onPick(number)}
+          accessibilityRole="button"
+          accessibilityLabel={number}
+          style={[styles.jerseyChip, { backgroundColor: colors.surface2, borderColor: colors.border }]}
+        >
+          <AppText variant="small" weight="semibold">
+            {number}
+          </AppText>
+        </Pressable>
+      ))}
+    </View>
   );
 }
 
@@ -222,16 +257,26 @@ function ProfileForm({ profile }) {
             control={control}
             name="jerseyNumber"
             render={({ field }) => (
-              <TextField
-                label={t('player.jerseyNumber')}
-                hint={t('profile.jerseyHint')}
-                keyboardType="number-pad"
-                maxLength={2}
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                error={errors.jerseyNumber}
-              />
+              <>
+                <TextField
+                  label={t('player.jerseyNumber')}
+                  hint={t('profile.jerseyHint')}
+                  keyboardType="number-pad"
+                  maxLength={JERSEY_MAX_LENGTH}
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  error={errors.jerseyNumber}
+                />
+                {/* The numbers this player has worn, so going back to one is a
+                    tap. A tournament may hand out another; this is the one the
+                    profile shows. */}
+                <SavedJerseys
+                  numbers={profile.profile?.savedJerseyNumbers ?? []}
+                  current={field.value}
+                  onPick={field.onChange}
+                />
+              </>
             )}
           />
           <Controller
@@ -838,4 +883,11 @@ const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
   pushBlocked: { gap: SPACING.xs, marginTop: SPACING.xs },
   flex: { flex: 1 },
+  savedJerseys: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs },
+  jerseyChip: {
+    borderRadius: RADII.full,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+  },
 });

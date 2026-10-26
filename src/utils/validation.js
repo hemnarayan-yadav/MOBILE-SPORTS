@@ -94,12 +94,16 @@ const requiredPhoneField = z
 // OTP flows are India-only, matching the API.
 const indianMobileField = requiredPhoneField.regex(INDIAN_MOBILE_PATTERN, 'validation.phoneIndia');
 
+// A number somebody may simply not give. An empty field is not an error; a
+// number that is there is still an Indian mobile, as the API requires.
+const optionalIndianMobile = z.union([z.literal(''), indianMobileField]);
+
 // The shirt number a player is known by: asked for at sign-up and kept on the
 // profile, so it is defined before the schemas that need it. Text, not a
 // number, so the shirt keeps its leading zero — "08" is the number worn, not 8
 // — and the API stores exactly what was typed. A number that reaches the schema
 // from saved data is read as its digits.
-const JERSEY_PATTERN = /^\d{1,2}$/;
+const JERSEY_PATTERN = /^\d{1,3}$/;
 const jerseyField = z.preprocess(
   (value) => (typeof value === 'number' ? String(value) : value),
   z
@@ -234,6 +238,13 @@ export const teamSchema = withLocation(
     description: text(1000),
     logoUrl: optionalUrl,
     bannerUrl: optionalUrl,
+    // The coach and the team's own manager. Both are optional, and so is each
+    // half of them. `.optional()` as well as empty-allowed, so a form that
+    // does not offer these fields still validates.
+    coachName: text(100).optional(),
+    coachPhone: optionalIndianMobile.optional(),
+    teamManagerName: text(100).optional(),
+    teamManagerPhone: optionalIndianMobile.optional(),
     ...locationFields,
   }),
 );

@@ -12,6 +12,7 @@ import AppText from '../../components/common/AppText.jsx';
 import Avatar from '../../components/common/Avatar.jsx';
 import Badge from '../../components/common/Badge.jsx';
 import { BackHeader, Card, Section, StatTile, TileGrid } from '../../components/common/Layout.jsx';
+import ShareButton from '../../components/common/ShareButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import { WinMargin } from '../../components/match/MatchResult.jsx';
 import { CareerStats, PlayingRoleBadge, PointsBars } from '../../components/player/PlayerBits.jsx';
@@ -140,7 +141,16 @@ export default function PlayerScreen() {
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <BackHeader />
+        <View style={styles.topBar}>
+          <BackHeader />
+          {p ? (
+            <ShareButton
+              path={`/player/${p.id}`}
+              title={p.name}
+              label={t('player.shareLabel', { name: p.name })}
+            />
+          ) : null}
+        </View>
         {player.isPending ? <LoadingState /> : null}
         {player.isError ? (
           <ErrorState error={player.error} onRetry={() => player.refetch()} />
@@ -189,6 +199,7 @@ export default function PlayerScreen() {
 }
 
 const styles = StyleSheet.create({
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },

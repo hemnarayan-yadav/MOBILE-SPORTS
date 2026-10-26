@@ -19,6 +19,7 @@ import {
   TabStrip,
   TileGrid,
 } from '../../components/common/Layout.jsx';
+import ShareButton from '../../components/common/ShareButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import { SquadBoard, TeamHero } from '../../components/team/TeamBits.jsx';
@@ -119,12 +120,37 @@ function TeamMatches({ teamId }) {
   return query.data.items.map((match) => <MatchCard key={match.id} match={match} />);
 }
 
+// The two people behind a squad who are not in it. Their numbers reach this
+// screen only for whoever manages the team (the API decides), so a visitor is
+// given the name alone.
+function StaffCard({ labelKey, staff }) {
+  const { t } = useTranslation();
+  if (!staff?.name && !staff?.phone) return null;
+  return (
+    <Card>
+      <AppText variant="label" tone="muted">
+        {t(labelKey)}
+      </AppText>
+      <AppText weight="semibold">{staff.name ?? '—'}</AppText>
+      {staff.phone ? (
+        <AppText variant="small" tone="muted">
+          {staff.phone}
+        </AppText>
+      ) : null}
+    </Card>
+  );
+}
+
 function About({ team }) {
   const { t } = useTranslation();
-  return team.description ? (
-    <AppText>{team.description}</AppText>
-  ) : (
-    <EmptyState title={t('team.noDescription')} />
+  const hasStaff = Boolean(team.coach || team.teamManager);
+  if (!team.description && !hasStaff) return <EmptyState title={t('team.noDescription')} />;
+  return (
+    <View style={styles.about}>
+      {team.description ? <AppText>{team.description}</AppText> : null}
+      <StaffCard labelKey="team.coachName" staff={team.coach} />
+      <StaffCard labelKey="team.teamManagerName" staff={team.teamManager} />
+    </View>
   );
 }
 
@@ -139,7 +165,16 @@ export default function TeamScreen() {
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <BackHeader />
+        <View style={styles.topBar}>
+          <BackHeader />
+          {team ? (
+            <ShareButton
+              path={`/team/${team.id}`}
+              title={team.name}
+              label={t('team.shareLabel', { name: team.name })}
+            />
+          ) : null}
+        </View>
         {query.isPending ? <LoadingState /> : null}
         {query.isError ? <ErrorState error={query.error} onRetry={() => query.refetch()} /> : null}
         {team ? (
@@ -163,6 +198,8 @@ export default function TeamScreen() {
 }
 
 const styles = StyleSheet.create({
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  about: { gap: SPACING.sm },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },

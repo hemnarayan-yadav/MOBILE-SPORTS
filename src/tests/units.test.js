@@ -1,3 +1,4 @@
+import { describeEvent, describeRaid } from '../sports/kabaddi/commentary.js';
 import { uploadableImage } from '../utils/mediaFile.js';
 import {
   changePasswordSchema,
@@ -7,6 +8,35 @@ import {
   registerProfileSchema,
 } from '../utils/validation.js';
 import { isVersionOlder } from '../utils/version.js';
+
+// A player walking out of play is scored like a tackle nobody made. The app's
+// commentary used to have no sentence for it at all, which is what the drift
+// check was pointing at.
+describe('commentary for a self-out', () => {
+  const context = {
+    t: (key, params) => `${key}:${JSON.stringify(params ?? {})}`,
+    playerName: (id) => `player-${id}`,
+    teamName: (side) => `team-${side}`,
+  };
+
+  it('names the raider who walked out, instead of calling it an empty raid', () => {
+    const sentence = describeRaid(
+      { outcome: 'self_out', raider: 'p1', raidingTeam: 'A', allOutTeams: [] },
+      context,
+    );
+    expect(sentence).toContain('commentary.raiderSelfOut');
+    expect(sentence).not.toContain('commentary.empty');
+  });
+
+  it('reports somebody walking out while no raid is on, and who takes the point', () => {
+    const sentence = describeEvent(
+      { type: 'self_out', team: 'A', player: 'p2', pointsTo: 'B', points: 1 },
+      context,
+    );
+    expect(sentence).toContain('commentary.selfOut');
+    expect(sentence).toContain('team-B');
+  });
+});
 
 describe('version comparison (forced update)', () => {
   it('compares versions part by part, numerically', () => {
@@ -77,9 +107,11 @@ describe('account forms (ported from the web)', () => {
 
   // The jersey number is required at sign-up, and the birthday, height and
   // weight are not sign-up fields at all (API auth.validation.registerSchema).
-  it('requires a one or two digit jersey number at sign-up, and nothing else about the body', () => {
+  it('requires a jersey number of one to three digits at sign-up, and nothing else about the body', () => {
     expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '' }).success).toBe(false);
-    expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '100' }).success).toBe(false);
+    // Three digits are a number a squad really wears; four are not.
+    expect(registerProfileSchema.parse({ ...signUp, jerseyNumber: '100' }).jerseyNumber).toBe('100');
+    expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '1000' }).success).toBe(false);
     expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '0' }).success).toBe(true);
     // The zero is part of the number on the shirt, so it is kept as typed.
     expect(

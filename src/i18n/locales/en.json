@@ -17,7 +17,8 @@
     "confirm": "Confirm",
     "done": "Done",
     "missing": "Missing",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "share": "Share"
   },
   "theme": {
     "label": "Theme",
@@ -64,7 +65,10 @@
       "players": "Players tracked",
       "matchesPlayed": "Matches played"
     },
-    "newsTitle": "Latest news"
+    "newsTitle": "Latest news",
+    "featuredTitle": "Spotlight",
+    "topTeamsTitle": "Top teams",
+    "tabRecent": "Recent"
   },
   "nav": {
     "brand": "KhelScore",
@@ -218,7 +222,8 @@
       "officialSubstitutionRule": "Substitutions only during a timeout or the interval."
     },
     "heading": "{{teamA}} vs {{teamB}} — kabaddi match",
-    "headingTournament": "{{teamA}} vs {{teamB}} — {{tournament}}"
+    "headingTournament": "{{teamA}} vs {{teamB}} — {{tournament}}",
+    "shareLabel": "Share {{name}}"
   },
   "errors": {
     "notFound": "Page not found",
@@ -438,7 +443,9 @@
       "registrations": "Registrations",
       "registrationsHint": "Tournament entry requests and decisions",
       "email": "Email me too",
-      "emailHint": "Also send reminders, results and registration decisions by email"
+      "emailHint": "Also send reminders, results and registration decisions by email",
+      "announcements": "KhelScore announcements",
+      "announcementsHint": "New tournaments and news from KhelScore"
     },
     "phoneVerified": "Number verified",
     "phoneNotVerified": "Number not verified",
@@ -482,7 +489,7 @@
     "passwordIntro": "Change the password you sign in with.",
     "passwordSignsOut": "Changing your password signs you out on every device. Sign in again with the new one.",
     "temporaryPassword": "This account still uses the temporary password it was created with. Choose your own to manage your squad.",
-    "temporaryPasswordHint": "The temporary one is the last 4 digits of your mobile number followed by your jersey number.",
+    "temporaryPasswordHint": "The temporary one is the first 6 digits of your mobile number.",
     "changePassword": "Change password",
     "currentPassword": "Current password",
     "passwordChanged": "Password changed. Please sign in again."
@@ -512,7 +519,7 @@
     "date": "Enter a valid date",
     "foundedYear": "Enter a year between 1900 and this year",
     "height": "Height must be between 100 and 250 cm",
-    "jersey": "Jersey number must be 1 or 2 digits",
+    "jersey": "Jersey number must be 1 to 3 digits",
     "number": "Enter a number",
     "shortName": "Use 2–5 letters or digits",
     "teamNameMin": "Team name must be at least 2 characters",
@@ -608,6 +615,9 @@
     "timeout": "{{team}} take a timeout.",
     "substitution": "{{team}}: {{playerIn}} comes in for {{playerOut}}.",
     "injury": "{{player}} ({{team}}) is injured.",
+    "raiderSelfOut": "{{raider}} walked out of play — the raid is lost.",
+    "selfOut_one": "{{player}} walks out — {{count}} point to {{opponent}}.",
+    "selfOut_other": "{{player}} walks out — {{count}} points to {{opponent}}.",
     "raidDelayPoint_one": "Raid delay — {{count}} technical point to {{team}}.",
     "raidDelayPoint_other": "Raid delay — {{count}} technical points to {{team}}.",
     "raidCancelled": "Last raid cancelled by controller.",
@@ -652,6 +662,7 @@
     "scope": "Show rankings for",
     "allTime": "All tournaments (all time)",
     "teamStandings": "Team standings",
+    "rankOf": "Rank {{rank}}: {{name}}",
     "category": {
       "best_raider": "Best raider",
       "best_defender": "Best defender",
@@ -781,7 +792,8 @@
     },
     "championTitle": "Champions",
     "championNamed": "Winner: {{team}}",
-    "playerOfTournament": "Player of the Tournament"
+    "playerOfTournament": "Player of the Tournament",
+    "shareLabel": "Share {{name}}"
   },
   "team": {
     "pageTitle": "Teams",
@@ -821,6 +833,12 @@
     "banner": "Banner image",
     "city": "City",
     "homeGround": "Home ground",
+    "staff": "Coach & team manager",
+    "staffHint": "Optional. Phone numbers are not shown publicly — only you and KhelScore staff can see them.",
+    "coachName": "Coach",
+    "coachPhone": "Coach mobile",
+    "teamManagerName": "Team manager",
+    "teamManagerPhone": "Team manager mobile",
     "foundedYear": "Founded year",
     "description": "Description",
     "createTitle": "Register your team",
@@ -840,7 +858,8 @@
     "statusUpdated": "Team status updated",
     "delete": "Delete team",
     "deleteConfirm": "Delete {{name}}? It will be hidden everywhere, its squad released and its captain returned to a regular account.",
-    "deletedToast": "Team deleted"
+    "deletedToast": "Team deleted",
+    "shareLabel": "Share {{name}}"
   },
   "player": {
     "pageTitle": "Players",
@@ -874,7 +893,19 @@
     "saved": "Player profile saved",
     "delete": "Delete player",
     "deleteConfirm": "Delete {{name}}? The profile will be hidden and released from any squad.",
-    "deleted": "Player deleted"
+    "deleted": "Player deleted",
+    "shareLabel": "Share {{name}}'s profile"
+  },
+  "jerseys": {
+    "title": "Tournament jersey numbers",
+    "subtitle": "The numbers this squad wears in this competition. Leave one empty to keep the squad’s number.",
+    "linkLabel": "Jerseys",
+    "worn": "Worn before:",
+    "inThisTournament": "Worn in this tournament",
+    "fallsBackTo": "Plays as {{number}} (squad number)",
+    "numberFor": "Jersey number for {{name}}",
+    "emptySquad": "This squad has no players yet",
+    "saved": "Jersey numbers saved"
   },
   "news": {
     "pageTitle": "News",
@@ -980,7 +1011,10 @@
     "registration_approved": "{{teamName}} is in {{tournamentName}}!",
     "registration_rejected": "{{teamName}}'s registration for {{tournamentName}} was not approved",
     "tournament_assigned": "You now manage {{tournamentName}}",
-    "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin"
+    "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin",
+    "tournament_published": "{{tournamentName}} is open on KhelScore",
+    "news_published": "KhelScore news: {{title}}",
+    "contact_message_received": "New message from {{senderName}}: {{subject}}"
   },
   "notifications": {
     "title": "Notifications",
@@ -1100,5 +1134,58 @@
     "countedMatches_one": "{{count}} ranked match",
     "countedMatches_other": "{{count}} ranked matches",
     "linkLabel": "Which matches count"
+  },
+  "notices": {
+    "sectionTitle": "Tournaments & news",
+    "tabTournaments": "Tournaments",
+    "tabNews": "News",
+    "phaseUpcoming": "Upcoming",
+    "phaseRunning": "On now",
+    "phaseCompleted": "Finished",
+    "allYears": "All years",
+    "emptyTitle": "No tournaments listed yet",
+    "emptyHint": "Know one? Announce it so other players can find it.",
+    "newsEmptyTitle": "No Kabaddi news right now",
+    "newsEmptyHint": "Check back later.",
+    "venueLabel": "Where",
+    "dateLabel": "When",
+    "prizesLabel": "Prizes",
+    "entryFeeLabel": "Entry fee",
+    "rulesLabel": "Rules",
+    "organiserLabel": "Organised by",
+    "contactLabel": "Contact",
+    "positionPrize": "Position {{position}}",
+    "readOnSource": "Read on {{source}}",
+    "announce": "Announce a tournament",
+    "announceHint": "A moderator checks every announcement before it appears.",
+    "announceSent": "Sent. A moderator will check it shortly.",
+    "myNotices": "What I announced",
+    "statusPending": "Waiting for review",
+    "statusApproved": "Published",
+    "statusRejected": "Not published",
+    "report": "Report",
+    "reportTitle": "Report this tournament",
+    "reportHint": "Tell us what is wrong. A moderator will look at it.",
+    "reportSent": "Thanks. A moderator will look at this.",
+    "fieldTitle": "Tournament name",
+    "fieldStartDate": "Date",
+    "fieldStartTime": "Start time",
+    "fieldVenue": "Ground or village",
+    "fieldPoster": "Poster",
+    "fieldEntryFee": "Entry fee",
+    "fieldRules": "Rules",
+    "fieldOrganiser": "Organised by",
+    "fieldContact": "Contact number",
+    "fieldPrize": "Prize {{position}}",
+    "reason": {
+      "not_real": "Not a real tournament",
+      "wrong_details": "Wrong details",
+      "offensive": "Offensive",
+      "spam": "Spam",
+      "other": "Something else"
+    },
+    "reportReasonLabel": "What is wrong?",
+    "reportNoteLabel": "More detail (optional)",
+    "yearLabel": "Year"
   }
 }

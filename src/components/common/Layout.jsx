@@ -121,7 +121,10 @@ export function TabStrip({ tabs, value, onChange, label }) {
               },
             ]}
           >
-            <AppText weight="semibold" tone={active ? 'onInk' : 'muted'}>
+            {/* One line, and the tab never shrinks: a Devanagari label is
+                longer than its English twin, and the Hindi ranking tabs were
+                wrapping and showing only their first word ("बेस्ट"). */}
+            <AppText weight="semibold" tone={active ? 'onInk' : 'muted'} numberOfLines={1}>
               {tab.label}
             </AppText>
           </Pressable>
@@ -148,5 +151,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     borderRadius: RADII.full,
     borderWidth: 1,
+    // The strip scrolls sideways, so a tab keeps the width its label needs
+    // instead of being squeezed by the ones beside it.
+    flexShrink: 0,
   },
 });

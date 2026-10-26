@@ -26,7 +26,7 @@ import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorKey } from '../../utils/apiErrors.js';
 import { joinPhone } from '../../utils/countries.js';
-import { PLAYING_ROLES } from '../../utils/constants.js';
+import { JERSEY_MAX_LENGTH, PLAYING_ROLES } from '../../utils/constants.js';
 import { directPlayerSchema, toLocationPayload } from '../../utils/validation.js';
 import AppText from '../common/AppText.jsx';
 import Avatar from '../common/Avatar.jsx';
@@ -174,7 +174,7 @@ function DirectAddForm({ teamId, query, found, onDone }) {
           <TextField
             label={t('player.jerseyNumber')}
             keyboardType="number-pad"
-            maxLength={2}
+            maxLength={JERSEY_MAX_LENGTH}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}

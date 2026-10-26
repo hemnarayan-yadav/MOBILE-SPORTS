@@ -7,6 +7,11 @@ export const tournamentsApi = {
   get: (id) => apiClient.get(`/tournaments/${id}`).then(unwrap),
   teams: (id, params) => apiClient.get(`/tournaments/${id}/teams`, { params }).then(unwrap),
   stats: (id) => apiClient.get(`/tournaments/${id}/stats`).then(unwrap),
+  // The numbers the captain's own squad wears in one competition. (An
+  // organiser sets them from the website; the API allows both.)
+  jerseys: (id, teamId) => apiClient.get(`/tournaments/${id}/teams/${teamId}/jerseys`).then(unwrap),
+  setJerseys: (id, teamId, jerseys) =>
+    apiClient.put(`/tournaments/${id}/teams/${teamId}/jerseys`, { jerseys }).then(unwrap),
   register: (id) => apiClient.post(`/tournaments/${id}/register-team`).then(unwrap),
   withdraw: (id) => apiClient.delete(`/tournaments/${id}/register-team`).then(unwrap),
 };
