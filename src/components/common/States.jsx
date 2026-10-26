@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import AppText from './AppText.jsx';
 
 // How long the retry button keeps its spinner even when the attempt settles at
@@ -76,7 +76,7 @@ export function ErrorState({ error, onRetry }) {
   return (
     <View style={styles.box} accessibilityLiveRegion="polite">
       <AppText weight="semibold" style={styles.center}>
-        {t(apiErrorKey(error))}
+        {apiErrorText(t, error)}
       </AppText>
       <AppText variant="small" tone="muted" style={styles.center}>
         {t('common.errorHint')}

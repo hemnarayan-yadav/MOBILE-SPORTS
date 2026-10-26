@@ -24,7 +24,7 @@ import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
 import { notify } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { joinPhone } from '../../utils/countries.js';
 import { JERSEY_MAX_LENGTH, PLAYING_ROLES } from '../../utils/constants.js';
 import { directPlayerSchema, toLocationPayload } from '../../utils/validation.js';
@@ -126,7 +126,7 @@ function DirectAddForm({ teamId, query, found, onDone }) {
       );
       onDone();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   // The two pickers are driven together: picking a state clears the district.
@@ -225,7 +225,7 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
       notify.success(t('squad.playerAdded', { name: member.player.name }));
       onDone();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   return (

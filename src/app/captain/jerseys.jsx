@@ -19,7 +19,7 @@ import CaptainScreen from '../../components/team/CaptainScreen.jsx';
 import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { JERSEY_MAX_LENGTH } from '../../utils/constants.js';
 
 const digitsOnly = (value) => value.replace(/\D/g, '').slice(0, JERSEY_MAX_LENGTH);
@@ -123,7 +123,7 @@ function JerseyList({ team, tournamentId, draft, setDraft, queryClient }) {
       queryClient.setQueryData(qk.tournaments.jerseys(tournamentId, team.id), data);
       notify.success(t('jerseys.saved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   if (query.isPending) return <LoadingState />;

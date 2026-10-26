@@ -18,7 +18,7 @@ import CaptainScreen from '../../components/team/CaptainScreen.jsx';
 import { TournamentCard } from '../../components/tournament/TournamentBits.jsx';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { KABADDI, TEAM_STATUS } from '../../utils/constants.js';
 import { formatDate } from '../../utils/format.js';
 
@@ -47,7 +47,7 @@ function OpenTournaments({ team }) {
       notify.success(t('registration.submitted'));
       queryClient.invalidateQueries({ queryKey: qk.teams.registrations(team.id) });
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const taken = new Set(
@@ -101,7 +101,7 @@ function MyEntries({ team }) {
       notify.success(t('registration.withdrawn'));
       queryClient.invalidateQueries({ queryKey: qk.teams.registrations(team.id) });
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const entries = query.data ?? [];

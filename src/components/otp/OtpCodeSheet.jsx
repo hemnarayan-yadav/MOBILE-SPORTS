@@ -7,7 +7,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { useNow } from '../../hooks/useNow.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
 import Sheet from '../common/Sheet.jsx';
@@ -121,7 +121,7 @@ export default function OtpCodeSheet({
       </View>
       {error ? (
         <AppText tone="danger" accessibilityLiveRegion="polite">
-          {t(apiErrorKey(error))}
+          {apiErrorText(t, error)}
         </AppText>
       ) : null}
       {notice && !error ? (

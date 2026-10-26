@@ -17,7 +17,7 @@ import { openInvitations } from '../../hooks/useTeamInvitations.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { formatPhone } from '../../utils/countries.js';
 import { formatDate } from '../../utils/format.js';
 import AppText from '../common/AppText.jsx';
@@ -78,7 +78,7 @@ export default function TeamInvitations({ teamId, query, onSquadChanged }) {
     },
     onError: (error) => {
       setCancelling(null);
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       refreshList();
       onSquadChanged();
     },

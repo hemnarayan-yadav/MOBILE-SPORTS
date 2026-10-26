@@ -61,7 +61,7 @@
   },
   "src/utils/apiErrors.js": {
     "source": "src/utils/apiErrors.js",
-    "sha256": "a06e8edec9a83ff7d3acab3649d1462f693b3eb344f8ebd4ec1b700cb660999e"
+    "sha256": "cfb39133e220d264b34f67931b15a52fb8a72a25c7f3d836034f5440c010e65f"
   },
   "src/utils/constants.js": {
     "source": "src/utils/constants.js",
@@ -121,7 +121,7 @@
   },
   "src/components/otp/OtpCodeSheet.jsx": {
     "source": "src/components/otp/OtpCodeSheet.jsx",
-    "sha256": "9a06d6ee83ff09827ffd3cae8afef3443d4382b3479c4f901b7227192a82f421"
+    "sha256": "9866e946627c920d1607f5647ad7d7dee39f979a47472bdcf30b87ff98660ca8"
   },
   "src/components/common/PhoneField.jsx": {
     "source": "src/components/common/PhoneField.jsx",
@@ -149,19 +149,19 @@
   },
   "src/app/auth/login.jsx": {
     "source": "src/pages/auth/Login.jsx",
-    "sha256": "96c672e9c0504fe146d26ff101b0a8affb63c4bd5b41fd4db743a93084c53600"
+    "sha256": "e10bef17fa2652a0fef1e910d3e5773ade27d1012aa04c44934b7d7ec2861ecb"
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "c3b4350ee5a7c3e7e777dafd13e297ca001b963fee802c2f8e79626b28b395a5"
+    "sha256": "b50ff93868b51cac6004f825046a4c59d4dddd46448bccc357b8a084caebf1a6"
   },
   "src/app/auth/forgot-password.jsx": {
     "source": "src/pages/auth/ForgotPassword.jsx",
-    "sha256": "ffeab1667b2f69275cdd7ac296b2487f69dfda3db35c3842844e456c4c25b115"
+    "sha256": "922658024b41b0880591a5716c00f6299cf17d6e03b8a74e193b4c33d1d61bc8"
   },
   "src/app/dashboard/profile.jsx": {
     "source": "src/pages/dashboard/Profile.jsx",
-    "sha256": "6b216ea11ef412344f7ccfb936ed249e8e36b1bd164ff470210ab865dfa79d9c"
+    "sha256": "2ac01f866d953c84c6c2dab9eb48dd8f69ec30983b81a17f6bd19371860a7556"
   },
   "src/api/teams.api.js": {
     "source": "src/api/teams.api.js",
@@ -189,7 +189,7 @@
   },
   "src/hooks/useFollow.js": {
     "source": "src/hooks/useFollow.js",
-    "sha256": "5076e60b14843828c33b28b330a07e0579c6d582d00e34b27a2ae9fb835fa509"
+    "sha256": "e60bf5666485479300f07d03b535451ed3d2b5e01d575ced6b8dfa460ca1130e"
   },
   "src/hooks/useDebouncedValue.js": {
     "source": "src/hooks/useDebouncedValue.js",
@@ -277,7 +277,7 @@
   },
   "src/app/tournament/[id].jsx": {
     "source": "src/pages/public/TournamentDetails.jsx",
-    "sha256": "5ce7e64d32ef218511ed6259f39bb6e92efac30fbb1eb4dd2c3f306d062975cc"
+    "sha256": "c1caf28f63d2a4205920dcc5a4822118c6a7b8f3c030c4039f776f8aa675bcc6"
   },
   "src/app/team/[id].jsx": {
     "source": "src/pages/public/TeamProfile.jsx",
@@ -321,7 +321,7 @@
   },
   "src/components/common/ImageField.jsx": {
     "source": "src/components/common/ImageField.jsx",
-    "sha256": "11ca6484b39181a82bff6291994f11eaffc89766a8ac3e7e80abe76b7e0abfbf"
+    "sha256": "5f17694c78ef5ad7877d36d17b4c4f449f0f1d2d190b5b76ff690f9233edaa3d"
   },
   "src/components/common/ConfirmDialog.jsx": {
     "source": "src/components/common/ConfirmDialog.jsx",
@@ -341,19 +341,19 @@
   },
   "src/components/team/AddByPhone.jsx": {
     "source": "src/pages/dashboard/captain/AddPlayer.jsx",
-    "sha256": "01305671547ab92a9afaf1c6fa6f3e4b292bd809f9511ba004016507578f366b"
+    "sha256": "f3eb44719d7aeefe9d4f0808856759e5ff8d043cc7b0d60d3b35812f36d71330"
   },
   "src/components/team/TeamInvitations.jsx": {
     "source": "src/pages/dashboard/captain/TeamInvitations.jsx",
-    "sha256": "20765d6ca62eaa1ed1ab729e0ec2760ae7542410c8d2b47de2b75f7b3598b305"
+    "sha256": "da144577cc7594de331b0ea5e039814cbc5e3169cec66887da4d0bdaf868931d"
   },
   "src/components/team/JoinActions.jsx": {
     "source": "src/pages/public/JoinTeam.jsx",
-    "sha256": "69edf91e61168e580b4d6d983f9bbd45824e9e8e3560b555412f56ebd0f5cafa"
+    "sha256": "4819cd6a3b202c4151e40b5b60e8f05f21cfc72b9d72360933fe81246cc00aa1"
   },
   "src/components/team/CaptainScreen.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
-    "sha256": "843f0a27b30e45b9b818401a4d8ea9d5699dfe058f2a42acc5b59def52e0bf03"
+    "sha256": "4c9a10b69c8449767dd38520c3269236cae788e53dde2fe70a5aafbe331b05aa"
   },
   "src/hooks/useCaptainTeam.js": {
     "source": "src/pages/dashboard/captain/useCaptainTeam.js",
@@ -365,35 +365,35 @@
   },
   "src/app/user/create-team.jsx": {
     "source": "src/pages/dashboard/user/CreateTeam.jsx",
-    "sha256": "f04427b5e2c789b94fa436826ec668cf42afb5d827244a414ffe580fe0a1e14f"
+    "sha256": "f45a7dbb80e06158b9401eb0fadced11ff4197e64e4900609d03cd490c9eeb7c"
   },
   "src/app/captain/index.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
-    "sha256": "843f0a27b30e45b9b818401a4d8ea9d5699dfe058f2a42acc5b59def52e0bf03"
+    "sha256": "4c9a10b69c8449767dd38520c3269236cae788e53dde2fe70a5aafbe331b05aa"
   },
   "src/app/captain/team.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
-    "sha256": "843f0a27b30e45b9b818401a4d8ea9d5699dfe058f2a42acc5b59def52e0bf03"
+    "sha256": "4c9a10b69c8449767dd38520c3269236cae788e53dde2fe70a5aafbe331b05aa"
   },
   "src/app/captain/squad.jsx": {
     "source": "src/pages/dashboard/captain/SquadManagement.jsx",
-    "sha256": "4596fc244ab1578853b50c349e47c7df6d0883b218de4fb276adac1defa805ea"
+    "sha256": "cfa53d069a906fb33d6176a62ed77b88940498c02325fc1821835ae66d94ac64"
   },
   "src/app/captain/tournaments.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
-    "sha256": "843f0a27b30e45b9b818401a4d8ea9d5699dfe058f2a42acc5b59def52e0bf03"
+    "sha256": "4c9a10b69c8449767dd38520c3269236cae788e53dde2fe70a5aafbe331b05aa"
   },
   "src/app/captain/matches.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
-    "sha256": "843f0a27b30e45b9b818401a4d8ea9d5699dfe058f2a42acc5b59def52e0bf03"
+    "sha256": "4c9a10b69c8449767dd38520c3269236cae788e53dde2fe70a5aafbe331b05aa"
   },
   "src/app/join/index.jsx": {
     "source": "src/pages/public/JoinTeam.jsx",
-    "sha256": "69edf91e61168e580b4d6d983f9bbd45824e9e8e3560b555412f56ebd0f5cafa"
+    "sha256": "4819cd6a3b202c4151e40b5b60e8f05f21cfc72b9d72360933fe81246cc00aa1"
   },
   "src/app/join/[token].jsx": {
     "source": "src/pages/public/JoinTeam.jsx",
-    "sha256": "69edf91e61168e580b4d6d983f9bbd45824e9e8e3560b555412f56ebd0f5cafa"
+    "sha256": "4819cd6a3b202c4151e40b5b60e8f05f21cfc72b9d72360933fe81246cc00aa1"
   },
   "src/utils/rounds.js": {
     "source": "src/utils/rounds.js",

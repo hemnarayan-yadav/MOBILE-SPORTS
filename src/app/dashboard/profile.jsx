@@ -35,7 +35,7 @@ import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { isoYearsAgo } from '../../utils/dates.js';
 import { JERSEY_MAX_LENGTH, ORGANISER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
@@ -175,7 +175,7 @@ function ProfileForm({ profile }) {
       applyProfile(updated);
       notify.success(t('profile.saved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
   const {
     control,
@@ -365,12 +365,12 @@ function EmailSection({ profile }) {
       applyProfile(updated);
       notify.success(t('profile.emailConfirmed'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const start = async () => {
     const otpToken = await ask(profile.email).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (otpToken) confirm.mutate(otpToken);
@@ -402,7 +402,7 @@ function ChangePhoneForm({ profile, verify, onSaved }) {
   const save = useMutation({
     mutationFn: usersApi.changePhone,
     onSuccess: onSaved,
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
   // Prefilled only with an Indian number: OTP cannot verify any other.
   const current = profile.phone && splitPhone(profile.phone).code === 'IN' ? profile.phone : '';
@@ -414,7 +414,7 @@ function ChangePhoneForm({ profile, verify, onSaved }) {
 
   const onSubmit = async ({ phone }) => {
     const otpToken = await verify(phone).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (otpToken) save.mutate({ phone, otpToken });
@@ -456,7 +456,7 @@ function PhoneSection({ profile }) {
       applyProfile(updated);
       notify.success(t('profile.phoneRemoved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const actionLabel = !profile.phone
@@ -562,7 +562,7 @@ function PasswordSection({ profile, openOnMount }) {
       await endSession();
       queryClient.clear();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const field = (name, label) => (
@@ -644,7 +644,7 @@ function NotificationPreferences({ profile }) {
       applyProfile(updated);
       notify.success(t('profile.preferencesSaved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   return PREFERENCES.map(({ key, label, hint }) => (
@@ -716,12 +716,12 @@ function DeleteAccountSection({ profile }) {
       clearSession();
       queryClient.clear();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   const byOtp = async () => {
     const otpToken = await phoneVerification.verify(profile.phone).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (otpToken) remove.mutate({ otpToken });

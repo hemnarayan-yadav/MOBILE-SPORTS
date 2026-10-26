@@ -10,7 +10,7 @@ import PushPrimer from '../components/common/PushPrimer.jsx';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
 import { notify } from '../store/noticeStore.js';
 import { useUiStore } from '../store/uiStore.js';
-import { apiErrorKey } from '../utils/apiErrors.js';
+import { apiErrorText } from '../utils/apiErrors.js';
 import { usePushPermission } from './usePush.js';
 
 export function useFollow(targetType, targetId) {
@@ -43,7 +43,7 @@ export function useFollow(targetType, targetId) {
       // show the prompt.
       if (data.following && !pushPrimed && permission.canAsk) setPriming(true);
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   // Whichever way it ends, the offer is not made again.

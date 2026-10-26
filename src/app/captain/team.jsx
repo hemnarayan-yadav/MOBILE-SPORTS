@@ -17,7 +17,7 @@ import CaptainScreen, { LockedNotice } from '../../components/team/CaptainScreen
 import TeamForm, { toTeamFormValues } from '../../components/team/TeamForm.jsx';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { ROLES, TEAM_STATUS } from '../../utils/constants.js';
 
 function Editor({ team }) {
@@ -33,7 +33,7 @@ function Editor({ team }) {
       queryClient.invalidateQueries({ queryKey: qk.teams.all });
       notify.success(t('team.saved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
   const setStatus = useMutation({
     mutationFn: (next) => teamsApi.setStatus(team.id, next),
@@ -46,7 +46,7 @@ function Editor({ team }) {
     },
     onError: (error) => {
       setConfirming(false);
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
     },
   });
 

@@ -4,8 +4,8 @@
 // captain's name for the player is suggested.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -23,7 +23,7 @@ import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { PROMPTS, notify, useNoticeStore } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { JERSEY_MAX_LENGTH } from '../../utils/constants.js';
 import { formatPhone } from '../../utils/countries.js';
 import {
@@ -74,13 +74,13 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
       // Availability could not be checked — fall through to the OTP path;
       // /auth/register remains the authority and will refuse if truly taken.
       if (error?.code) {
-        notify.error(t(apiErrorKey(error)));
+        notify.error(apiErrorText(t, error));
         return;
       }
     }
     setTakenPhone(null);
     const otpToken = await verification.verify(phone).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (otpToken) await onVerified({ phone, otpToken });
@@ -238,7 +238,7 @@ function ProfileStep({ verified, onChangeNumber }) {
       },
       {
         onError: (error) => {
-          notify.error(t(apiErrorKey(error)));
+          notify.error(apiErrorText(t, error));
           // A number taken meanwhile sends them back to step one.
           if (error?.code === 'PHONE_TAKEN') onChangeNumber();
         },
@@ -344,11 +344,22 @@ export default function Register() {
   const [step, setStep] = useState(STEPS.PHONE);
   // The proved number, its single-use proof and the invitations waiting for it.
   const [verified, setVerified] = useState(null);
+  // A sign-in that found no account hands its proof over rather than letting it
+  // go to waste: sign-up opens on step two with the number already proved, so
+  // nobody waits out the resend interval for a second code.
+  const { phone: carriedPhone, otpToken: carriedProof } = useLocalSearchParams();
 
   const handleVerified = async ({ phone, otpToken }) => {
     setVerified({ phone, otpToken, invitations: await lookupInvitations(phone, otpToken) });
     setStep(STEPS.PROFILE);
   };
+
+  const carried = useRef(false);
+  useEffect(() => {
+    if (!carriedPhone || !carriedProof || carried.current) return;
+    carried.current = true;
+    handleVerified({ phone: String(carriedPhone), otpToken: String(carriedProof) });
+  }, [carriedPhone, carriedProof]);
   const changeNumber = () => {
     setVerified(null);
     setStep(STEPS.PHONE);
