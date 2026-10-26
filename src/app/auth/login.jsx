@@ -2,7 +2,7 @@
 // phone) or a one-time code on the phone. OTP sign-in is offered only when the
 // API's code flow is available.
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { loginSchema, otpLoginSchema } from '../../utils/validation.js';
 
 const METHODS = Object.freeze({ PASSWORD: 'password', OTP: 'otp' });
@@ -36,7 +36,7 @@ function PasswordLoginForm({ initialIdentifier = '' }) {
   });
 
   const onSubmit = (values) =>
-    login.mutate(values, { onError: (error) => notify.error(t(apiErrorKey(error))) });
+    login.mutate(values, { onError: (error) => notify.error(apiErrorText(t, error)) });
 
   return (
     <View style={styles.form}>
@@ -90,6 +90,7 @@ function PasswordLoginForm({ initialIdentifier = '' }) {
 
 function OtpLoginForm({ verify, channel }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const { otpLogin } = useAuth();
   const {
     control,
@@ -99,13 +100,25 @@ function OtpLoginForm({ verify, channel }) {
 
   const onSubmit = async ({ phone }) => {
     const otpToken = await verify(phone).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (!otpToken) return;
     otpLogin.mutate(
       { phone, otpToken },
-      { onError: (error) => notify.error(t(apiErrorKey(error))) },
+      {
+        onError: (error) => {
+          // Signing in before signing up is an easy mistake, and the number is
+          // already proved. Sign-up continues with the same proof rather than
+          // sending a second code the resend interval would hold back.
+          if (error?.code === 'PHONE_NOT_REGISTERED') {
+            notify.info(t('auth.noAccountSoSignUp'));
+            router.push({ pathname: '/auth/register', params: { phone, otpToken } });
+            return;
+          }
+          notify.error(apiErrorText(t, error));
+        },
+      },
     );
   };
 

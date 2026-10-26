@@ -20,7 +20,7 @@ import { notify } from '../../store/noticeStore.js';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { formatDate } from '../../utils/format.js';
 
 // The reasons the API accepts. `other` has to say what is wrong.
@@ -65,7 +65,7 @@ export default function NoticeDetail() {
     },
     // A second report from the same account answers 409; the reader is told
     // plainly rather than left pressing a button that does nothing.
-    onError: (err) => notify.error(t(apiErrorKey(err))),
+    onError: (err) => notify.error(apiErrorText(t, err)),
   });
 
   const notice = query.data;

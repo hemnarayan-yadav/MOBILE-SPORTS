@@ -26,7 +26,7 @@ import TeamInvitations from '../../components/team/TeamInvitations.jsx';
 import { openInvitations, useTeamInvitations } from '../../hooks/useTeamInvitations.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { KABADDI } from '../../utils/constants.js';
 import { blankToNull } from '../../utils/validation.js';
 
@@ -46,7 +46,7 @@ function PlayingSeven({ team, onSaved }) {
       onSaved(squad);
       notify.success(t('squad.playingSevenSaved'));
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   // The full-squad notice is raised here and not inside the updater: an updater
@@ -95,7 +95,7 @@ function EditProfileSheet({ playerId, onClose, onSaved }) {
       onSaved();
       onClose();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   return (
@@ -120,7 +120,7 @@ function Squad({ team, view, onView }) {
   const queryClient = useQueryClient();
   const teamKey = qk.teams.detail(team.id);
   const refreshTeam = () => queryClient.invalidateQueries({ queryKey: teamKey });
-  const onError = (error) => notify.error(t(apiErrorKey(error)));
+  const onError = (error) => notify.error(apiErrorText(t, error));
 
   const [adding, setAdding] = useState(false);
   const [actionsFor, setActionsFor] = useState(null);

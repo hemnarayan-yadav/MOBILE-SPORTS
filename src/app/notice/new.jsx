@@ -21,7 +21,7 @@ import TextField from '../../components/common/TextField.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 
 // Four is what a village poster offers: प्रथम, द्वितीय, तृतीय, चतुर्थ.
 const PRIZE_POSITIONS = Object.freeze([1, 2, 3, 4]);
@@ -77,7 +77,7 @@ export default function AnnounceTournament() {
       notify.success(t('notices.announceSent'));
       router.back();
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   if (status === AUTH_STATUS.ANONYMOUS) return <Redirect href="/auth/login" />;

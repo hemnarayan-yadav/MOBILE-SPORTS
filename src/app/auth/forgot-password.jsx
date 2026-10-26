@@ -20,7 +20,7 @@ import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { emailResetSchema, phoneResetSchema } from '../../utils/validation.js';
 
 const METHODS = Object.freeze({ EMAIL: 'email', PHONE: 'phone' });
@@ -56,13 +56,13 @@ function useResetFlow({ verify, send, onReset }) {
   const reset = useMutation({ mutationFn: send });
   const submit = async ({ contact, password, payload }) => {
     const otpToken = await verify(contact).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (!otpToken) return;
     reset.mutate(
       { ...payload, otpToken, password },
-      { onSuccess: onReset, onError: (error) => notify.error(t(apiErrorKey(error))) },
+      { onSuccess: onReset, onError: (error) => notify.error(apiErrorText(t, error)) },
     );
   };
   return { submit, pending: reset.isPending };

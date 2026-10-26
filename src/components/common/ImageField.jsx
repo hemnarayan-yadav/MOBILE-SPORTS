@@ -14,7 +14,7 @@ import { qk } from '../../api/queryKeys.js';
 import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { uploadableImage } from '../../utils/mediaFile.js';
 import AppText from './AppText.jsx';
 import Button from './Button.jsx';
@@ -60,7 +60,7 @@ export default function ImageField({
       onChange(asset.optimized?.url ?? asset.url);
       notify.success(t('media.uploaded'));
     },
-    onError: (failure) => notify.error(t(apiErrorKey(failure))),
+    onError: (failure) => notify.error(apiErrorText(t, failure)),
   });
 
   const pick = async () => {

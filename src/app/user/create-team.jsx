@@ -11,7 +11,7 @@ import { LoadingState } from '../../components/common/States.jsx';
 import TeamForm from '../../components/team/TeamForm.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { ROLES } from '../../utils/constants.js';
 
 export default function CreateTeam() {
@@ -32,7 +32,7 @@ export default function CreateTeam() {
       notify.success(t('team.created', { name: team.name }));
       router.replace('/captain/squad');
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
   if (status === AUTH_STATUS.ANONYMOUS) return <Redirect href="/auth/login" />;

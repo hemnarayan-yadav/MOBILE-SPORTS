@@ -13,7 +13,7 @@ import { useAuth } from '../../hooks/useAuth.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
-import { apiErrorKey } from '../../utils/apiErrors.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import AppText from '../common/AppText.jsx';
 import Button from '../common/Button.jsx';
 
@@ -39,7 +39,7 @@ export function useAcceptInvitations(onAccepted) {
       const team = accepted[0].team;
       router.replace(team?.id ? `/team/${team.id}` : '/teams');
     },
-    onError: (error) => notify.error(t(apiErrorKey(error))),
+    onError: (error) => notify.error(apiErrorText(t, error)),
   });
 }
 
@@ -51,7 +51,7 @@ export default function JoinActions({ otherNumber = false, accepting, onConfirm 
 
   const confirm = async () => {
     const otpToken = await phoneVerification.verify(user.phone).catch((error) => {
-      notify.error(t(apiErrorKey(error)));
+      notify.error(apiErrorText(t, error));
       return null;
     });
     if (otpToken) onConfirm(otpToken);
