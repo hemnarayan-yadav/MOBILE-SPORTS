@@ -65,7 +65,7 @@
   },
   "src/utils/constants.js": {
     "source": "src/utils/constants.js",
-    "sha256": "c1be2dc51d6ab4b0b6b56a7e7bc0bb37cc8f19f6c7c4afa9aa783bf5b98a5801"
+    "sha256": "a695a5ad9e60bf57d6b1a23b07726f080ef668cf93487b28446df32be62beb98"
   },
   "src/utils/format.js": {
     "source": "src/utils/format.js",
@@ -257,7 +257,7 @@
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
-    "sha256": "60ab658821e4a472cdd307865ecb72f34402ec2dd3b65275ed15701cfe9a34ca"
+    "sha256": "c2c26cf6f83a0cc73fee6af8d7b915520775dd023d4555a2a28cfbfa7c190ab6"
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
