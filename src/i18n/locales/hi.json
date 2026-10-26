@@ -17,7 +17,8 @@
     "confirm": "पक्का करें",
     "done": "हो गया",
     "missing": "बाकी है",
-    "saveChanges": "सेव करें"
+    "saveChanges": "सेव करें",
+    "share": "शेयर करें"
   },
   "theme": {
     "label": "थीम",
@@ -64,7 +65,10 @@
       "players": "खिलाड़ी",
       "matchesPlayed": "मैच खेले गए"
     },
-    "newsTitle": "ताज़ा खबरें"
+    "newsTitle": "ताज़ा खबरें",
+    "featuredTitle": "स्पॉटलाइट",
+    "topTeamsTitle": "टॉप टीमें",
+    "tabRecent": "हाल के"
   },
   "nav": {
     "brand": "KhelScore",
@@ -218,7 +222,8 @@
       "officialSubstitutionRule": "खिलाड़ी बदलना सिर्फ़ टाइमआउट या इंटरवल में।"
     },
     "heading": "{{teamA}} बनाम {{teamB}} — कबड्डी मैच",
-    "headingTournament": "{{teamA}} बनाम {{teamB}} — {{tournament}}"
+    "headingTournament": "{{teamA}} बनाम {{teamB}} — {{tournament}}",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "errors": {
     "notFound": "पेज नहीं मिला",
@@ -438,7 +443,9 @@
       "registrations": "रजिस्ट्रेशन",
       "registrationsHint": "टूर्नामेंट एंट्री और उन पर फ़ैसले",
       "email": "ईमेल पर भी भेजें",
-      "emailHint": "याद दिलाना, नतीजे और रजिस्ट्रेशन के फ़ैसले ईमेल पर भी"
+      "emailHint": "याद दिलाना, नतीजे और रजिस्ट्रेशन के फ़ैसले ईमेल पर भी",
+      "announcements": "KhelScore की घोषणाएं",
+      "announcementsHint": "नए टूर्नामेंट और KhelScore की खबरें"
     },
     "phoneVerified": "नंबर पक्का है",
     "phoneNotVerified": "नंबर पक्का नहीं है",
@@ -482,7 +489,7 @@
     "passwordIntro": "जिस पासवर्ड से आप साइन इन करते हैं, उसे बदलें।",
     "passwordSignsOut": "पासवर्ड बदलने पर आप हर डिवाइस से साइन आउट हो जाएँगे। नए पासवर्ड से फिर साइन इन करें।",
     "temporaryPassword": "इस अकाउंट में अभी शुरुआती अस्थायी पासवर्ड चल रहा है। स्क्वाड संभालने के लिए अपना पासवर्ड बनाएँ।",
-    "temporaryPasswordHint": "अस्थायी पासवर्ड यानी आपके मोबाइल नंबर के आखिरी 4 अंक और उसके बाद आपका जर्सी नंबर।",
+    "temporaryPasswordHint": "अस्थायी पासवर्ड यानी आपके मोबाइल नंबर के शुरुआती 6 अंक।",
     "changePassword": "पासवर्ड बदलें",
     "currentPassword": "अभी का पासवर्ड",
     "passwordChanged": "पासवर्ड बदल गया। कृपया फिर साइन इन करें।"
@@ -512,7 +519,7 @@
     "date": "सही तारीख डालें",
     "foundedYear": "1900 से इस साल के बीच का साल डालें",
     "height": "लंबाई 100 से 250 सेमी के बीच होनी चाहिए",
-    "jersey": "जर्सी नंबर 1 या 2 अंकों का होना चाहिए",
+    "jersey": "जर्सी नंबर 1 से 3 अंकों का होना चाहिए",
     "number": "नंबर डालें",
     "shortName": "2–5 अक्षर या अंक लिखें",
     "teamNameMin": "टीम का नाम कम से कम 2 अक्षर का होना चाहिए",
@@ -608,6 +615,9 @@
     "timeout": "{{team}} ने टाइम-आउट लिया।",
     "substitution": "{{team}}: {{playerOut}} की जगह {{playerIn}} अंदर।",
     "injury": "{{player}} ({{team}}) को चोट लगी।",
+    "raiderSelfOut": "{{raider}} ख़ुद बाहर चले गए — रेड गई।",
+    "selfOut_one": "{{player}} ख़ुद बाहर चले गए — {{opponent}} को {{count}} अंक।",
+    "selfOut_other": "{{player}} ख़ुद बाहर चले गए — {{opponent}} को {{count}} अंक।",
     "raidDelayPoint_one": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidDelayPoint_other": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidCancelled": "कंट्रोलर ने पिछली रेड रद्द कर दी।",
@@ -652,6 +662,7 @@
     "scope": "रैंकिंग दिखाएं",
     "allTime": "सारे टूर्नामेंट (अब तक)",
     "teamStandings": "टीम तालिका",
+    "rankOf": "रैंक {{rank}}: {{name}}",
     "category": {
       "best_raider": "बेस्ट रेडर",
       "best_defender": "बेस्ट डिफेंडर",
@@ -781,7 +792,8 @@
     },
     "championTitle": "विजेता",
     "championNamed": "विजेता: {{team}}",
-    "playerOfTournament": "प्लेयर ऑफ़ द टूर्नामेंट"
+    "playerOfTournament": "प्लेयर ऑफ़ द टूर्नामेंट",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "team": {
     "pageTitle": "टीमें",
@@ -821,6 +833,12 @@
     "banner": "बैनर फ़ोटो",
     "city": "शहर",
     "homeGround": "होम ग्राउंड",
+    "staff": "कोच और टीम मैनेजर",
+    "staffHint": "ऐच्छिक। मोबाइल नंबर सबको नहीं दिखता — सिर्फ आपको और KhelScore स्टाफ को।",
+    "coachName": "कोच",
+    "coachPhone": "कोच का मोबाइल",
+    "teamManagerName": "टीम मैनेजर",
+    "teamManagerPhone": "टीम मैनेजर का मोबाइल",
     "foundedYear": "स्थापना का साल",
     "description": "जानकारी",
     "createTitle": "अपनी टीम जोड़ें",
@@ -840,7 +858,8 @@
     "statusUpdated": "टीम का स्टेटस बदल गया",
     "delete": "टीम हटाएं",
     "deleteConfirm": "{{name}} हटाएं? टीम हर जगह से छिप जाएगी, खिलाड़ी रिलीज़ होंगे और कप्तान आम अकाउंट बन जाएगा।",
-    "deletedToast": "टीम हटा दी गई"
+    "deletedToast": "टीम हटा दी गई",
+    "shareLabel": "{{name}} शेयर करें"
   },
   "player": {
     "pageTitle": "खिलाड़ी",
@@ -874,7 +893,19 @@
     "saved": "खिलाड़ी की प्रोफ़ाइल सेव हो गई",
     "delete": "खिलाड़ी हटाएं",
     "deleteConfirm": "{{name}} को हटाएं? प्रोफ़ाइल छिप जाएगी और स्क्वॉड से रिलीज़ होगी।",
-    "deleted": "खिलाड़ी हटा दिया गया"
+    "deleted": "खिलाड़ी हटा दिया गया",
+    "shareLabel": "{{name}} की प्रोफ़ाइल शेयर करें"
+  },
+  "jerseys": {
+    "title": "टूर्नामेंट जर्सी नंबर",
+    "subtitle": "इस टूर्नामेंट में टीम के नंबर। खाली छोड़ने पर स्क्वाड वाला नंबर चलेगा।",
+    "linkLabel": "जर्सी",
+    "worn": "पहले पहने:",
+    "inThisTournament": "इस टूर्नामेंट का नंबर",
+    "fallsBackTo": "{{number}} से खेलेगा (स्क्वाड नंबर)",
+    "numberFor": "{{name}} का जर्सी नंबर",
+    "emptySquad": "इस स्क्वाड में अभी कोई खिलाड़ी नहीं",
+    "saved": "जर्सी नंबर सेव हुए"
   },
   "news": {
     "pageTitle": "खबरें",
@@ -980,7 +1011,10 @@
     "registration_approved": "{{teamName}} {{tournamentName}} में शामिल!",
     "registration_rejected": "{{tournamentName}} के लिए {{teamName}} का रजिस्ट्रेशन मंज़ूर नहीं हुआ",
     "tournament_assigned": "अब आप {{tournamentName}} मैनेज करेंगे",
-    "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया"
+    "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया",
+    "tournament_published": "KhelScore पर {{tournamentName}} शुरू हुआ",
+    "news_published": "KhelScore खबर: {{title}}",
+    "contact_message_received": "{{senderName}} का नया संदेश: {{subject}}"
   },
   "notifications": {
     "title": "नोटिफिकेशन",
@@ -1100,5 +1134,58 @@
     "countedMatches_one": "{{count}} रैंक वाला मैच",
     "countedMatches_other": "{{count}} रैंक वाले मैच",
     "linkLabel": "कौन से मैच गिने जाते हैं"
+  },
+  "notices": {
+    "sectionTitle": "टूर्नामेंट और खबरें",
+    "tabTournaments": "टूर्नामेंट",
+    "tabNews": "खबरें",
+    "phaseUpcoming": "आने वाले",
+    "phaseRunning": "अभी चल रहे",
+    "phaseCompleted": "हो चुके",
+    "allYears": "सभी साल",
+    "emptyTitle": "अभी कोई टूर्नामेंट नहीं है",
+    "emptyHint": "कोई टूर्नामेंट पता है? यहाँ बताएँ ताकि बाकी खिलाड़ी भी पहुँच सकें।",
+    "newsEmptyTitle": "अभी कबड्डी की कोई खबर नहीं",
+    "newsEmptyHint": "थोड़ी देर बाद देखें।",
+    "venueLabel": "कहाँ",
+    "dateLabel": "कब",
+    "prizesLabel": "इनाम",
+    "entryFeeLabel": "एंट्री फीस",
+    "rulesLabel": "नियम",
+    "organiserLabel": "आयोजक",
+    "contactLabel": "संपर्क",
+    "positionPrize": "{{position}} नंबर",
+    "readOnSource": "{{source}} पर पढ़ें",
+    "announce": "टूर्नामेंट की जानकारी दें",
+    "announceHint": "हर जानकारी दिखने से पहले एक मॉडरेटर जाँचता है।",
+    "announceSent": "भेज दी गई। मॉडरेटर जल्द देखेगा।",
+    "myNotices": "मैंने जो भेजा",
+    "statusPending": "समीक्षा बाकी है",
+    "statusApproved": "दिख रहा है",
+    "statusRejected": "नहीं दिखाया गया",
+    "report": "रिपोर्ट करें",
+    "reportTitle": "इस टूर्नामेंट की रिपोर्ट करें",
+    "reportHint": "बताएँ क्या ग़लत है। मॉडरेटर इसे देखेगा।",
+    "reportSent": "शुक्रिया। मॉडरेटर इसे देखेगा।",
+    "fieldTitle": "टूर्नामेंट का नाम",
+    "fieldStartDate": "तारीख़",
+    "fieldStartTime": "शुरू होने का समय",
+    "fieldVenue": "मैदान या गाँव",
+    "fieldPoster": "पोस्टर",
+    "fieldEntryFee": "एंट्री फीस",
+    "fieldRules": "नियम",
+    "fieldOrganiser": "आयोजक",
+    "fieldContact": "संपर्क नंबर",
+    "fieldPrize": "इनाम {{position}}",
+    "reason": {
+      "not_real": "असली टूर्नामेंट नहीं है",
+      "wrong_details": "जानकारी ग़लत है",
+      "offensive": "आपत्तिजनक है",
+      "spam": "स्पैम है",
+      "other": "कुछ और"
+    },
+    "reportReasonLabel": "क्या ग़लत है?",
+    "reportNoteLabel": "और जानकारी (ज़रूरी नहीं)",
+    "yearLabel": "साल"
   }
 }

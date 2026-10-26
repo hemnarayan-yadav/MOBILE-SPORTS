@@ -8,10 +8,11 @@ import { useTheme } from '../../theme/useTheme.js';
 import { IMAGE_WIDTH, sizedImage } from '../../utils/image.js';
 import { formatDate, formatNumber, formatPercent } from '../../utils/format.js';
 import { locationLabel } from '../../utils/india.js';
-import { rankTone } from '../../utils/medals.js';
+import { medalOf, rankRing, rankTone } from '../../utils/medals.js';
 import AppText from '../common/AppText.jsx';
 import Avatar from '../common/Avatar.jsx';
 import Badge, { StatusBadge } from '../common/Badge.jsx';
+import RankFrame from '../ranking/RankFrame.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 import { ChampionLine } from './ChampionBanner.jsx';
 
@@ -37,7 +38,9 @@ export function TournamentCard({ tournament }) {
           <Image
             source={{ uri: sizedImage(tournament.bannerUrl, { width: IMAGE_WIDTH.card }) }}
             style={[StyleSheet.absoluteFill, styles.bannerImage]}
-            resizeMode="contain"
+            // The one image in the app that is cropped: a letterboxed banner
+            // left the card looking empty (the owner's decision, 2026-10-25).
+            resizeMode="cover"
             accessibilityIgnoresInvertColors
           />
         ) : null}
@@ -82,7 +85,7 @@ export function TournamentHero({ tournament, actions }) {
         <Image
           source={{ uri: sizedImage(tournament.bannerUrl, { width: IMAGE_WIDTH.hero }) }}
           style={[StyleSheet.absoluteFill, styles.heroImage]}
-          resizeMode="contain"
+          resizeMode="cover"
           accessibilityIgnoresInvertColors
         />
       ) : null}
@@ -219,12 +222,24 @@ export function LeaderboardList({ entries, category, compact = false }) {
               { backgroundColor: rankTone(entry.rank, colors).row },
             ]}
           >
-            <RankBadge rank={entry.rank} />
-            <Avatar
-              src={entry.player.photoUrl}
-              name={entry.player.name}
-              size={compact ? 'sm' : 'md'}
-            />
+            {medalOf(entry.rank) ? (
+              <RankFrame
+                rank={entry.rank}
+                src={entry.player.photoUrl}
+                name={entry.player.name}
+                size={compact ? 64 : 76}
+              />
+            ) : (
+              <>
+                <RankBadge rank={entry.rank} />
+                <Avatar
+                  src={entry.player.photoUrl}
+                  name={entry.player.name}
+                  size={compact ? 'sm' : 'md'}
+                  ring={rankRing(entry.rank)}
+                />
+              </>
+            )}
             <View style={styles.flex}>
               <AppText weight="semibold" numberOfLines={1}>
                 {entry.player.name}

@@ -29,7 +29,7 @@ export function FieldMessages({ hint, error }) {
 const REVEAL_WIDTH = MIN_TOUCH;
 
 const TextField = forwardRef(function TextField(
-  { label, hint, error, style, inputStyle, secureTextEntry, onFocus, ...inputProps },
+  { label, labelHidden = false, hint, error, style, inputStyle, secureTextEntry, onFocus, ...inputProps },
   ref,
 ) {
   const { t, i18n } = useTranslation();
@@ -60,7 +60,9 @@ const TextField = forwardRef(function TextField(
 
   return (
     <View style={[styles.field, style]}>
-      <AppText variant="label">{label}</AppText>
+      {/* A field in a list of its own rows says what it is in the row beside
+          it, so the label is still read out but is not written twice. */}
+      {labelHidden ? null : <AppText variant="label">{label}</AppText>}
       <View style={styles.row}>
         <TextInput
           ref={setInput}

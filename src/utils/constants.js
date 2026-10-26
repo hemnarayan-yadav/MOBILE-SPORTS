@@ -76,6 +76,11 @@ export const LEADERBOARD_CATEGORIES = Object.freeze([
   'best_allrounder',
 ]);
 
+// The shirt number is one to three digits (utils/validation.js and the API
+// agree); inputs stop typing at that length rather than letting a fourth digit
+// be typed and then refused.
+export const JERSEY_MAX_LENGTH = 3;
+
 // Kabaddi rules the UI needs before a match exists (the API stays authoritative).
 export const KABADDI = Object.freeze({
   playersOnCourt: 7,

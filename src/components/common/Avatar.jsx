@@ -7,12 +7,20 @@ import AppText from './AppText.jsx';
 
 const SIZES = Object.freeze({ xs: 28, sm: 36, md: 44, lg: 64, xl: 96 });
 
-export default function Avatar({ src, name = '', size = 'md' }) {
+// The rim around the picture. `highlight` marks somebody out from the players
+// around them — the leaderboard's 4th to 10th wear it — and `none` is for a
+// picture that sits inside artwork of its own (the podium's crown frames).
+// `px` overrides the size where one is measured from that artwork.
+export default function Avatar({ src, name = '', size = 'md', ring = 'default', px: exactPx }) {
   const { colors } = useTheme();
-  const px = SIZES[size] ?? SIZES.md;
+  const px = exactPx ?? SIZES[size] ?? SIZES.md;
   const box = { width: px, height: px, borderRadius: px / 2, backgroundColor: colors.surface2 };
+  const rim =
+    ring === 'none'
+      ? { borderWidth: 0 }
+      : { borderWidth: ring === 'highlight' ? 2 : StyleSheet.hairlineWidth, borderColor: ring === 'highlight' ? colors.brand : colors.border };
   return (
-    <View style={[styles.box, box, { borderColor: colors.border }]} accessible={false}>
+    <View style={[styles.box, box, rim]} accessible={false}>
       {src ? (
         <Image
           source={{ uri: sizedImage(src, { width: px }) }}
@@ -34,6 +42,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
   },
 });

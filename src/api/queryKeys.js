@@ -20,6 +20,7 @@ export const qk = Object.freeze({
     list: (params) => ['tournaments', 'list', params],
     detail: (id) => ['tournaments', 'detail', id],
     teams: (id, params) => ['tournaments', 'teams', id, params],
+    jerseys: (id, teamId) => ['tournaments', 'jerseys', id, teamId],
     stats: (id) => ['tournaments', 'stats', id],
   },
   matches: {
@@ -47,6 +48,17 @@ export const qk = Object.freeze({
     all: ['follows'],
     list: ['follows', 'list'],
     status: (type, id) => ['follows', 'status', type, id],
+  },
+  home: ['home'],
+  newsFeed: {
+    all: ['news-feed'],
+    list: (params) => ['news-feed', 'list', params],
+  },
+  notices: {
+    all: ['notices'],
+    list: (params) => ['notices', 'list', params],
+    item: (id) => ['notices', 'item', id],
+    mine: (params) => ['notices', 'mine', params],
   },
   content: {
     all: ['content'],

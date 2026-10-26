@@ -129,6 +129,21 @@ function MyEntries({ team }) {
             </AppText>
           ) : null}
           <StatusBadge status={entry.status} />
+          {/* The numbers this competition hands the squad. Only once the team
+              is in it: there is nothing to number before that. */}
+          {entry.status === 'approved' ? (
+            <Button
+              variant="secondary"
+              onPress={() =>
+                router.push({
+                  pathname: '/captain/jerseys',
+                  params: { tournamentId: entry.tournament.id },
+                })
+              }
+            >
+              {t('jerseys.linkLabel')}
+            </Button>
+          ) : null}
           {entry.status === 'pending' ? (
             <Button
               variant="secondary"
