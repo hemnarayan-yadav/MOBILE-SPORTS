@@ -138,6 +138,9 @@ module.exports = () => {
       // Push notifications. Without an EAS project id and Firebase credentials
       // the app simply reports push unavailable (src/lib/push/expoPush.js).
       'expo-notifications',
+      // Reads the phone's language list, so the app opens in Hindi on a Hindi
+      // phone without anybody finding the toggle (src/i18n/index.js).
+      'expo-localization',
       // Refresh token in the Android Keystore; auto-backup excludes it.
       ['expo-secure-store', { configureAndroidBackup: true }],
       // Profile photos come from the photo library only: no camera or microphone.
