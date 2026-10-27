@@ -5,7 +5,7 @@
   },
   "src/api/matches.api.js": {
     "source": "src/api/matches.api.js",
-    "sha256": "9f40aa77f1b1e1716fd0b8d7fadc67648e738ce527a07e0155bf7760c6defb18"
+    "sha256": "fa6ec4a26ef4d146a03358859e815918f7e3235641da657174fd45970b7ebb81"
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
@@ -97,7 +97,7 @@
   },
   "src/store/authStore.js": {
     "source": "src/store/authStore.js",
-    "sha256": "ebd65235ce94fdd494e0d5837cc07db3de4114bc0f7f0f6d8c1e20513bbe53ca"
+    "sha256": "0dfc37bfa0bd2f3c69b6d11c048d45dfd1fa8277a81f3adf092c31e1ff871466"
   },
   "src/hooks/useAuth.js": {
     "source": "src/hooks/useAuth.js",
@@ -157,7 +157,7 @@
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "b50ff93868b51cac6004f825046a4c59d4dddd46448bccc357b8a084caebf1a6"
+    "sha256": "04fea1d8f9e99d231841043f5d9453e6343df15f736043de4f42aedc6e9573e0"
   },
   "src/app/auth/forgot-password.jsx": {
     "source": "src/pages/auth/ForgotPassword.jsx",
@@ -261,7 +261,7 @@
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
-    "sha256": "0f6ba148d32912e79ace8d402e38fe7d22fd03fa743f341233c7c6a252be59a3"
+    "sha256": "28f24ce1d403d0376f472f82e237c1da8b70ec9afe50ca336b840191235327e1"
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
@@ -273,7 +273,7 @@
   },
   "src/app/(tabs)/rankings.jsx": {
     "source": "src/pages/public/Rankings.jsx",
-    "sha256": "3a396fa26ea7aebba2d975b770456870a96e2b8f1295102159a0abb6affce0b5"
+    "sha256": "434b3c2ee3e60a0a5197ebbc5a2efae5d560a92bb1b777565abfb613d292543d"
   },
   "src/app/match/[id].jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
@@ -345,7 +345,7 @@
   },
   "src/components/team/AddByPhone.jsx": {
     "source": "src/pages/dashboard/captain/AddPlayer.jsx",
-    "sha256": "6ea0ff93655dd5dcdb83388d29c17ec74dc5770bb44539565526f1ae2ab4fceb"
+    "sha256": "573751f24ee107f5530a88ae67bdc27b50ad22347a7a81297cdcc7bfcd93daf8"
   },
   "src/components/team/TeamInvitations.jsx": {
     "source": "src/pages/dashboard/captain/TeamInvitations.jsx",
@@ -381,7 +381,7 @@
   },
   "src/app/user/create-team.jsx": {
     "source": "src/pages/dashboard/user/CreateTeam.jsx",
-    "sha256": "f45a7dbb80e06158b9401eb0fadced11ff4197e64e4900609d03cd490c9eeb7c"
+    "sha256": "42631eabb7e371663222eee481c77fec1f925464d32812edbded0125c5c73f21"
   },
   "src/app/captain/index.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",

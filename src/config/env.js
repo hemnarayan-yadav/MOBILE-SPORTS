@@ -14,6 +14,8 @@ function readRawEnv() {
     SITE_URL: process.env.EXPO_PUBLIC_SITE_URL,
     DEFAULT_LOCALE: process.env.EXPO_PUBLIC_DEFAULT_LOCALE,
     SENTRY_DSN: process.env.EXPO_PUBLIC_SENTRY_DSN,
+    POSTHOG_KEY: process.env.EXPO_PUBLIC_POSTHOG_KEY,
+    POSTHOG_HOST: process.env.EXPO_PUBLIC_POSTHOG_HOST,
   };
 }
 
@@ -32,6 +34,11 @@ const envSchema = z
     // Optional. A Sentry DSN is an ingest URL, not a secret (it can only write
     // events), but it is still per-environment. Unset: no crash reporting.
     SENTRY_DSN: urlSchema('EXPO_PUBLIC_SENTRY_DSN').optional(),
+    // Optional. A PostHog project key is public by design (it can only write
+    // events) and is per-environment. Unset: the app measures nothing, which
+    // is every development build (src/lib/analytics.js).
+    POSTHOG_KEY: z.string().optional(),
+    POSTHOG_HOST: urlSchema('EXPO_PUBLIC_POSTHOG_HOST').optional(),
   })
   .superRefine((cfg, ctx) => {
     // Only a development build may talk to a plain-http backend (a laptop on

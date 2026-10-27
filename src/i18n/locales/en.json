@@ -39,6 +39,7 @@
     "watchLive": "Watch live",
     "registerTeam": "Register your team",
     "liveNow": "Live now",
+    "nearYouTitle": "In {{place}}",
     "nextUp": "Next up",
     "matchesTitle": "Matches",
     "tabCompleted24h": "Last 24 hours",
