@@ -5,7 +5,7 @@
   },
   "src/api/matches.api.js": {
     "source": "src/api/matches.api.js",
-    "sha256": "9f40aa77f1b1e1716fd0b8d7fadc67648e738ce527a07e0155bf7760c6defb18"
+    "sha256": "fa6ec4a26ef4d146a03358859e815918f7e3235641da657174fd45970b7ebb81"
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
