@@ -88,7 +88,11 @@ export function SquadRow({ member, invited, onOpenActions }) {
               {`★ ${t('squad.playingSevenShort')}`}
             </AppText>
           ) : null}
-          {invited ? <Badge tone="info">{t('teamInvite.invitedTag')}</Badge> : null}
+          {member.leaveRequestedAt ? (
+            <Badge tone="warning">{t('squad.wantsToLeave')}</Badge>
+          ) : invited ? (
+            <Badge tone="info">{t('teamInvite.invitedTag')}</Badge>
+          ) : null}
         </View>
       </View>
       <Pressable

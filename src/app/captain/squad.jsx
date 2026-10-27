@@ -23,7 +23,9 @@ import AddByPhone from '../../components/team/AddByPhone.jsx';
 import CaptainScreen from '../../components/team/CaptainScreen.jsx';
 import { PlayingSevenPicker, SquadReadiness, SquadRow } from '../../components/team/SquadBits.jsx';
 import TeamInvitations from '../../components/team/TeamInvitations.jsx';
+import TeamJoinRequests from '../../components/team/TeamJoinRequests.jsx';
 import { openInvitations, useTeamInvitations } from '../../hooks/useTeamInvitations.js';
+import { useTeamJoinRequests } from '../../hooks/useTeamJoinRequests.js';
 import { notify } from '../../store/noticeStore.js';
 import { SPACING } from '../../theme/tokens.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
@@ -132,6 +134,8 @@ function Squad({ team, view, onView }) {
   const invitedPlayerIds = new Set(
     openInvitations(invitations.data).map((invitation) => invitation.player?.id),
   );
+  // Players this squad has asked for and is waiting on.
+  const joinRequests = useTeamJoinRequests(team.id, { enabled: view === 'squad' });
 
   const updateMember = useMutation({
     mutationFn: ({ playerId, values }) => teamsApi.updateMember(team.id, playerId, values),
@@ -147,6 +151,16 @@ function Squad({ team, view, onView }) {
     onSuccess: () => {
       notify.success(t('squad.playerReleased'));
       setReleasing(null);
+      refreshTeam();
+    },
+    onError,
+  });
+  // Turning a leave request down. The player stays in the squad and is told.
+  const declineLeave = useMutation({
+    mutationFn: (playerId) => teamsApi.declineLeave(team.id, playerId),
+    onSuccess: () => {
+      notify.success(t('squad.leaveDeclined'));
+      setActionsFor(null);
       refreshTeam();
     },
     onError,
@@ -194,6 +208,7 @@ function Squad({ team, view, onView }) {
               ))}
             </Card>
           )}
+          <TeamJoinRequests teamId={team.id} query={joinRequests} />
           <TeamInvitations teamId={team.id} query={invitations} onSquadChanged={refreshTeam} />
         </>
       )}
@@ -208,6 +223,7 @@ function Squad({ team, view, onView }) {
             onDone={() => {
               setAdding(false);
               refreshTeam();
+              queryClient.invalidateQueries({ queryKey: qk.joinRequests.team(team.id) });
             }}
           />
         ) : null}
@@ -224,6 +240,30 @@ function Squad({ team, view, onView }) {
               <Avatar src={actionsFor.player.photoUrl} name={actionsFor.player.name} />
               <AppText tone="muted">#{actionsFor.jerseyNumber}</AppText>
             </View>
+            {/* A player who has asked to leave: the two answers come first,
+                because that is what the captain opened this sheet for. */}
+            {actionsFor.leaveRequestedAt ? (
+              <>
+                <AppText variant="small" tone="muted">
+                  {t('squad.leaveRequestNote', { name: actionsFor.player.name })}
+                </AppText>
+                <Button
+                  onPress={() => {
+                    setReleasing(actionsFor);
+                    setActionsFor(null);
+                  }}
+                >
+                  {t('squad.approveLeave')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  loading={declineLeave.isPending}
+                  onPress={() => declineLeave.mutate(actionsFor.player.id)}
+                >
+                  {t('squad.keepInSquad')}
+                </Button>
+              </>
+            ) : null}
             <Button
               variant="secondary"
               onPress={() => {
@@ -284,9 +324,11 @@ function Squad({ team, view, onView }) {
 
       <ConfirmDialog
         open={Boolean(releasing)}
-        title={t('squad.release')}
-        message={t('squad.releaseConfirm', { name: releasing?.player.name })}
-        confirmLabel={t('squad.release')}
+        title={releasing?.leaveRequestedAt ? t('squad.approveLeave') : t('squad.release')}
+        message={t(releasing?.leaveRequestedAt ? 'squad.approveLeaveConfirm' : 'squad.releaseConfirm', {
+          name: releasing?.player.name,
+        })}
+        confirmLabel={releasing?.leaveRequestedAt ? t('squad.approveLeave') : t('squad.release')}
         loading={release.isPending}
         onCancel={() => setReleasing(null)}
         onConfirm={() => release.mutate(releasing.player.id)}

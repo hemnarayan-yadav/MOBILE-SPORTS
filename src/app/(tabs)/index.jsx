@@ -21,6 +21,7 @@ import TabbedSection from '../../components/home/TabbedSection.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import AutoCarousel from '../../components/notice/AutoCarousel.jsx';
 import { NewsCard, NoticeCard } from '../../components/notice/NoticeBits.jsx';
+import MyJoinRequests from '../../components/team/MyJoinRequests.jsx';
 import { LeaderboardList, StandingsTable, TournamentCard } from '../../components/tournament/TournamentBits.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
@@ -331,6 +332,9 @@ export default function Home() {
   const sections = [
     { key: 'header', render: () => <Header /> },
     { key: 'shortcut', render: () => <TeamShortcut /> },
+    // A squad waiting for an answer comes before the rest of the screen:
+    // until it is answered, nobody is in a team.
+    { key: 'joinRequests', render: () => <MyJoinRequests /> },
     { key: 'live', render: () => <LiveSection matches={data?.live} /> },
     { key: 'featured', render: () => <FeaturedSection people={data?.featured} /> },
     { key: 'matches', render: () => <MatchesSection matches={data?.matches} /> },

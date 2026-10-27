@@ -1,6 +1,6 @@
 // Team — adapted from frontend/src/pages/public/TeamProfile.jsx: squad,
 // matches, statistics and about.
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,8 @@ import { matchesApi } from '../../api/matches.api.js';
 import { qk } from '../../api/queryKeys.js';
 import { teamsApi } from '../../api/teams.api.js';
 import AppText from '../../components/common/AppText.jsx';
+import Button from '../../components/common/Button.jsx';
+import ConfirmDialog from '../../components/common/ConfirmDialog.jsx';
 import FollowButton from '../../components/common/FollowButton.jsx';
 import {
   BackHeader,
@@ -23,8 +25,10 @@ import ShareButton from '../../components/common/ShareButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import { SquadBoard, TeamHero } from '../../components/team/TeamBits.jsx';
+import { notify } from '../../store/noticeStore.js';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
+import { apiErrorText } from '../../utils/apiErrors.js';
 import { formatNumber } from '../../utils/format.js';
 
 const TABS = Object.freeze(['squad', 'matches', 'stats', 'about']);
@@ -154,6 +158,59 @@ function About({ team }) {
   );
 }
 
+// For a player in this squad: ask to leave, or withdraw the request while the
+// captain has not answered it. The captain of the team is not offered it — they
+// hand the team over first, and the API says so.
+function LeaveTeam({ team, membership }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [asking, setAsking] = useState(false);
+  const refresh = () => queryClient.invalidateQueries({ queryKey: qk.teams.detail(team.id) });
+  const onError = (error) => notify.error(apiErrorText(t, error));
+
+  const ask = useMutation({
+    mutationFn: () => teamsApi.requestLeave(team.id),
+    onSuccess: () => {
+      notify.success(t('squad.leaveRequested'));
+      setAsking(false);
+      refresh();
+    },
+    onError,
+  });
+  const withdraw = useMutation({
+    mutationFn: () => teamsApi.cancelLeave(team.id),
+    onSuccess: () => {
+      notify.success(t('squad.leaveWithdrawn'));
+      refresh();
+    },
+    onError,
+  });
+
+  if (membership.leaveRequestedAt) {
+    return (
+      <Button variant="secondary" loading={withdraw.isPending} onPress={() => withdraw.mutate()}>
+        {t('squad.leaveWithdraw')}
+      </Button>
+    );
+  }
+  return (
+    <>
+      <Button variant="secondary" onPress={() => setAsking(true)}>
+        {t('squad.leaveTeam')}
+      </Button>
+      <ConfirmDialog
+        open={asking}
+        title={t('squad.leaveTeam')}
+        message={t('squad.leaveConfirm', { team: team.name })}
+        confirmLabel={t('squad.leaveTeam')}
+        loading={ask.isPending}
+        onCancel={() => setAsking(false)}
+        onConfirm={() => ask.mutate()}
+      />
+    </>
+  );
+}
+
 export default function TeamScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -161,6 +218,9 @@ export default function TeamScreen() {
   const [tab, setTab] = useState('squad');
   const query = useQuery({ queryKey: qk.teams.detail(id), queryFn: () => teamsApi.get(id) });
   const team = query.data;
+  // The viewer's own squad row, marked by the API; the captain's row carries no
+  // leave control, because a captain hands the team over before leaving it.
+  const membership = team?.squad.find((member) => member.isSelf);
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
@@ -179,7 +239,17 @@ export default function TeamScreen() {
         {query.isError ? <ErrorState error={query.error} onRetry={() => query.refetch()} /> : null}
         {team ? (
           <>
-            <TeamHero team={team} actions={<FollowButton targetType="team" targetId={team.id} />} />
+            <TeamHero
+              team={team}
+              actions={
+                <>
+                  <FollowButton targetType="team" targetId={team.id} />
+                  {membership && !membership.isCaptain ? (
+                    <LeaveTeam team={team} membership={membership} />
+                  ) : null}
+                </>
+              }
+            />
             <TabStrip
               tabs={TABS.map((tabId) => ({ id: tabId, label: t(`team.tab.${tabId}`) }))}
               value={tab}
