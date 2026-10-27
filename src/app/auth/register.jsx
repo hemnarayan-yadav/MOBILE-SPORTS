@@ -23,6 +23,7 @@ import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { PROMPTS, notify, useNoticeStore } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
+import { EVENTS, track } from '../../lib/analytics.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
 import { JERSEY_MAX_LENGTH } from '../../utils/constants.js';
 import { formatPhone } from '../../utils/countries.js';
@@ -186,6 +187,7 @@ function ProfileStep({ verified, onChangeNumber }) {
   const registerAccount = useMutation({
     mutationFn: authApi.register,
     onSuccess: async ({ joinedTeams, ...session }) => {
+      track(EVENTS.SIGNED_UP, { joinedTeams: joinedTeams?.length ?? 0 });
       await startSession(session);
       // The team the server says the account joined (newest invitation first);
       // nothing joined is the normal case now that invitations are retired.

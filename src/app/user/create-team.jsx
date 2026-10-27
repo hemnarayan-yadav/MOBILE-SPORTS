@@ -13,6 +13,7 @@ import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
 import { ROLES } from '../../utils/constants.js';
+import { EVENTS, track } from '../../lib/analytics.js';
 
 export default function CreateTeam() {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ export default function CreateTeam() {
   const create = useMutation({
     mutationFn: teamsApi.create,
     onSuccess: ({ team, user }) => {
+      track(EVENTS.TEAM_CREATED);
       setUser(user);
       queryClient.setQueryData(qk.me, user);
       queryClient.setQueryData(qk.teams.detail(team.id), { ...team, squad: [] });

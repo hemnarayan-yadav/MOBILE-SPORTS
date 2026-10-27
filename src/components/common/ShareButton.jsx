@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { env } from '../../config/env.js';
 import { MIN_TOUCH, RADII } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
+import { EVENTS, track } from '../../lib/analytics.js';
 
 /**
  * Shares a page of the website.
@@ -25,8 +26,11 @@ export default function ShareButton({ path, title, label }) {
   const { colors } = useTheme();
   const url = `${env.SITE_URL}${path}`;
 
-  const share = () =>
-    Share.share(
+  const share = () => {
+    // What was shared, by kind — "/team/abc" is a team. Never the id, which
+    // would say which team somebody follows.
+    track(EVENTS.SHARED, { kind: path.split('/')[1] ?? 'page' });
+    return Share.share(
       // iOS takes the url separately and the message as the accompanying text;
       // Android has one field, so the url has to be inside the message or it
       // is simply dropped.
@@ -35,6 +39,7 @@ export default function ShareButton({ path, title, label }) {
         : { message: title ? `${title}\n${url}` : url },
       { dialogTitle: title },
     ).catch(() => {});
+  };
 
   return (
     <Pressable

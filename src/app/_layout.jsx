@@ -14,6 +14,7 @@ import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
 import i18n from '../i18n/index.js';
 import { startAppLifecycle } from '../lib/appLifecycle.js';
+import { startAnalytics } from '../lib/analytics.js';
 import { initMonitoring } from '../lib/monitoring.js';
 import { queryClient } from '../lib/queryClient.js';
 import { useUiStore } from '../store/uiStore.js';
@@ -30,6 +31,9 @@ SplashScreen.preventAutoHideAsync();
 startAppLifecycle();
 // Crash reporting, if this build was given a DSN; a no-op otherwise.
 initMonitoring();
+// Five events and nothing else, and nothing at all without a key
+// (lib/analytics.js).
+startAnalytics();
 
 // The session is restored from the keystore in the background: public screens
 // do not wait for it. Push hangs off the session: this device is registered

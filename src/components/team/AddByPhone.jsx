@@ -38,6 +38,7 @@ import SegmentedControl from '../common/SegmentedControl.jsx';
 import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField, { FieldMessages } from '../common/TextField.jsx';
 import PlayerForm from '../player/PlayerForm.jsx';
+import { EVENTS, track } from '../../lib/analytics.js';
 
 // The API's own minimum for a search (users.validation.searchPlayerAccountsSchema).
 const MIN_QUERY_LENGTH = 2;
@@ -126,6 +127,7 @@ function DirectAddForm({ teamId, query, found, onDone }) {
         : member.accountCreated
           ? 'squad.playerAdded'
           : 'squad.playerLinked';
+      track(EVENTS.SQUAD_PLAYER_ADDED, { pending: Boolean(member.pending) });
       notify.success(t(key, { name: member.player.name }));
       onDone();
     },
@@ -225,6 +227,7 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
   const add = useMutation({
     mutationFn: (values) => teamsApi.addExistingUser(teamId, { userId: picked.id, ...values }),
     onSuccess: (member) => {
+      track(EVENTS.SQUAD_PLAYER_ADDED, { pending: Boolean(member.pending) });
       notify.success(
         t(member.pending ? 'joinRequest.sent' : 'squad.playerAdded', { name: member.player.name }),
       );
