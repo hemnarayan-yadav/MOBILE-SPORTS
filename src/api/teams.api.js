@@ -11,6 +11,11 @@ export const teamsApi = {
   setStatus: (id, status) => apiClient.patch(`/teams/${id}/status`, { status }).then(unwrap),
   registrations: (id) => apiClient.get(`/teams/${id}/registrations`).then(unwrap),
 
+  // What the squad has asked for and is waiting on, and withdrawing a request.
+  joinRequests: (teamId) => apiClient.get(`/teams/${teamId}/join-requests`).then(unwrap),
+  cancelJoinRequest: (teamId, requestId) =>
+    apiClient.delete(`/teams/${teamId}/join-requests/${requestId}`).then(unwrap),
+
   // An account that already exists, named either by its id (picked from
   // POST /users/search) or by its number — exactly one of the two.
   addExistingUser: (teamId, payload) =>
@@ -23,8 +28,15 @@ export const teamsApi = {
     apiClient.post(`/teams/${teamId}/players/direct`, payload).then(unwrap),
   updateMember: (teamId, playerId, changes) =>
     apiClient.patch(`/teams/${teamId}/players/${playerId}`, changes).then(unwrap),
+  // Releasing a player, which is also how a leave request is granted.
   releasePlayer: (teamId, playerId) =>
     apiClient.delete(`/teams/${teamId}/players/${playerId}`).then(unwrap),
+  // The squad's own player asking to leave, and changing their mind.
+  requestLeave: (teamId) => apiClient.post(`/teams/${teamId}/leave`).then(unwrap),
+  cancelLeave: (teamId) => apiClient.delete(`/teams/${teamId}/leave`).then(unwrap),
+  // The captain turning a leave request down; the player stays in the squad.
+  declineLeave: (teamId, playerId) =>
+    apiClient.delete(`/teams/${teamId}/players/${playerId}/leave-request`).then(unwrap),
   setPlayingSeven: (teamId, playerIds) =>
     apiClient.put(`/teams/${teamId}/playing-seven`, { playerIds }).then(unwrap),
 };

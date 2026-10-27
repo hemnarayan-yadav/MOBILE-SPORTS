@@ -126,6 +126,10 @@ function captainApi(overrides = {}, team = TEAM) {
         return ok([]);
       case '/teams/t1/invitations':
         return ok([INVITATION]);
+      // Nothing waiting unless a test says so: a captain's add asks the
+      // player first, and what it is waiting on is its own list.
+      case '/teams/t1/join-requests':
+        return ok([]);
       case '/users/search':
         return ok({ items: [] });
       case '/matches':

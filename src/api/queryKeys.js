@@ -36,6 +36,11 @@ export const qk = Object.freeze({
     overview: (params) => ['rankings', 'overview', params],
     teams: (params) => ['rankings', 'teams', params],
   },
+  joinRequests: {
+    all: ['joinRequests'],
+    mine: ['joinRequests', 'mine'],
+    team: (teamId) => ['joinRequests', 'team', teamId],
+  },
   invitations: {
     preview: (token) => ['invitations', 'preview', token],
     team: (teamId) => ['invitations', 'team', teamId],

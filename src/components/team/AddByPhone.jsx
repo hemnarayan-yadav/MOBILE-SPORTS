@@ -119,11 +119,14 @@ function DirectAddForm({ teamId, query, found, onDone }) {
         location: toLocationPayload({ state, district }),
       }),
     onSuccess: (member) => {
-      notify.success(
-        t(member.accountCreated ? 'squad.playerAdded' : 'squad.playerLinked', {
-          name: member.player.name,
-        }),
-      );
+      // A captain's add asks the player first (`pending`): nobody is in the
+      // squad until they accept it.
+      const key = member.pending
+        ? 'joinRequest.sent'
+        : member.accountCreated
+          ? 'squad.playerAdded'
+          : 'squad.playerLinked';
+      notify.success(t(key, { name: member.player.name }));
       onDone();
     },
     onError: (error) => notify.error(apiErrorText(t, error)),
@@ -222,7 +225,9 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
   const add = useMutation({
     mutationFn: (values) => teamsApi.addExistingUser(teamId, { userId: picked.id, ...values }),
     onSuccess: (member) => {
-      notify.success(t('squad.playerAdded', { name: member.player.name }));
+      notify.success(
+        t(member.pending ? 'joinRequest.sent' : 'squad.playerAdded', { name: member.player.name }),
+      );
       onDone();
     },
     onError: (error) => notify.error(apiErrorText(t, error)),
