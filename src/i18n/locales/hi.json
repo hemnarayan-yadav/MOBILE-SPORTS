@@ -1016,7 +1016,8 @@
     "team_status_changed": "सुपर एडमिन ने {{teamName}} को {{status}} किया",
     "tournament_published": "KhelScore पर {{tournamentName}} शुरू हुआ",
     "news_published": "KhelScore खबर: {{title}}",
-    "contact_message_received": "{{senderName}} का नया संदेश: {{subject}}"
+    "contact_message_received": "{{senderName}} का नया संदेश: {{subject}}",
+    "squad_player_joined": "{{playerName}} {{teamName}} में शामिल हुआ"
   },
   "notifications": {
     "title": "नोटिफिकेशन",
