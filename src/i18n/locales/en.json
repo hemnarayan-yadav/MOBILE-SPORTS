@@ -1016,7 +1016,8 @@
     "team_status_changed": "{{teamName}} was set to {{status}} by a Super Admin",
     "tournament_published": "{{tournamentName}} is open on KhelScore",
     "news_published": "KhelScore news: {{title}}",
-    "contact_message_received": "New message from {{senderName}}: {{subject}}"
+    "contact_message_received": "New message from {{senderName}}: {{subject}}",
+    "squad_player_joined": "{{playerName}} joined {{teamName}}"
   },
   "notifications": {
     "title": "Notifications",
