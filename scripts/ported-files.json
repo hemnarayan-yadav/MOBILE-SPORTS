@@ -257,7 +257,7 @@
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
-    "sha256": "c2c26cf6f83a0cc73fee6af8d7b915520775dd023d4555a2a28cfbfa7c190ab6"
+    "sha256": "0f6ba148d32912e79ace8d402e38fe7d22fd03fa743f341233c7c6a252be59a3"
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
