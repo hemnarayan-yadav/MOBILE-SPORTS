@@ -13,7 +13,9 @@ import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
 import { TabStrip } from '../../components/common/Layout.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
+import StateDistrictFields from '../../components/common/StateDistrictFields.jsx';
 import { LeaderboardList, StandingsTable } from '../../components/tournament/TournamentBits.jsx';
+import { useAuthStore } from '../../store/authStore.js';
 import { SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { LEADERBOARD_CATEGORIES } from '../../utils/constants.js';
@@ -46,11 +48,25 @@ export default function Rankings() {
   const router = useRouter();
   const [tab, setTab] = useState(LEADERBOARD_CATEGORIES[0]);
   const [tournamentId, setTournamentId] = useState(ALL_TIME);
+  // A national table says who the best raider in India is; a district table
+  // says who the best raider somebody has heard of is. The reader's own
+  // district is where it starts, and they can look anywhere.
+  const area = useAuthStore((s) => s.user?.area ?? null);
+  const [location, setLocation] = useState(() => ({
+    state: area?.state ?? '',
+    district: area?.district ?? '',
+  }));
   const tournaments = useQuery({
     queryKey: qk.tournaments.list({ limit: LIMIT }),
     queryFn: () => tournamentsApi.list({ limit: LIMIT }),
   });
-  const playerParams = { category: tab, limit: LIMIT, tournament_id: tournamentId };
+  const playerParams = {
+    category: tab,
+    limit: LIMIT,
+    tournament_id: tournamentId,
+    state: location.state,
+    district: location.district,
+  };
   const players = useQuery({
     queryKey: qk.rankings.players(playerParams),
     queryFn: () => rankingsApi.players(playerParams),
@@ -93,6 +109,14 @@ export default function Rankings() {
             label={t('rankings.scope')}
           />
         </View>
+        {/* Ranks inside a district are that district's own: a player who is
+            41st in India and 2nd in Durg reads as 2nd here. */}
+        <StateDistrictFields
+          variant="filter"
+          state={location.state}
+          district={location.district}
+          onChange={setLocation}
+        />
         <TabStrip tabs={tabs} value={tab} onChange={setTab} label={t('rankings.pageTitle')} />
         {tab === TEAMS ? (
           <Result

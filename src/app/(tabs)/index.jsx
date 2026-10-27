@@ -27,6 +27,7 @@ import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { LEADERBOARD_CATEGORIES, PLAYER_ROLES, ROLES } from '../../utils/constants.js';
+import { stateName } from '../../utils/india.js';
 
 // Everything on this screen arrives in one response (GET /mobile/home), which
 // the server has already trimmed — so these are about layout, not fetching.
@@ -34,6 +35,9 @@ const LEADER_LIMIT = 3;
 // The whole screen is refetched on this cadence because of the live section;
 // everything else in the payload is cheap and server-cached anyway.
 const HOME_REFRESH_MS = 60_000;
+// Cards in the reader's own district: enough to show the circuit is alive,
+// not so many that the rest of the screen is pushed off it.
+const NEAR_YOU_LIMIT = 3;
 const NOTICE_TAB = Object.freeze({ TOURNAMENTS: 'tournaments', NEWS: 'news' });
 // Cards visible at once in the carousel.
 const HOME_CARDS = 2;
@@ -162,6 +166,38 @@ function TeamShortcut() {
 // Live matches, and only when something is live. A "Live" strip sitting empty
 // for most of the day is the first thing a reader sees and it says the app is
 // dead; between matches the sections below take its place.
+/**
+ * What is happening in the reader's own district, above everything national.
+ *
+ * Kabaddi is played by circuit: the match that matters to somebody in Durg is
+ * in Durg, not four states away. The district comes from the account, so
+ * nobody is asked a question the data already answers, and a reader without
+ * one sees the national screen they always saw.
+ */
+function NearYouSection({ nearYou }) {
+  const { t } = useTranslation();
+  if (!nearYou) return null;
+  const matches = [...(nearYou.live ?? []), ...(nearYou.upcoming ?? [])].slice(0, NEAR_YOU_LIMIT);
+  const tournaments = nearYou.tournaments ?? [];
+  if (matches.length === 0 && tournaments.length === 0) return null;
+
+  const place = nearYou.area?.district ?? stateName(nearYou.area?.state) ?? '';
+  return (
+    <Section
+      title={t('home.nearYouTitle', { place })}
+      actionTo="/matches"
+      actionLabel={t('common.viewAll')}
+    >
+      {matches.map((match) => (
+        <MatchCard key={match.id} match={match} />
+      ))}
+      {tournaments.slice(0, NEAR_YOU_LIMIT - matches.length).map((tournament) => (
+        <TournamentCard key={tournament.id} tournament={tournament} />
+      ))}
+    </Section>
+  );
+}
+
 function LiveSection({ matches }) {
   const { t } = useTranslation();
   if (!matches?.length) return null;
@@ -319,9 +355,14 @@ export default function Home() {
   const { colors } = useTheme();
   // One request for the whole screen. Refetched on the live cadence, because
   // the live section is the only part anybody minds being a minute old.
+  // The account's own district, resolved by the server and carried on the
+  // user (backend modules/users/area.service.js). It is part of the query key,
+  // so signing in or changing district redraws the screen rather than serving
+  // somebody else's.
+  const area = useAuthStore((s) => s.user?.area ?? null);
   const query = useQuery({
-    queryKey: qk.home,
-    queryFn: mobileApi.home,
+    queryKey: qk.homeFor(area),
+    queryFn: () => mobileApi.home(area ? { state: area.state, district: area.district } : null),
     refetchInterval: HOME_REFRESH_MS,
   });
   const data = query.data;
@@ -332,6 +373,7 @@ export default function Home() {
   const sections = [
     { key: 'header', render: () => <Header /> },
     { key: 'shortcut', render: () => <TeamShortcut /> },
+    { key: 'nearYou', render: () => <NearYouSection nearYou={data?.nearYou} /> },
     // A squad waiting for an answer comes before the rest of the screen:
     // until it is answered, nobody is in a team.
     { key: 'joinRequests', render: () => <MyJoinRequests /> },

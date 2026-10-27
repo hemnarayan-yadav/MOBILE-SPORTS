@@ -261,7 +261,7 @@
   },
   "src/app/(tabs)/index.jsx": {
     "source": "src/pages/public/Home.jsx",
-    "sha256": "0f6ba148d32912e79ace8d402e38fe7d22fd03fa743f341233c7c6a252be59a3"
+    "sha256": "28f24ce1d403d0376f472f82e237c1da8b70ec9afe50ca336b840191235327e1"
   },
   "src/app/(tabs)/matches.jsx": {
     "source": "src/pages/public/Matches.jsx",
@@ -273,7 +273,7 @@
   },
   "src/app/(tabs)/rankings.jsx": {
     "source": "src/pages/public/Rankings.jsx",
-    "sha256": "3a396fa26ea7aebba2d975b770456870a96e2b8f1295102159a0abb6affce0b5"
+    "sha256": "434b3c2ee3e60a0a5197ebbc5a2efae5d560a92bb1b777565abfb613d292543d"
   },
   "src/app/match/[id].jsx": {
     "source": "src/pages/public/MatchDetails.jsx",

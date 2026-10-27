@@ -55,6 +55,7 @@ export const qk = Object.freeze({
     status: (type, id) => ['follows', 'status', type, id],
   },
   home: ['home'],
+  homeFor: (area) => ['home', area?.state ?? null, area?.district ?? null],
   newsFeed: {
     all: ['news-feed'],
     list: (params) => ['news-feed', 'list', params],
