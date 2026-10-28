@@ -70,6 +70,14 @@ export default function NoticeDetail() {
 
   const notice = query.data;
   const place = [notice?.venue, notice?.location?.district].filter(Boolean).join(', ');
+  // `contacts` is what the API answers now; `contactPhone` is what it answered
+  // when this screen was written, and still answers for a notice submitted
+  // before the list existed.
+  const contacts = notice?.contacts?.length
+    ? notice.contacts
+    : notice?.contactPhone
+      ? [{ name: null, phone: notice.contactPhone }]
+      : [];
   const needsNote = reason === 'other' && !note.trim();
 
   return (
@@ -98,8 +106,24 @@ export default function NoticeDetail() {
           <Detail icon="location-outline" label={t('notices.venueLabel')} value={place} />
           <Detail icon="cash-outline" label={t('notices.entryFeeLabel')} value={notice.entryFee} />
           <Detail icon="person-outline" label={t('notices.organiserLabel')} value={notice.organiserName} />
-          <Detail icon="call-outline" label={t('notices.contactLabel')} value={notice.contactPhone} />
           <Detail icon="document-text-outline" label={t('notices.rulesLabel')} value={notice.rules} />
+
+          {/* Won by one player rather than by placing — बेस्ट रेडर, मैन ऑफ द सीरीज —
+              and announced before the tournament, which is half of why players
+              turn up. */}
+          {notice.awards?.length ? (
+            <View style={styles.block}>
+              <AppText variant="small" tone="muted">
+                {t('notices.awardsLabel')}
+              </AppText>
+              {notice.awards.map((award) => (
+                <View key={award.title} style={styles.prizeRow}>
+                  <AppText tone="muted">{award.title}</AppText>
+                  <AppText weight="semibold">{award.prize}</AppText>
+                </View>
+              ))}
+            </View>
+          ) : null}
 
           {notice.prizes?.length ? (
             <View style={styles.block}>
@@ -117,11 +141,17 @@ export default function NoticeDetail() {
 
           {notice.description ? <AppText>{notice.description}</AppText> : null}
 
-          {notice.contactPhone ? (
-            <Button onPress={() => Linking.openURL(`tel:${notice.contactPhone}`).catch(() => {})}>
-              {t('notices.contactLabel')}
+          {/* A poster prints two or three numbers because one of them will not
+              pick up, and the name matters as much as the number: it is who a
+              captain asks for. */}
+          {contacts.map((contact) => (
+            <Button
+              key={contact.phone}
+              onPress={() => Linking.openURL(`tel:${contact.phone}`).catch(() => {})}
+            >
+              {contact.name ? `${contact.name} · ${contact.phone}` : contact.phone}
             </Button>
-          ) : null}
+          ))}
 
           {/* Anyone signed in may flag a notice. Play's user-generated content
               policy wants reporting as well as moderation, and an approved

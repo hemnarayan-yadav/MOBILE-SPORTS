@@ -1242,6 +1242,7 @@
     },
     "reportReasonLabel": "What is wrong?",
     "reportNoteLabel": "More detail (optional)",
-    "yearLabel": "Year"
+    "yearLabel": "Year",
+    "awardsLabel": "Player awards"
   }
 }
