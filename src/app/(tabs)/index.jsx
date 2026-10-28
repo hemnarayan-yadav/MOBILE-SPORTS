@@ -21,6 +21,7 @@ import TabbedSection from '../../components/home/TabbedSection.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import AutoCarousel from '../../components/notice/AutoCarousel.jsx';
 import { NewsCard, NoticeCard } from '../../components/notice/NoticeBits.jsx';
+import UpdatePrompt from '../../components/common/UpdatePrompt.jsx';
 import MyJoinRequests from '../../components/team/MyJoinRequests.jsx';
 import { LeaderboardList, StandingsTable, TournamentCard } from '../../components/tournament/TournamentBits.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
@@ -391,6 +392,9 @@ export default function Home() {
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]} edges={['top']}>
+      {/* A newer release, offered once. The gate above this screen handles the
+          other case: an app too old to be used at all. */}
+      <UpdatePrompt />
       {query.isPending ? (
         <View style={styles.content}>
           <Header />

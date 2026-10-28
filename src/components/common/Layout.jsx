@@ -70,21 +70,43 @@ export function TileGrid({ children }) {
 
 // Back action and title for a stack screen that is not a form (lists and detail
 // screens use it inside their own scroll view).
+//
+// Home sits beside Back because this app is read by following links: a
+// tournament leads to a team, the team to a player, the player to another
+// match. Four screens deep, Back is four taps from where somebody wanted to
+// be — so the way out is one tap, and it empties the stack rather than
+// stacking home on top of it.
 export function BackHeader({ title }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const goHome = () => {
+    if (router.canDismiss?.()) router.dismissAll();
+    router.navigate('/');
+  };
   return (
     <View style={styles.backHeader}>
-      <Pressable
-        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-        accessibilityRole="button"
-        accessibilityLabel={t('common.back')}
-        style={styles.back}
-      >
-        <AppText weight="semibold" tone="muted">
-          {`‹ ${t('common.back')}`}
-        </AppText>
-      </Pressable>
+      <View style={styles.headerRow}>
+        <Pressable
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.back')}
+          style={styles.back}
+        >
+          <AppText weight="semibold" tone="muted">
+            {`‹ ${t('common.back')}`}
+          </AppText>
+        </Pressable>
+        <Pressable
+          onPress={goHome}
+          accessibilityRole="button"
+          accessibilityLabel={t('nav.home')}
+          style={styles.back}
+        >
+          <AppText weight="semibold" tone="muted">
+            {t('nav.home')}
+          </AppText>
+        </Pressable>
+      </View>
       {title ? (
         <AppText variant="heading" accessibilityRole="header">
           {title}
@@ -143,7 +165,8 @@ const styles = StyleSheet.create({
   tile: { flexBasis: '47%', flexGrow: 1, padding: SPACING.md, gap: SPACING.xs },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   backHeader: { gap: SPACING.xs },
-  back: { minHeight: MIN_TOUCH, justifyContent: 'center', alignSelf: 'flex-start' },
+  back: { minHeight: MIN_TOUCH, justifyContent: 'center' },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   tabs: { gap: SPACING.sm, paddingVertical: SPACING.xs },
   tab: {
     minHeight: MIN_TOUCH - 4,

@@ -33,11 +33,16 @@ export const useUiStore = create(
       },
       setLanguage: (language) => set({ language }),
       setPushPrimed: () => set({ pushPrimed: true }),
+      // The app version somebody said “later” to. Kept so the same update is
+      // not offered on every screen, and forgotten the moment a newer one is
+      // published (utils/appVersion.js decides).
+      updateSkipped: null,
+      skipUpdate: (version) => set({ updateSkipped: version }),
     }),
     {
       name: UI_STORAGE_KEY,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ theme, language, pushPrimed }) => ({ theme, language, pushPrimed }),
+      partialize: ({ theme, language, pushPrimed, updateSkipped }) => ({ theme, language, pushPrimed, updateSkipped }),
       onRehydrateStorage: () => (state) => {
         // A previous build persisted 'system'; keep the user's actual current
         // preference by pinning it to the resolved scheme at first restore.

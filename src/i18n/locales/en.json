@@ -606,7 +606,10 @@
       "pick": "Pick a date",
       "exactSpan": "Or an exact span"
     },
-    "noMatches": "No matches"
+    "noMatches": "No matches",
+    "updateAvailableTitle": "A newer KhelScore is out",
+    "updateAvailableBody": "Version {{version}} is on the Play Store. It takes a moment, and the app keeps everything where it is.",
+    "updateLater": "Later"
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",

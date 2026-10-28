@@ -23,7 +23,9 @@ function storeLinks() {
   };
 }
 
-async function openStore() {
+// Shared with the soft prompt (UpdatePrompt.jsx), so both buttons land in the
+// same place.
+export async function openStore() {
   const { app, web } = storeLinks();
   try {
     await Linking.openURL(app);
