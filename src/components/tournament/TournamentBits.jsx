@@ -117,6 +117,10 @@ export function TournamentHero({ tournament, actions }) {
 
 // The medal rule itself is in utils/medals.js, so this badge and every
 // leaderboard that draws a row around it agree on what rank 1–3 looks like.
+// Big enough that the frame's ring holds an `xs` crest, small enough to
+// leave the table its compact rows.
+const PODIUM_FRAME = 44;
+
 export function RankBadge({ rank }) {
   const { colors } = useTheme();
   const tone = rankTone(rank, colors);
@@ -180,7 +184,16 @@ export function StandingsTable({ rows }) {
             <RankBadge rank={row.rank} />
           </View>
           <View style={[styles.flex, styles.teamCell]}>
-            <TeamCrest team={row.team} size="xs" />
+            {/* The top three wear the same podium frame the players do: a
+                table is where a season is read, and first place should look
+                like first place here too. */}
+            {medalOf(row.rank) ? (
+              <RankFrame rank={row.rank} name={row.team.name} size={PODIUM_FRAME}>
+                <TeamCrest team={row.team} size="xs" />
+              </RankFrame>
+            ) : (
+              <TeamCrest team={row.team} size="xs" />
+            )}
             <AppText weight="semibold" numberOfLines={1} style={styles.flex}>
               {row.team.shortName ?? row.team.name}
             </AppText>

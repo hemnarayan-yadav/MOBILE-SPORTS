@@ -606,7 +606,10 @@
       "pick": "तारीख़ चुनें",
       "exactSpan": "या पूरी तारीख़ चुनें"
     },
-    "noMatches": "कोई नतीजा नहीं"
+    "noMatches": "कोई नतीजा नहीं",
+    "updateAvailableTitle": "KhelScore का नया वर्शन आ गया है",
+    "updateAvailableBody": "Play Store पर वर्शन {{version}} मौजूद है। एक मिनट लगेगा, और ऐप में सब कुछ जहाँ है वहीं रहेगा।",
+    "updateLater": "बाद में"
   },
   "commentary": {
     "raidNumber": "रेड {{number}}",

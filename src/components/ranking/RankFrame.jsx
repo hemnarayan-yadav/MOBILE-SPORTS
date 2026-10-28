@@ -1,33 +1,35 @@
 // Adapted from frontend/src/components/ranking/RankFrame.jsx — the artwork and
-// the numbers measured from it are the web's; the layout is React Native's.
+// the numbers it carries are the web's; the layout is React Native's.
 //
-// The podium frame the top three wear on a leaderboard: the supplied artwork,
-// with the player's photo in the ring at its centre. The rank is part of the
-// picture — each frame carries its own numeral on the shield — so a row that
-// wears one needs no rank badge beside it.
+// The podium frame the top three wear: the supplied drawing, with the player's
+// photo — or a team's crest — in the ring at its centre. The rank is part of
+// the picture, so a row that wears one needs no rank badge beside it.
 //
-// The three frames are not drawn identically, so the ring each one leaves is
-// measured from the artwork rather than guessed: `hole` is the photo's diameter
-// and `top` its centre, both as a fraction of the frame. Swapping the artwork
-// means measuring it again.
+// The artwork says where its own ring is: a 512 canvas whose inner rim is a
+// circle of radius 157 centred at (256, 226). Those are the numbers below, so
+// nothing is measured by eye and all three frames hold their picture in
+// exactly the same place.
 import { useTranslation } from 'react-i18next';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import Avatar from '../common/Avatar.jsx';
-import goldFrame from '../../assets/rank/rank-1.webp';
-import silverFrame from '../../assets/rank/rank-2.webp';
-import bronzeFrame from '../../assets/rank/rank-3.webp';
+import goldFrame from '../../assets/rank/rank-1.js';
+import silverFrame from '../../assets/rank/rank-2.js';
+import bronzeFrame from '../../assets/rank/rank-3.js';
 
-const FRAMES = Object.freeze({
-  1: { src: goldFrame, hole: 0.536, top: 0.529 },
-  2: { src: silverFrame, hole: 0.505, top: 0.518 },
-  3: { src: bronzeFrame, hole: 0.516, top: 0.526 },
-});
+const FRAMES = Object.freeze({ 1: goldFrame, 2: silverFrame, 3: bronzeFrame });
 
-export default function RankFrame({ rank, src, name, size = 72 }) {
+const CANVAS = 512;
+const RING_RADIUS = 157;
+const RING_CENTRE_Y = 226;
+const HOLE = (RING_RADIUS * 2) / CANVAS;
+const CENTRE_Y = RING_CENTRE_Y / CANVAS;
+
+export default function RankFrame({ rank, src, name, size = 72, children }) {
   const { t } = useTranslation();
   const frame = FRAMES[rank];
   if (!frame) return null;
-  const photo = Math.round(size * frame.hole);
+  const inner = Math.round(size * HOLE);
 
   return (
     <View
@@ -36,27 +38,27 @@ export default function RankFrame({ rank, src, name, size = 72 }) {
       accessibilityRole="image"
       accessibilityLabel={t('rankings.rankOf', { rank, name })}
     >
-      {/* The photo sits under the artwork: the shield at the bottom of the
+      {/* The picture sits under the artwork: the medal at the bottom of the
           frame is meant to overlap it, exactly as the frame was drawn. */}
       <View
         style={[
-          styles.photo,
-          { left: size * 0.497 - photo / 2, top: size * frame.top - photo / 2 },
+          styles.inner,
+          {
+            left: size / 2 - inner / 2,
+            top: size * CENTRE_Y - inner / 2,
+            width: inner,
+            height: inner,
+          },
         ]}
       >
-        <Avatar src={src} name={name} px={photo} ring="none" />
+        {children ?? <Avatar src={src} name={name} px={inner} ring="none" />}
       </View>
-      <Image
-        source={frame.src}
-        style={[styles.art, { width: size, height: size }]}
-        resizeMode="contain"
-        accessibilityIgnoresInvertColors
-      />
+      <SvgXml xml={frame} width={size} height={size} style={styles.art} pointerEvents="none" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  photo: { position: 'absolute' },
+  inner: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
   art: { position: 'absolute', left: 0, top: 0 },
 });
