@@ -43,10 +43,14 @@ const LIGHT = {
 };
 
 const DARK = {
-  bg: [9, 13, 22],
-  surface: [17, 23, 36],
-  surface2: [26, 33, 50],
-  border: [40, 49, 70],
+  // Dark palette raised a step from the web's values so cards and tabs pop
+  // against the page background on an OLED screen (owner's call, 2026-11-03:
+  // the player and tournament screens were reading as flat black). The web
+  // keeps its own values.
+  bg: [12, 17, 29],
+  surface: [28, 36, 54],
+  surface2: [42, 52, 76],
+  border: [56, 68, 94],
   text: [236, 238, 243],
   muted: [152, 160, 178],
   ink: [6, 10, 19],

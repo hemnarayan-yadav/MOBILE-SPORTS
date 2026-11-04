@@ -227,7 +227,7 @@ describe('Home (the rest of the screen)', () => {
     expect(useUiStore.getState().theme).toBe('dark');
   });
 
-  it('shows the same person icon signed out and signed in, and still goes to both places', async () => {
+  it('shows the person icon to a visitor and the account avatar once signed in', async () => {
     await renderHome();
     expect(await screen.findByTestId('ionicon-person-circle-outline')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
@@ -239,9 +239,13 @@ describe('Home (the rest of the screen)', () => {
         user: { id: 'u1', name: 'Asha', role: 'user' },
       }),
     );
-    // The same glyph — only the label and where it leads change.
-    expect(screen.getByTestId('ionicon-person-circle-outline')).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Account' }));
+    // Signed-in: no generic icon; the account's own avatar (first initial on
+    // a tinted disc when no photo has been uploaded) is drawn inside the
+    // Account button, so the button still leads to the profile.
+    expect(screen.queryByTestId('ionicon-person-circle-outline')).toBeNull();
+    const accountButton = screen.getByRole('button', { name: 'Account' });
+    expect(accountButton).toBeTruthy();
+    await fireEvent.press(accountButton);
     expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
   });
 
@@ -255,13 +259,13 @@ describe('Home (the rest of the screen)', () => {
 });
 
 describe('Home (signed-in shortcut)', () => {
-  it('offers "Create your team" to a signed-in user without a team', async () => {
+  it('offers "Register your team" to a signed-in user without a team', async () => {
     useAuthStore.setState({
       status: AUTH_STATUS.AUTHENTICATED,
       user: { id: 'u1', name: 'Asha', role: 'user' },
     });
     await renderHome();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Create your team' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Register your team' }));
     expect(router.push).toHaveBeenCalledWith('/user/create-team');
   });
 
@@ -278,7 +282,7 @@ describe('Home (signed-in shortcut)', () => {
   it('is hidden for signed-out visitors', async () => {
     await renderHome();
     await settled();
-    expect(screen.queryByRole('button', { name: 'Create your team' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Register your team' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'My team' })).toBeNull();
   });
 });

@@ -15,9 +15,12 @@ import { PROMPTS, useNoticeStore } from '../store/noticeStore.js';
 // A reminder therefore: appears once per sign-in, stays dismissed for the rest
 // of that session, is checked again at the next sign-in, and stops appearing as
 // soon as the account satisfies it.
+//
+// Mobile is OTP-only, so `mustChangePassword` is not surfaced here: the user
+// cannot change their password on mobile and the backend never issues a
+// temporary one to a self-registered OTP account.
 export const isOwed = (profileState) =>
-  Boolean(profileState) &&
-  (profileState.profileComplete === false || profileState.mustChangePassword === true);
+  Boolean(profileState) && profileState.profileComplete === false;
 
 export function useAccountPrompts() {
   const status = useAuthStore((s) => s.status);
@@ -36,8 +39,7 @@ export function useAccountPrompts() {
     showPrompt({
       accountId: user.id,
       kind: PROMPTS.REMINDERS,
-      missingFields: profileState.profileComplete ? [] : (profileState.missingFields ?? []),
-      mustChangePassword: Boolean(profileState.mustChangePassword),
+      missingFields: profileState.missingFields ?? [],
     });
   }, [status, user, showPrompt]);
 }

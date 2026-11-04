@@ -16,6 +16,8 @@ import { LanguageSwitcher, ThemeToggle } from '../../components/common/Controls.
 import { TabStrip } from '../../components/common/Layout.jsx';
 import Logo from '../../components/common/Logo.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
+import UserAvatar from '../../components/common/UserAvatar.jsx';
+import { completionTone, computeProfileCompletion } from '../../utils/profileCompletion.js';
 import FeaturedStrip from '../../components/home/FeaturedStrip.jsx';
 import TabbedSection from '../../components/home/TabbedSection.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
@@ -33,6 +35,9 @@ import { stateName } from '../../utils/india.js';
 // Everything on this screen arrives in one response (GET /mobile/home), which
 // the server has already trimmed — so these are about layout, not fetching.
 const LEADER_LIMIT = 3;
+// Mirror of LEADER_LIMIT for the top-teams card: three is enough to show the
+// shape of the standings on the home screen; the full table lives on /rankings.
+const TOP_TEAMS_LIMIT = 3;
 // The whole screen is refetched on this cadence because of the live section;
 // everything else in the payload is cheap and server-cached anyway.
 const HOME_REFRESH_MS = 60_000;
@@ -43,18 +48,20 @@ const NOTICE_TAB = Object.freeze({ TOURNAMENTS: 'tournaments', NEWS: 'news' });
 // Cards visible at once in the carousel.
 const HOME_CARDS = 2;
 
-// The same person icon whether or not anyone is signed in — it is the way to
-// the account either way, and a different glyph per state only made the header
-// change shape on sign-in. Where it goes and what it is called still differ:
-// the profile for a signed-in account, sign-in for a visitor. Nothing while the
-// stored session is still being restored, so the icon does not flicker.
+// A signed-in person sees their own avatar (uploaded photo or the first
+// initial on a tinted disc) with a coloured ring + two-digit percentage while
+// their profile is short of 100%; a visitor sees the generic person icon, so
+// the button also reads as "sign in". Nothing while the stored session is
+// still being restored, so the icon does not flicker.
 function AccountIconButton() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
   const status = useAuthStore((s) => s.status);
+  const user = useAuthStore((s) => s.user);
   if (status === AUTH_STATUS.UNKNOWN) return null;
   const signedIn = status === AUTH_STATUS.AUTHENTICATED;
+  const completion = signedIn ? computeProfileCompletion(user).percent : null;
   const label = t(signedIn ? 'app.accountLabel' : 'app.signInLabel');
   return (
     <Pressable
@@ -62,9 +69,65 @@ function AccountIconButton() {
       accessibilityRole="button"
       accessibilityLabel={label}
       hitSlop={8}
-      style={[styles.iconButton, { backgroundColor: colors.surface2 }]}
+      style={
+        signedIn
+          ? styles.avatarButton
+          : [styles.iconButton, { backgroundColor: colors.surface2 }]
+      }
     >
-      <Ionicons name="person-circle-outline" size={22} color={colors.text} />
+      {signedIn ? (
+        <UserAvatar
+          size={36}
+          avatarUrl={user?.avatarUrl}
+          name={user?.name}
+          completion={completion}
+        />
+      ) : (
+        <Ionicons name="person-circle-outline" size={22} color={colors.text} />
+      )}
+    </Pressable>
+  );
+}
+
+// A low-key pill under the header for a signed-in player whose profile is not
+// yet complete, so they know there is something to finish and tapping takes
+// them straight to the profile screen. Nothing while the stored session is
+// still being restored or when the profile is already complete.
+function CompleteProfilePrompt() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { colors } = useTheme();
+  const status = useAuthStore((s) => s.status);
+  const user = useAuthStore((s) => s.user);
+  if (status !== AUTH_STATUS.AUTHENTICATED || !user) return null;
+  const { percent } = computeProfileCompletion(user);
+  if (percent >= 100) return null;
+  const tone = completionTone(percent);
+  return (
+    <Pressable
+      onPress={() => router.push('/dashboard/profile')}
+      accessibilityRole="button"
+      accessibilityLabel={t('app.completeProfilePrompt', { percent })}
+      style={[
+        styles.completePrompt,
+        { backgroundColor: colors.surface2, borderColor: colors.border },
+      ]}
+    >
+      <View style={[styles.completeDot, { backgroundColor: colors[tone] }]}>
+        <AppText
+          weight="bold"
+          style={{ color: colors.onLive ?? '#ffffff', fontSize: 11, lineHeight: 14 }}
+        >
+          {percent}
+        </AppText>
+      </View>
+      <View style={styles.flex}>
+        <AppText weight="semibold">{t('app.completeProfileTitle')}</AppText>
+        <AppText variant="small" tone="muted">
+          {t('app.completeProfileSubtitle', { percent })}
+        </AppText>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
     </Pressable>
   );
 }
@@ -112,10 +175,11 @@ function Section({ title, actionTo, actionLabel, children }) {
   );
 }
 
-// Signed-in shortcut: "My team" for a captain (into the captain desk),
-// otherwise "Create your team" (into the user's create-team flow). Nothing
-// while the session is still being restored, and nothing for a signed-out
-// visitor.
+// Signed-in shortcut: "My team" takes a captain into the captain desk;
+// "Register your team" takes any other player into the create-team flow. Only
+// a player or a captain is offered a shortcut here — an organiser (Admin,
+// Manager, Super Admin) runs competitions from the website and must not be
+// offered one that their role could not finish.
 function TeamShortcut() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -123,13 +187,10 @@ function TeamShortcut() {
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
   if (status !== AUTH_STATUS.AUTHENTICATED || !user) return null;
-  // Only a player or a captain has a team of their own. An organiser (Admin,
-  // Manager, Super Admin) runs competitions from the website and must not be
-  // offered "create your team" here, which their role could not finish.
   if (!PLAYER_ROLES.includes(user.role)) return null;
   const isCaptain = user.role === ROLES.CAPTAIN;
   const target = isCaptain ? '/captain' : '/user/create-team';
-  const title = t(isCaptain ? 'app.myTeamTitle' : 'app.createTeamTitle');
+  const title = t(isCaptain ? 'app.myTeamTitle' : 'home.registerTeam');
   const subtitle = t(isCaptain ? 'app.myTeamSubtitle' : 'app.createTeamSubtitle');
   const iconName = isCaptain ? 'shield-checkmark-outline' : 'add-circle-outline';
   return (
@@ -346,7 +407,7 @@ function TopTeamsSection({ rows }) {
   if (!rows?.length) return null;
   return (
     <Section title={t('home.topTeamsTitle')} actionTo="/rankings" actionLabel={t('common.viewAll')}>
-      <StandingsTable rows={rows} />
+      <StandingsTable rows={rows.slice(0, TOP_TEAMS_LIMIT)} />
     </Section>
   );
 }
@@ -373,11 +434,13 @@ export default function Home() {
   // between Home appearing and Home taking a beat on a low-end phone.
   const sections = [
     { key: 'header', render: () => <Header /> },
+    // A squad waiting for an answer comes right after the header, before any
+    // shortcut or near-you strip: nobody is in a team until the player accepts
+    // it, so the pending invite is the first thing a signed-in player sees.
+    { key: 'joinRequests', render: () => <MyJoinRequests /> },
+    { key: 'completeProfile', render: () => <CompleteProfilePrompt /> },
     { key: 'shortcut', render: () => <TeamShortcut /> },
     { key: 'nearYou', render: () => <NearYouSection nearYou={data?.nearYou} /> },
-    // A squad waiting for an answer comes before the rest of the screen:
-    // until it is answered, nobody is in a team.
-    { key: 'joinRequests', render: () => <MyJoinRequests /> },
     { key: 'live', render: () => <LiveSection matches={data?.live} /> },
     { key: 'featured', render: () => <FeaturedSection people={data?.featured} /> },
     { key: 'matches', render: () => <MatchesSection matches={data?.matches} /> },
@@ -434,6 +497,12 @@ const styles = StyleSheet.create({
     borderRadius: RADII.md,
     paddingHorizontal: SPACING.sm,
   },
+  avatarButton: {
+    minHeight: MIN_TOUCH,
+    minWidth: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   section: { gap: SPACING.sm },
   sectionHeading: {
     flexDirection: 'row',
@@ -459,4 +528,19 @@ const styles = StyleSheet.create({
   },
   flex: { flex: 1 },
   leaderBoard: { gap: SPACING.xs },
+  completePrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+    padding: SPACING.md,
+    borderRadius: RADII.md,
+    borderWidth: 1,
+  },
+  completeDot: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

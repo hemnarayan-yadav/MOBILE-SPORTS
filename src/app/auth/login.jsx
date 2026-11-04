@@ -1,89 +1,51 @@
-// Sign in — adapted from frontend/src/pages/auth/Login.jsx: password (email or
-// phone) or a one-time code on the phone. OTP sign-in is offered only when the
-// API's code flow is available.
+// Sign in — OTP-only. The verified mobile number is the credential; no password
+// field exists on mobile. A number with no account is sent to the sign-up
+// screen with its proof carried over, so no second OTP is sent.
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
+import Logo from '../../components/common/Logo.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
-import SegmentedControl from '../../components/common/SegmentedControl.jsx';
-import TextField from '../../components/common/TextField.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
 import { notify } from '../../store/noticeStore.js';
-import { SPACING } from '../../theme/tokens.js';
+import { RADII, SPACING } from '../../theme/tokens.js';
+import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
-import { loginSchema, otpLoginSchema } from '../../utils/validation.js';
+import { otpLoginSchema } from '../../utils/validation.js';
 
-const METHODS = Object.freeze({ PASSWORD: 'password', OTP: 'otp' });
-
-function PasswordLoginForm({ initialIdentifier = '' }) {
+// The green pill at the top so the user sees, before anything else, that the
+// screen takes a WhatsApp number and that no password is involved. Shown with a
+// WhatsApp glyph when the server's OTP channel is WhatsApp; the same pill in
+// neutral tone with an SMS glyph otherwise, so the promise matches the channel.
+function ChannelBadge({ channel }) {
   const { t } = useTranslation();
-  const { login } = useAuth();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { identifier: initialIdentifier, password: '' },
-  });
-
-  const onSubmit = (values) =>
-    login.mutate(values, { onError: (error) => notify.error(apiErrorText(t, error)) });
-
+  const { colors } = useTheme();
+  const whatsapp = channel === 'whatsapp';
   return (
-    <View style={styles.form}>
-      <Controller
-        control={control}
-        name="identifier"
-        render={({ field }) => (
-          <TextField
-            label={t('auth.identifier')}
-            placeholder={t('auth.identifierPlaceholder')}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="username"
-            textContentType="username"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            error={errors.identifier}
-          />
-        )}
+    <View
+      style={[
+        styles.badge,
+        { backgroundColor: whatsapp ? '#E8F8EE' : colors.surface2 },
+      ]}
+      accessible
+      accessibilityLabel={t(whatsapp ? 'app.whatsappOtpBadge' : 'app.smsOtpBadge')}
+    >
+      <Ionicons
+        name={whatsapp ? 'logo-whatsapp' : 'chatbubble-ellipses'}
+        size={18}
+        color={whatsapp ? '#25D366' : colors.brandStrong}
       />
-      <Controller
-        control={control}
-        name="password"
-        render={({ field }) => (
-          <TextField
-            label={t('auth.password')}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="current-password"
-            textContentType="password"
-            value={field.value}
-            onChangeText={field.onChange}
-            onBlur={field.onBlur}
-            onSubmitEditing={handleSubmit(onSubmit)}
-            error={errors.password}
-          />
-        )}
-      />
-      <Link href="/auth/forgot-password" style={styles.link}>
-        <AppText weight="semibold" tone="brandStrong">
-          {t('auth.forgotPasswordLink')}
-        </AppText>
-      </Link>
-      <Button onPress={handleSubmit(onSubmit)} loading={login.isPending}>
-        {t('auth.loginSubmit')}
-      </Button>
+      <AppText weight="semibold" style={{ color: whatsapp ? '#0E7D3A' : colors.text }}>
+        {t(whatsapp ? 'app.whatsappOtpBadge' : 'app.smsOtpBadge')}
+      </AppText>
     </View>
   );
 }
@@ -108,9 +70,9 @@ function OtpLoginForm({ verify, channel }) {
       { phone, otpToken },
       {
         onError: (error) => {
-          // Signing in before signing up is an easy mistake, and the number is
-          // already proved. Sign-up continues with the same proof rather than
-          // sending a second code the resend interval would hold back.
+          // A number with no account hands its proof to sign-up rather than
+          // waste it — the same screen continues to profile without a second
+          // OTP send.
           if (error?.code === 'PHONE_NOT_REGISTERED') {
             notify.info(t('auth.noAccountSoSignUp'));
             router.push({ pathname: '/auth/register', params: { phone, otpToken } });
@@ -131,6 +93,7 @@ function OtpLoginForm({ verify, channel }) {
           <PhoneField
             label={t('auth.phone')}
             hint={t('auth.otpPhoneHint', { context: channel })}
+            channel={channel}
             value={field.value}
             onChange={field.onChange}
             error={errors.phone}
@@ -147,34 +110,28 @@ function OtpLoginForm({ verify, channel }) {
 export default function Login() {
   const { t } = useTranslation();
   useGuestScreen();
-  // A pre-filled phone comes in from the sign-up screen when someone tried to
-  // register a number that already has an account (item #1 of the launch
-  // sprint). It is only accepted for the password path; the OTP path collects
-  // its own number.
-  const params = useLocalSearchParams();
-  const initialIdentifier = typeof params.phone === 'string' ? params.phone : '';
   const phoneVerification = usePhoneVerification();
-  const [method, setMethod] = useState(METHODS.PASSWORD);
-  const showOtp = phoneVerification.isAvailable && method === METHODS.OTP;
+
+  // When the server has no OTP provider configured, the screen does not pretend
+  // there is a fallback — password sign-in has been removed from mobile.
+  if (!phoneVerification.isAvailable && !phoneVerification.isChecking) {
+    return (
+      <Screen title={t('auth.loginTitle')}>
+        <View style={styles.brand}>
+          <Logo height={44} title={t('nav.brand')} />
+        </View>
+        <AppText tone="muted">{t('app.otpUnavailableMobile')}</AppText>
+      </Screen>
+    );
+  }
 
   return (
-    <Screen title={t('auth.loginTitle')}>
-      {phoneVerification.isAvailable ? (
-        <SegmentedControl
-          label={t('auth.loginMethod')}
-          value={method}
-          onChange={setMethod}
-          options={[
-            { value: METHODS.PASSWORD, label: t('auth.methodPassword') },
-            { value: METHODS.OTP, label: t('auth.methodOtp') },
-          ]}
-        />
-      ) : null}
-      {showOtp ? (
-        <OtpLoginForm verify={phoneVerification.verify} channel={phoneVerification.channel} />
-      ) : (
-        <PasswordLoginForm initialIdentifier={initialIdentifier} />
-      )}
+    <Screen title={t('auth.loginTitle')} subtitle={t('app.whatsappSubtitle')}>
+      <View style={styles.brand}>
+        <Logo height={44} title={t('nav.brand')} />
+      </View>
+      <ChannelBadge channel={phoneVerification.channel} />
+      <OtpLoginForm verify={phoneVerification.verify} channel={phoneVerification.channel} />
       <View style={styles.footer}>
         <AppText tone="muted">{t('auth.noAccount')}</AppText>
         <Link href="/auth/register">
@@ -190,6 +147,16 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   form: { gap: SPACING.lg },
-  link: { alignSelf: 'flex-end', paddingVertical: SPACING.sm },
+  brand: { alignItems: 'center', marginBottom: SPACING.lg },
+  badge: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADII.full,
+    marginBottom: SPACING.md,
+  },
   footer: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs, justifyContent: 'center' },
 });

@@ -3,14 +3,13 @@
 // OTP), notification preferences, language and theme, and signing out.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { authApi } from '../../api/auth.api.js';
-import { endSession } from '../../api/client.js';
 import { qk } from '../../api/queryKeys.js';
 import { usersApi } from '../../api/users.api.js';
 import AppText from '../../components/common/AppText.jsx';
@@ -40,7 +39,6 @@ import { isoYearsAgo } from '../../utils/dates.js';
 import { JERSEY_MAX_LENGTH, ORGANISER_ROLES, OTP_CHANNELS, ROLES } from '../../utils/constants.js';
 import { formatPhone, splitPhone } from '../../utils/countries.js';
 import {
-  changePasswordSchema,
   changePhoneSchema,
   profileSchemaFor,
   toLocationPayload,
@@ -525,112 +523,7 @@ function CompletionStatus({ profile }) {
           })}
         </AppText>
       ) : null}
-      {state.mustChangePassword ? (
-        <AppText variant="small" tone="warning">
-          {t('profile.temporaryPassword')}
-        </AppText>
-      ) : null}
     </View>
-  );
-}
-
-// Replacing the password. The API signs the account out everywhere, so this
-// says so plainly, forgets the session on this device and sends the person to
-// sign in again with the password they just chose.
-function PasswordSection({ profile, openOnMount }) {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const [editing, setEditing] = useState(openOnMount);
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(changePasswordSchema),
-    defaultValues: { currentPassword: '', password: '', confirmPassword: '' },
-  });
-
-  const change = useMutation({
-    mutationFn: usersApi.changePassword,
-    onSuccess: async () => {
-      setEditing(false);
-      // Leave the screen before the session ends, so the signed-out redirect
-      // never flashes, then forget the refresh token on this device.
-      router.replace('/auth/login');
-      notify.success(t('profile.passwordChanged'));
-      await endSession();
-      queryClient.clear();
-    },
-    onError: (error) => notify.error(apiErrorText(t, error)),
-  });
-
-  const field = (name, label) => (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field: input }) => (
-        <TextField
-          label={label}
-          secureTextEntry
-          autoCapitalize="none"
-          autoComplete={name === 'currentPassword' ? 'current-password' : 'new-password'}
-          value={input.value}
-          onChangeText={input.onChange}
-          onBlur={input.onBlur}
-          error={errors[name]}
-        />
-      )}
-    />
-  );
-
-  return (
-    <Section title={t('profile.passwordTitle')}>
-      {profile.mustChangePassword ? (
-        <>
-          <AppText variant="small" tone="warning">
-            {t('profile.temporaryPassword')}
-          </AppText>
-          <AppText variant="small" tone="muted">
-            {t('profile.temporaryPasswordHint')}
-          </AppText>
-        </>
-      ) : (
-        <AppText variant="small" tone="muted">
-          {t('profile.passwordIntro')}
-        </AppText>
-      )}
-      <Button variant="secondary" onPress={() => setEditing(true)}>
-        {t('profile.changePassword')}
-      </Button>
-      <Sheet
-        open={editing}
-        onClose={() => setEditing(false)}
-        title={t('profile.changePassword')}
-      >
-        {editing ? (
-          <View style={styles.stack}>
-            <AppText variant="small" tone="muted">
-              {t('profile.passwordSignsOut')}
-            </AppText>
-            {field('currentPassword', t('profile.currentPassword'))}
-            {field('password', t('auth.newPassword'))}
-            {field('confirmPassword', t('auth.confirmPassword'))}
-            <Button
-              onPress={handleSubmit((values) =>
-                change.mutate({
-                  currentPassword: values.currentPassword,
-                  password: values.password,
-                }),
-              )}
-              loading={change.isPending}
-            >
-              {t('profile.changePassword')}
-            </Button>
-          </View>
-        ) : null}
-      </Sheet>
-    </Section>
   );
 }
 
@@ -695,9 +588,9 @@ function PushState() {
 
 // Deleting the account. Google Play requires the app itself to offer it, so the
 // whole flow lives here: what goes, what stays, the public page on the website,
-// and a fresh proof (password, or a code to the number on the account) before
-// it runs. The screen is left before the session ends, so the signed-out
-// redirect above never flashes.
+// and a fresh OTP to the number on the account before it runs. The screen is
+// left before the session ends, so the signed-out redirect above never flashes.
+// Mobile is OTP-only, so password confirmation is not offered here.
 function DeleteAccountSection({ profile }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -705,7 +598,6 @@ function DeleteAccountSection({ profile }) {
   const clearSession = useAuthStore((s) => s.clear);
   const phoneVerification = usePhoneVerification();
   const [open, setOpen] = useState(false);
-  const [password, setPassword] = useState('');
 
   const remove = useMutation({
     mutationFn: usersApi.deleteAccount,
@@ -763,28 +655,17 @@ function DeleteAccountSection({ profile }) {
               {t('profile.deleteCaptainNote')}
             </AppText>
           ) : null}
-          <TextField
-            label={t('auth.password')}
-            hint={t('profile.deletePasswordHint')}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="current-password"
-            value={password}
-            onChangeText={setPassword}
-          />
+          <AppText variant="small" tone="muted">
+            {t('app.deleteOtpHint')}
+          </AppText>
           <Button
             variant="danger"
-            disabled={!password}
+            disabled={!canUseOtp}
             loading={remove.isPending}
-            onPress={() => remove.mutate({ password })}
+            onPress={byOtp}
           >
-            {t('profile.deleteAction')}
+            {t('app.deleteWithOtpMobile')}
           </Button>
-          {canUseOtp ? (
-            <Button variant="ghost" disabled={remove.isPending} onPress={byOtp}>
-              {t('profile.deleteWithOtp')}
-            </Button>
-          ) : null}
         </View>
       </Sheet>
       {phoneVerification.dialog}
@@ -797,10 +678,6 @@ export default function Profile() {
   const router = useRouter();
   const status = useAuthStore((s) => s.status);
   const { logout } = useAuth();
-  // The temporary-password reminder links straight to the password form
-  // (components/common/NoticeHost.jsx).
-  const params = useLocalSearchParams();
-  const openPasswordSheet = params.changePassword === '1';
   // The button sits right below Delete account and wears the same danger
   // colour, so it asks first — signing back in costs a password, or an OTP
   // when that password has been forgotten.
@@ -836,7 +713,6 @@ export default function Profile() {
             <EmailSection profile={profile} />
             <PhoneSection profile={profile} />
           </Section>
-          <PasswordSection profile={profile} openOnMount={openPasswordSheet} />
           <Section title={t('profile.notifications')}>
             <NotificationPreferences profile={profile} />
           </Section>

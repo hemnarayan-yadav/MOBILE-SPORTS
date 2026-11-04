@@ -6,13 +6,12 @@ jest.mock('expo-constants', () => ({
 
 import { configure, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Linking, Platform, Text } from 'react-native';
 import Profile from '../app/dashboard/profile.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
-import { useNoticeStore } from '../store/noticeStore.js';
 import { REFRESH_KEY, fail, fakeApi, ok, renderWithQuery, resetSession } from './helpers.jsx';
 
 configure({ asyncUtilTimeout: 5000 });
@@ -35,7 +34,6 @@ const PROFILE = {
     email: false,
   },
   updatedAt: '2026-09-26T00:00:00.000Z',
-  mustChangePassword: false,
   // The player half of the account, and what it still owes — both from the
   // server (API users.serializer.serializeAccount, modules/users/profileState).
   profile: {
@@ -47,7 +45,7 @@ const PROFILE = {
     age: 27,
     photoUrl: null,
   },
-  profileState: { profileComplete: true, missingFields: [], mustChangePassword: false },
+  profileState: { profileComplete: true, missingFields: [] },
 };
 let api;
 
@@ -113,12 +111,7 @@ describe('Profile', () => {
     const owing = {
       ...PROFILE,
       profile: { ...PROFILE.profile, jerseyNumber: null, dob: null, age: null },
-      profileState: {
-        profileComplete: false,
-        missingFields: ['jerseyNumber'],
-        mustChangePassword: true,
-      },
-      mustChangePassword: true,
+      profileState: { profileComplete: false, missingFields: ['jerseyNumber'] },
     };
     useAuthStore.getState().setSession({ user: owing, accessToken: 'at' });
     api = profileApi(owing);
@@ -126,9 +119,6 @@ describe('Profile', () => {
 
     expect(await screen.findByText('Profile incomplete')).toBeTruthy();
     expect(screen.getByText('Still needed: jersey number')).toBeTruthy();
-    expect(screen.getAllByText(/still uses the temporary password/).length).toBeGreaterThan(
-      0,
-    );
   });
 
   it('saves the jersey number, height, weight and birthday in one request', async () => {
@@ -174,59 +164,16 @@ describe('Profile', () => {
     expect(screen.queryByLabelText('Weight (kg)')).toBeNull();
   });
 
-  // Changing the password signs the account out everywhere, so the app says so,
-  // forgets the session on this device and sends the person to sign in again.
-  it('changes the password, then ends the session and asks for a fresh sign-in', async () => {
-    SecureStore.__store.set(REFRESH_KEY, 'rt-1');
+  // Mobile is OTP-only: the password change screen and reminder have been
+  // retired, so the profile offers no password controls at all.
+  it('shows no password controls on mobile', async () => {
     useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
     api = profileApi();
     await renderWithQuery(<Profile />);
 
-    await fireEvent.press(await screen.findByRole('button', { name: 'Change password' }));
-    expect(
-      await screen.findByText(/Changing your password signs you out on every device/),
-    ).toBeTruthy();
-
-    await fireEvent.changeText(screen.getByLabelText('Current password'), 'old12345');
-    await fireEvent.changeText(screen.getByLabelText('New password'), 'Kabaddi456');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi456');
-    await fireEvent.press(screen.getAllByRole('button', { name: 'Change password' }).at(-1));
-
-    await waitFor(() =>
-      expect(api.calls.find((c) => c.url === '/users/me/password')?.body).toEqual({
-        currentPassword: 'old12345',
-        password: 'Kabaddi456',
-      }),
-    );
-    expect(router.replace).toHaveBeenCalledWith('/auth/login');
-    await waitFor(() => expect(SecureStore.__store.has(REFRESH_KEY)).toBe(false));
-    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.ANONYMOUS);
-  });
-
-  it('never sends a password change whose confirmation does not match', async () => {
-    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
-    api = profileApi();
-    await renderWithQuery(<Profile />);
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Change password' }));
-    await fireEvent.changeText(screen.getByLabelText('Current password'), 'old12345');
-    await fireEvent.changeText(screen.getByLabelText('New password'), 'Kabaddi456');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi999');
-    await fireEvent.press(screen.getAllByRole('button', { name: 'Change password' }).at(-1));
-
-    expect(await screen.findByText("Passwords don't match")).toBeTruthy();
-    expect(api.calls.some((c) => c.url === '/users/me/password')).toBe(false);
-  });
-
-  // The temporary-password reminder links straight here.
-  it('opens the password form straight away when the reminder sent them', async () => {
-    useLocalSearchParams.mockReturnValue({ changePassword: '1' });
-    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
-    api = profileApi();
-    await renderWithQuery(<Profile />);
-
-    expect(await screen.findByLabelText('Current password')).toBeTruthy();
-    useLocalSearchParams.mockReturnValue({});
+    await screen.findByText('Signed in as User');
+    expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+    expect(screen.queryByLabelText('Current password')).toBeNull();
   });
 
   it('saves a notification preference as soon as it is switched', async () => {
@@ -282,13 +229,13 @@ describe('Profile', () => {
 });
 
 // Deleting the account from the app (M4). Google Play requires the app itself
-// to offer it, so the whole flow is here.
+// to offer it, so the whole flow is here. Mobile confirms deletion with an OTP
+// to the number on the account — the password confirmation path is gone.
 describe('Delete account', () => {
   const openSheet = async () => {
     const buttons = await screen.findAllByRole('button', { name: 'Delete my account' });
     await fireEvent.press(buttons[0]);
   };
-  const submitButton = () => screen.getAllByRole('button', { name: 'Delete my account' }).at(-1);
 
   it('says what is erased and what is kept, and opens the public page on the website', async () => {
     useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
@@ -303,59 +250,18 @@ describe('Delete account', () => {
     );
   });
 
-  it('confirms with the password, leaves the screen and ends the session', async () => {
-    SecureStore.__store.set(REFRESH_KEY, 'rt-1');
+  it('shows the OTP confirmation path and offers no password field', async () => {
     useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
     api = profileApi();
     await renderWithQuery(<Profile />);
 
     await openSheet();
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Passw0rd123');
-    await fireEvent.press(submitButton());
-
-    await waitFor(() =>
-      expect(api.calls.find((c) => c.url === '/users/me/delete')?.body).toEqual({
-        password: 'Passw0rd123',
-      }),
+    expect(screen.queryByLabelText('Password')).toBeNull();
+    // The confirm button is the OTP path; its label comes from
+    // profile.deleteWithOtp.
+    expect(screen.getAllByRole('button', { name: /Verify .* and delete/i }).length).toBeGreaterThan(
+      0,
     );
-    expect(router.dismissTo).toHaveBeenCalledWith('/');
-    await waitFor(() => expect(useAuthStore.getState().status).toBe(AUTH_STATUS.ANONYMOUS));
-  });
-
-  it('keeps the session and shows the translated refusal when the captain still has a team', async () => {
-    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
-    api = fakeApi((call) => {
-      if (call.url === '/users/me/delete') return fail(409, 'CAPTAIN_TEAM_ACTIVE');
-      if (call.url === '/users/me') return ok({ ...PROFILE, role: 'captain' });
-      if (call.url === '/otp/config')
-        return ok({ available: true, flow: 'code', channel: 'whatsapp' });
-      if (call.url === '/media/config') return ok({ enabled: true, maxImageMb: 5, maxVideoMb: 50 });
-      return ok(null);
-    });
-    await renderWithQuery(<Profile />);
-
-    await openSheet();
-    expect(screen.getByText(/You are a team captain/)).toBeTruthy();
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Passw0rd123');
-    await fireEvent.press(submitButton());
-
-    await waitFor(() =>
-      expect(useNoticeStore.getState().notice).toMatchObject({
-        tone: 'error',
-        message: 'Hand your team to another captain or deactivate it before deleting your account',
-      }),
-    );
-    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.AUTHENTICATED);
-  });
-
-  it('never sends an empty confirmation', async () => {
-    useAuthStore.getState().setSession({ user: PROFILE, accessToken: 'at' });
-    api = profileApi();
-    await renderWithQuery(<Profile />);
-
-    await openSheet();
-    await fireEvent.press(submitButton());
-    expect(api.calls.some((c) => c.url === '/users/me/delete')).toBe(false);
   });
 });
 

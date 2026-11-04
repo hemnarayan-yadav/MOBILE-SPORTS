@@ -1,19 +1,24 @@
-// Ported from frontend/src/pages/dashboard/captain/AddPlayer.jsx (which
-// replaced AddByPhone.jsx when inviting was retired).
+// Adding a player to the squad. Two paths, picked by a tab at the top:
 //
-// Adding a player to the squad. Search first, by name or by mobile number: an
-// account that already exists is added to the squad, so the same person is
-// never registered twice. A matching name is no proof it is the same person,
-// though, so adding a new member is always on offer alongside the results — it
-// creates the account and the squad place together, and the API still refuses a
-// second account for a number that already has one.
+//   Direct: the captain fills the player's details (name, WhatsApp number,
+//           jersey, role) and submits. Once the number is a complete Indian
+//           mobile, the component looks it up on KhelScore behind the scenes;
+//           if an account already uses it, a small sheet shows that account's
+//           profile and asks whether to attach it to the squad instead of
+//           creating a second one.
+//
+//   Search: the captain searches by name or number (the previous flow).
+//
+// On both paths the server does the final dedupe: an `addDirectPlayer` call
+// with a number that turns out to have an account attaches it rather than
+// creating a duplicate, and the answer tells the component which happened.
 //
 // Inviting a player over WhatsApp is retired — there is no link, no resend and
-// no delivery state here any more. Invitations sent before the change can still
-// be accepted by the player (app/join).
+// no delivery state here any more. Invitations sent before the change can
+// still be accepted by the player (app/join).
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -25,7 +30,7 @@ import { notify } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
-import { joinPhone } from '../../utils/countries.js';
+import { joinPhone, splitPhone } from '../../utils/countries.js';
 import { JERSEY_MAX_LENGTH, PLAYING_ROLES } from '../../utils/constants.js';
 import { directPlayerSchema, toLocationPayload } from '../../utils/validation.js';
 import AppText from '../common/AppText.jsx';
@@ -35,6 +40,7 @@ import { ErrorState, LoadingState } from '../common/States.jsx';
 import PhoneField from '../common/PhoneField.jsx';
 import SearchField from '../common/SearchField.jsx';
 import SegmentedControl from '../common/SegmentedControl.jsx';
+import Sheet from '../common/Sheet.jsx';
 import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField, { FieldMessages } from '../common/TextField.jsx';
 import PlayerForm from '../player/PlayerForm.jsx';
@@ -44,6 +50,8 @@ import { EVENTS, track } from '../../lib/analytics.js';
 const MIN_QUERY_LENGTH = 2;
 const DIGITS_ONLY = /^[\d\s+\-()]+$/;
 const INDIAN_MOBILE_DIGITS = 10;
+
+const MODES = Object.freeze({ DIRECT: 'direct', SEARCH: 'search' });
 
 // One account found by the search: the picture, the name and the jersey number
 // the contract asks for, plus the masked number — the full one is never sent.
@@ -73,8 +81,6 @@ function ResultRow({ item, onPick }) {
           {item.phoneMasked ?? ''}
         </AppText>
       </View>
-      {/* The number itself, not copy; a player without one shows a dash and
-          says so in the row's accessibility label. */}
       <AppText display weight="bold" tone={jersey ? 'text' : 'muted'}>
         {jersey ?? '—'}
       </AppText>
@@ -87,15 +93,57 @@ function ResultRow({ item, onPick }) {
   );
 }
 
-// A player with no account yet. Name, number and jersey are required; the state
-// and district are not. If the number turns out to have an account after all,
-// the API attaches it instead of creating a second one and says so.
-function DirectAddForm({ teamId, query, found, onDone }) {
+// The sheet shown when the typed number already belongs to a KhelScore
+// account. The captain either accepts the match (the squad place is created
+// from that account, not from a second one) or rejects it and continues with
+// the direct-add they already filled.
+function ExistingAccountSheet({ match, onUseExisting, onReject }) {
   const { t } = useTranslation();
-  // A ten-digit search carries over into the number; anything else into the
-  // name, so the captain never types what they just searched for twice.
-  const digits = query.replace(/\D/g, '');
-  const looksLikeNumber = DIGITS_ONLY.test(query) && digits.length >= INDIAN_MOBILE_DIGITS;
+  const { colors } = useTheme();
+  return (
+    <Sheet open onClose={onReject} title={t('app.squadExistingTitle')}>
+      <View style={styles.stack}>
+        <AppText tone="muted">{t('app.squadExistingBody')}</AppText>
+        <View
+          style={[styles.account, { backgroundColor: colors.surface2, borderColor: colors.border }]}
+        >
+          <Avatar src={match.avatarUrl} name={match.name} size="md" />
+          <View style={styles.flex}>
+            <AppText weight="semibold" numberOfLines={1}>
+              {match.name}
+            </AppText>
+            {match.phoneMasked ? (
+              <AppText variant="small" tone="muted">
+                {match.phoneMasked}
+              </AppText>
+            ) : null}
+            {match.inSquad ? (
+              <AppText variant="small" tone="warning">
+                {t('squad.alreadyInSquad')}
+              </AppText>
+            ) : null}
+          </View>
+        </View>
+        <Button disabled={match.inSquad} onPress={onUseExisting}>
+          {t('app.squadUseExistingProfile')}
+        </Button>
+        <Button variant="ghost" onPress={onReject}>
+          {t('app.squadNotThisPerson')}
+        </Button>
+      </View>
+    </Sheet>
+  );
+}
+
+// Direct add: name, WhatsApp number, jersey, role (+ optional state/district).
+// Debounces a lookup on the number so a 10-digit entry asks the server whether
+// it is already in use; if so, the sheet above offers the match. Accepting
+// the match bubbles up through `onUseExisting`, so the parent can swap this
+// form for the "add known account" view with the jersey + role carried over.
+function DirectAddForm({ teamId, initialQuery, onDone, onUseExisting }) {
+  const { t } = useTranslation();
+  const digits = initialQuery.replace(/\D/g, '');
+  const looksLikeNumber = DIGITS_ONLY.test(initialQuery) && digits.length >= INDIAN_MOBILE_DIGITS;
   const {
     control,
     handleSubmit,
@@ -105,7 +153,7 @@ function DirectAddForm({ teamId, query, found, onDone }) {
   } = useForm({
     resolver: zodResolver(directPlayerSchema),
     defaultValues: {
-      name: looksLikeNumber ? '' : query,
+      name: looksLikeNumber ? '' : initialQuery,
       phone: looksLikeNumber ? joinPhone('IN', digits.slice(-INDIAN_MOBILE_DIGITS)) : '',
       jerseyNumber: '',
       playingRole: 'raider',
@@ -113,6 +161,28 @@ function DirectAddForm({ teamId, query, found, onDone }) {
       district: '',
     },
   });
+
+  // Behind-the-scenes dedupe lookup once the number is complete. The sheet is
+  // shown only after the captain has stopped typing (debounced) and the
+  // captain has not already dismissed it for this number.
+  const phoneValue = watch('phone');
+  const phoneDigits = splitPhone(phoneValue ?? '').national ?? '';
+  const phoneReady = phoneDigits.replace(/\D/g, '').length === INDIAN_MOBILE_DIGITS;
+  const debouncedPhone = useDebouncedValue(phoneReady ? phoneValue : '');
+  const [rejectedNumber, setRejectedNumber] = useState(null);
+
+  const lookup = useQuery({
+    queryKey: qk.users.search({ query: debouncedPhone, teamId }),
+    queryFn: () => usersApi.search({ query: debouncedPhone, teamId }),
+    enabled: Boolean(debouncedPhone) && debouncedPhone !== rejectedNumber,
+  });
+  const match = lookup.data?.items?.[0] ?? null;
+
+  // A new number clears a previous dismissal so the lookup can show its match.
+  useEffect(() => {
+    if (rejectedNumber && phoneValue !== rejectedNumber) setRejectedNumber(null);
+  }, [phoneValue, rejectedNumber]);
+
   const add = useMutation({
     mutationFn: ({ state, district, ...values }) =>
       teamsApi.addDirectPlayer(teamId, {
@@ -120,8 +190,6 @@ function DirectAddForm({ teamId, query, found, onDone }) {
         location: toLocationPayload({ state, district }),
       }),
     onSuccess: (member) => {
-      // A captain's add asks the player first (`pending`): nobody is in the
-      // squad until they accept it.
       const key = member.pending
         ? 'joinRequest.sent'
         : member.accountCreated
@@ -134,16 +202,25 @@ function DirectAddForm({ teamId, query, found, onDone }) {
     onError: (error) => notify.error(apiErrorText(t, error)),
   });
 
-  // The two pickers are driven together: picking a state clears the district.
   const setLocation = ({ state, district }) => {
     setValue('state', state);
     setValue('district', district);
   };
 
+  const useExistingMatch = () => {
+    if (!match) return;
+    // The jersey and role the captain has already filled carry over.
+    onUseExisting({
+      picked: match,
+      jerseyNumber: watch('jerseyNumber'),
+      playingRole: watch('playingRole'),
+    });
+  };
+
   return (
     <View style={styles.stack}>
-      <AppText variant="small" tone="muted" accessibilityLiveRegion="polite">
-        {found ? t('squad.addNewMemberHint') : t('squad.noMatch', { query })}
+      <AppText variant="small" tone="muted">
+        {t('app.squadDirectAddHint')}
       </AppText>
       <Controller
         control={control}
@@ -215,13 +292,20 @@ function DirectAddForm({ teamId, query, found, onDone }) {
       <Button onPress={handleSubmit((values) => add.mutate(values))} loading={add.isPending}>
         {t('squad.addPlayer')}
       </Button>
+      {match ? (
+        <ExistingAccountSheet
+          match={match}
+          onUseExisting={useExistingMatch}
+          onReject={() => setRejectedNumber(phoneValue)}
+        />
+      ) : null}
     </View>
   );
 }
 
 // The jersey number and role the picked account will play in. The squad place
 // is created from the account's id, never from a number typed again.
-function AddPickedAccount({ teamId, picked, onBack, onDone }) {
+function AddPickedAccount({ teamId, picked, prefill, onBack, onDone }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const add = useMutation({
@@ -235,6 +319,13 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
     },
     onError: (error) => notify.error(apiErrorText(t, error)),
   });
+
+  const defaultJersey =
+    prefill?.jerseyNumber && String(prefill.jerseyNumber).trim() !== ''
+      ? String(prefill.jerseyNumber)
+      : picked.jerseyNumber === null || picked.jerseyNumber === undefined
+        ? ''
+        : String(picked.jerseyNumber);
 
   return (
     <View style={styles.stack}>
@@ -254,11 +345,8 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
       <PlayerForm
         mode="membership"
         defaultValues={{
-          jerseyNumber:
-            picked.jerseyNumber === null || picked.jerseyNumber === undefined
-              ? ''
-              : String(picked.jerseyNumber),
-          playingRole: 'raider',
+          jerseyNumber: defaultJersey,
+          playingRole: prefill?.playingRole ?? 'raider',
         }}
         onSubmit={(values) => add.mutate(values)}
         submitting={add.isPending}
@@ -271,13 +359,10 @@ function AddPickedAccount({ teamId, picked, onBack, onDone }) {
   );
 }
 
-export default function AddByPhone({ teamId, onDone }) {
+// Search-by-name path (the previous flow): type, see matches, tap one to add.
+function SearchByName({ teamId, onPickExisting }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
-  const [picked, setPicked] = useState(null);
-  // Asked for explicitly when the search did find somebody. Typing again puts
-  // the choice back, so the new results are seen before the form reopens.
-  const [addingNew, setAddingNew] = useState(false);
   const trimmed = useDebouncedValue(query.trim());
   const enabled = trimmed.length >= MIN_QUERY_LENGTH;
 
@@ -287,45 +372,21 @@ export default function AddByPhone({ teamId, onDone }) {
     enabled,
   });
 
-  if (picked) {
-    return (
-      <AddPickedAccount
-        teamId={teamId}
-        picked={picked}
-        onBack={() => setPicked(null)}
-        onDone={onDone}
-      />
-    );
-  }
-
   const items = search.data?.items ?? [];
-  const searched = enabled && search.isSuccess;
-  const nothingFound = searched && items.length === 0;
-  // The form opens itself when nothing matched, and on request when something
-  // did; either way only after a finished search.
-  const showNewMember = nothingFound || (searched && addingNew);
-  // Nothing found needs no hint: the direct-add form says so itself.
   const hint = !trimmed
     ? 'squad.searchHint'
     : !enabled
       ? 'validation.searchMin'
       : items.length > 0
         ? 'squad.searchResults'
-        : null;
+        : 'squad.noMatch';
 
   return (
     <View style={styles.stack}>
-      <SearchField
-        value={query}
-        onChange={(value) => {
-          setQuery(value);
-          setAddingNew(false);
-        }}
-        placeholder={t('squad.searchLabel')}
-      />
+      <SearchField value={query} onChange={setQuery} placeholder={t('squad.searchLabel')} />
       {hint ? (
         <AppText variant="small" tone="muted">
-          {t(hint)}
+          {t(hint, { query: trimmed })}
         </AppText>
       ) : null}
       {enabled && search.isPending ? <LoadingState /> : null}
@@ -333,16 +394,60 @@ export default function AddByPhone({ teamId, onDone }) {
         <ErrorState error={search.error} onRetry={() => search.refetch()} />
       ) : null}
       {items.map((item) => (
-        <ResultRow key={item.id} item={item} onPick={setPicked} />
+        <ResultRow key={item.id} item={item} onPick={onPickExisting} />
       ))}
-      {searched && !showNewMember ? (
-        <Button variant="secondary" onPress={() => setAddingNew(true)}>
-          {t('squad.addNewMember')}
-        </Button>
-      ) : null}
-      {showNewMember ? (
-        <DirectAddForm teamId={teamId} query={trimmed} found={items.length > 0} onDone={onDone} />
-      ) : null}
+    </View>
+  );
+}
+
+export default function AddByPhone({ teamId, onDone }) {
+  const { t } = useTranslation();
+  const [mode, setMode] = useState(MODES.DIRECT);
+  // Picked from the dedupe sheet (direct mode) or the search list (search mode).
+  const [picked, setPicked] = useState(null);
+  const [pickedPrefill, setPickedPrefill] = useState(null);
+
+  const pickExisting = ({ picked: p, jerseyNumber, playingRole }) => {
+    setPicked(p);
+    setPickedPrefill({ jerseyNumber, playingRole });
+  };
+
+  if (picked) {
+    return (
+      <AddPickedAccount
+        teamId={teamId}
+        picked={picked}
+        prefill={pickedPrefill}
+        onBack={() => {
+          setPicked(null);
+          setPickedPrefill(null);
+        }}
+        onDone={onDone}
+      />
+    );
+  }
+
+  return (
+    <View style={styles.stack}>
+      <SegmentedControl
+        label={t('app.squadAddModeLabel')}
+        value={mode}
+        onChange={setMode}
+        options={[
+          { value: MODES.DIRECT, label: t('app.squadAddModeDirect') },
+          { value: MODES.SEARCH, label: t('app.squadAddModeSearch') },
+        ]}
+      />
+      {mode === MODES.DIRECT ? (
+        <DirectAddForm
+          teamId={teamId}
+          initialQuery=""
+          onDone={onDone}
+          onUseExisting={pickExisting}
+        />
+      ) : (
+        <SearchByName teamId={teamId} onPickExisting={setPicked} />
+      )}
     </View>
   );
 }

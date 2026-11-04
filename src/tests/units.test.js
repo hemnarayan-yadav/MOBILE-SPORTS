@@ -1,7 +1,6 @@
 import { describeEvent, describeRaid } from '../sports/kabaddi/commentary.js';
 import { uploadableImage } from '../utils/mediaFile.js';
 import {
-  changePasswordSchema,
   directPlayerSchema,
   playerSearchSchema,
   profileSchemaFor,
@@ -77,50 +76,22 @@ describe('picked photo', () => {
 });
 
 describe('account forms (ported from the web)', () => {
-  const signUp = {
-    name: 'Asha',
-    jerseyNumber: '7',
-    email: '',
-    password: 'kabaddi12',
-    confirmPassword: 'kabaddi12',
-  };
+  // Mobile sign-up asks for one thing: the account's name. Password, jersey,
+  // email, state and district are not sign-up fields on mobile — they are
+  // filled in later on the profile (owner's call, 2026-11-03).
+  const signUp = { name: 'Asha' };
 
-  // Six characters, and nothing about letters or digits (owner's decision,
-  // 2026-10-14; the API's rule is the same).
-  it('requires matching passwords of at least six characters', () => {
+  it('asks for the name alone and nothing else', () => {
     expect(registerProfileSchema.safeParse(signUp).success).toBe(true);
-    expect(registerProfileSchema.safeParse({ ...signUp, confirmPassword: 'other123' }).success).toBe(
-      false,
-    );
-    expect(
-      registerProfileSchema.safeParse({
-        ...signUp,
-        password: 'onlyletters',
-        confirmPassword: 'onlyletters',
-      }).success,
-    ).toBe(true);
-    expect(
-      registerProfileSchema.safeParse({ ...signUp, password: 'short', confirmPassword: 'short' })
-        .success,
-    ).toBe(false);
-  });
-
-  // The jersey number is required at sign-up, and the birthday, height and
-  // weight are not sign-up fields at all (API auth.validation.registerSchema).
-  it('requires a jersey number of one to three digits at sign-up, and nothing else about the body', () => {
-    expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '' }).success).toBe(false);
-    // Three digits are a number a squad really wears; four are not.
-    expect(registerProfileSchema.parse({ ...signUp, jerseyNumber: '100' }).jerseyNumber).toBe('100');
-    expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '1000' }).success).toBe(false);
-    expect(registerProfileSchema.safeParse({ ...signUp, jerseyNumber: '0' }).success).toBe(true);
-    // The zero is part of the number on the shirt, so it is kept as typed.
-    expect(
-      registerProfileSchema.parse({ ...signUp, jerseyNumber: '08' }).jerseyNumber,
-    ).toBe('08');
-    const parsed = registerProfileSchema.parse({ ...signUp, dob: '1999-04-21', heightCm: '175' });
-    expect(parsed.jerseyNumber).toBe('7');
-    expect(parsed.dob).toBeUndefined();
-    expect(parsed.heightCm).toBeUndefined();
+    expect(registerProfileSchema.safeParse({ name: 'A' }).success).toBe(false);
+    const parsed = registerProfileSchema.parse(signUp);
+    expect(parsed.name).toBe('Asha');
+    expect(parsed.password).toBeUndefined();
+    expect(parsed.confirmPassword).toBeUndefined();
+    expect(parsed.jerseyNumber).toBeUndefined();
+    expect(parsed.email).toBeUndefined();
+    expect(parsed.state).toBeUndefined();
+    expect(parsed.district).toBeUndefined();
   });
 
   it('keeps the phone of a player and the email of an organiser', () => {
@@ -164,17 +135,6 @@ describe('account forms (ported from the web)', () => {
     expect(schema.safeParse({ ...base, weightKg: '500' }).success).toBe(false);
     expect(schema.safeParse({ ...base, dob: '21-04-1999' }).success).toBe(false);
     expect(schema.parse({ ...base, dob: '1999-04-21', heightCm: '175' }).heightCm).toBe(175);
-  });
-
-  it('asks the password change for the current password and a matching new one', () => {
-    const base = { currentPassword: 'old12345', password: 'kabaddi12', confirmPassword: 'kabaddi12' };
-    expect(changePasswordSchema.safeParse(base).success).toBe(true);
-    expect(changePasswordSchema.safeParse({ ...base, currentPassword: '' }).success).toBe(false);
-    expect(changePasswordSchema.safeParse({ ...base, confirmPassword: 'other123' }).success).toBe(
-      false,
-    );
-    expect(changePasswordSchema.safeParse({ ...base, password: 'short', confirmPassword: 'short' })
-      .success).toBe(false);
   });
 
   // A player with no account, added straight into the squad: name, Indian

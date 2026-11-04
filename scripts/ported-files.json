@@ -71,10 +71,6 @@
     "source": "src/pages/public/Tournaments.jsx",
     "sha256": "3107ad8dffc809530801376559254c40fd036eb0df9b0e857790e18faa047fa0"
   },
-  "src/app/auth/forgot-password.jsx": {
-    "source": "src/pages/auth/ForgotPassword.jsx",
-    "sha256": "922658024b41b0880591a5716c00f6299cf17d6e03b8a74e193b4c33d1d61bc8"
-  },
   "src/app/auth/login.jsx": {
     "source": "src/pages/auth/Login.jsx",
     "sha256": "e10bef17fa2652a0fef1e910d3e5773ade27d1012aa04c44934b7d7ec2861ecb"

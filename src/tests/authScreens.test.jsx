@@ -1,7 +1,6 @@
 import { configure, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
-import ForgotPassword from '../app/auth/forgot-password.jsx';
 import Login from '../app/auth/login.jsx';
 import Register from '../app/auth/register.jsx';
 import NoticeHost from '../components/common/NoticeHost.jsx';
@@ -62,7 +61,6 @@ function authApi(overrides = {}) {
           },
           201,
         );
-      case '/auth/login':
       case '/auth/otp/login':
         return ok({ user: USER, accessToken: 'at', refreshToken: 'rt-login' });
       default:
@@ -84,42 +82,12 @@ async function verifyCodeInSheet(code = '123456') {
 }
 
 describe('Sign in', () => {
-  it('signs in with a password, keeps the token in the keystore and returns home', async () => {
+  it('signs in with a WhatsApp code and keeps the refresh token in the keystore', async () => {
     api = authApi();
     await renderWithQuery(<Login />);
 
-    await fireEvent.changeText(screen.getByLabelText('Email or phone number'), '9876543210');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-    await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
-
-    await waitFor(() => expect(router.dismissTo).toHaveBeenCalledWith('/'));
-    expect(api.calls.find((c) => c.url === '/auth/login').body).toEqual({
-      identifier: '9876543210',
-      password: 'Kabaddi123',
-    });
-    expect(SecureStore.__store.get(REFRESH_KEY)).toBe('rt-login');
-    expect(useAuthStore.getState().status).toBe(AUTH_STATUS.AUTHENTICATED);
-  });
-
-  it('shows the translated reason, never the server text, and stays signed out', async () => {
-    api = authApi({ '/auth/login': () => fail(401, 'INVALID_CREDENTIALS') });
-    await renderWithQuery(withNotices(<Login />));
-
-    await fireEvent.changeText(screen.getByLabelText('Email or phone number'), 'x@example.com');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'wrong');
-    await fireEvent.press(screen.getByRole('button', { name: 'Sign in' }));
-
-    expect(await screen.findByText('Incorrect email/phone or password')).toBeTruthy();
-    expect(SecureStore.__store.has(REFRESH_KEY)).toBe(false);
-  });
-
-  it('signs in with a WhatsApp code when the code flow is available', async () => {
-    api = authApi();
-    await renderWithQuery(<Login />);
-
-    await fireEvent.press(await screen.findByRole('radio', { name: 'OTP' }));
-    await fireEvent.changeText(screen.getByLabelText('Phone number'), '9876543210');
-    startPress(screen.getByRole('button', { name: 'Send OTP' }));
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
     await verifyCodeInSheet();
 
     await waitFor(() => expect(useAuthStore.getState().status).toBe(AUTH_STATUS.AUTHENTICATED));
@@ -128,13 +96,48 @@ describe('Sign in', () => {
       phone: '+919876543210',
       otpToken: 'proof-1',
     });
+    expect(SecureStore.__store.get(REFRESH_KEY)).toBe('rt-login');
+    await waitFor(() => expect(router.dismissTo).toHaveBeenCalledWith('/'));
   });
 
-  it('offers password sign-in only when the API uses a widget flow', async () => {
-    api = authApi({ '/otp/config': () => ok({ available: true, flow: 'widget', channel: 'sms' }) });
+  it('offers no password or email login path on mobile', async () => {
+    api = authApi();
     await renderWithQuery(<Login />);
-    await waitFor(() => expect(api.calls.some((c) => c.url === '/otp/config')).toBe(true));
-    expect(screen.queryByRole('radio', { name: 'OTP' })).toBeNull();
+    await screen.findByLabelText('Phone number');
+    expect(screen.queryByLabelText('Password')).toBeNull();
+    expect(screen.queryByLabelText('Email or phone number')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
+  });
+
+  it('shows the WhatsApp OTP badge when the server channel is WhatsApp', async () => {
+    api = authApi();
+    await renderWithQuery(<Login />);
+    expect(await screen.findByText('Login with WhatsApp OTP')).toBeTruthy();
+  });
+
+  it('says sign-in is unavailable when the server has no OTP provider', async () => {
+    api = authApi({ '/otp/config': () => ok({ available: false, flow: null, channel: null }) });
+    await renderWithQuery(<Login />);
+    expect(
+      await screen.findByText("Sign-in isn't available right now. Please try again in a few minutes."),
+    ).toBeTruthy();
+    expect(screen.queryByLabelText('Phone number')).toBeNull();
+  });
+
+  it('sends a visitor with no account to sign-up with the proof carried over', async () => {
+    api = authApi({ '/auth/otp/login': () => fail(404, 'PHONE_NOT_REGISTERED') });
+    await renderWithQuery(withNotices(<Login />));
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+
+    await waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith({
+        pathname: '/auth/register',
+        params: { phone: '+919876543210', otpToken: 'proof-1' },
+      }),
+    );
   });
 });
 
@@ -149,55 +152,25 @@ describe('Create account', () => {
 
     expect(await screen.findByText('Joining Gaon Warriors · Jersey #7')).toBeTruthy();
     expect(screen.getByLabelText('Name').props.value).toBe('Asha Devi');
-    // An invitation from before the change already names a shirt number.
-    expect(screen.getByLabelText('Jersey number').props.value).toBe('7');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
     await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
 
     expect(await screen.findByText('Account created. Welcome to KhelScore!')).toBeTruthy();
-    expect(api.calls.find((c) => c.url === '/auth/register').body).toEqual({
-      name: 'Asha Devi',
-      jerseyNumber: '7',
-      email: '',
-      phone: '+919876543210',
-      password: 'Kabaddi123',
-      otpToken: 'proof-1',
-      // Sign-up always sends the (optional) location pair; left blank it is null.
-      location: { state: null, district: null },
-    });
+    const call = api.calls.find((c) => c.url === '/auth/register');
+    expect(call.body.name).toBe('Asha Devi');
+    // An invitation's jersey number is kept when there is one, so the invited
+    // player's shirt is still what the account is created with.
+    expect(call.body.jerseyNumber).toBe('7');
+    expect(call.body.phone).toBe('+919876543210');
+    expect(call.body.otpToken).toBe('proof-1');
+    // A throwaway password is sent so the API's `password` constraint is
+    // satisfied; it is never shown to or chosen by the user.
+    expect(typeof call.body.password).toBe('string');
+    expect(call.body.password.length).toBeGreaterThanOrEqual(6);
     expect(SecureStore.__store.get(REFRESH_KEY)).toBe('rt-register');
     await waitFor(() => expect(router.dismissTo).toHaveBeenCalledWith('/'));
   });
 
-  // The jersey number is part of who a player is on a kabaddi team, so sign-up
-  // asks for it and will not create the account without one.
-  it('will not create the account without a jersey number', async () => {
-    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
-    await renderWithQuery(withNotices(<Register />));
-
-    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
-    startPress(await sendOtpButton());
-    await verifyCodeInSheet();
-
-    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
-    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
-
-    expect(await screen.findByText('This field is required')).toBeTruthy();
-    expect(api.calls.some((c) => c.url === '/auth/register')).toBe(false);
-
-    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
-    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
-    await waitFor(() =>
-      expect(api.calls.find((c) => c.url === '/auth/register')?.body.jerseyNumber).toBe('12'),
-    );
-  });
-
-  // Birthday, height and weight are not sign-up fields — they belong on the
-  // profile, and the account is created without them.
-  it('never asks for a birthday, a height or a weight', async () => {
+  it('asks for the name alone — no password, jersey, email or location', async () => {
     api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
     await renderWithQuery(<Register />);
 
@@ -205,10 +178,34 @@ describe('Create account', () => {
     startPress(await sendOtpButton());
     await verifyCodeInSheet();
 
-    await screen.findByLabelText('Jersey number');
+    await screen.findByLabelText('Name');
+    expect(screen.queryByLabelText('Password')).toBeNull();
+    expect(screen.queryByLabelText('Confirm password')).toBeNull();
+    expect(screen.queryByLabelText('Jersey number')).toBeNull();
+    expect(screen.queryByLabelText(/email/i)).toBeNull();
+    expect(screen.queryByLabelText(/state/i)).toBeNull();
+    expect(screen.queryByLabelText(/district/i)).toBeNull();
     expect(screen.queryByLabelText('Date of birth')).toBeNull();
     expect(screen.queryByLabelText('Height (cm)')).toBeNull();
     expect(screen.queryByLabelText('Weight (kg)')).toBeNull();
+  });
+
+  // A sign-up without any pending invitation still succeeds — the jersey number
+  // the API requires falls back to the "0" placeholder.
+  it('falls back to a "0" jersey when nothing is pending for the number', async () => {
+    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
+    await renderWithQuery(<Register />);
+
+    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
+    startPress(await sendOtpButton());
+    await verifyCodeInSheet();
+
+    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
+    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
+
+    await waitFor(() =>
+      expect(api.calls.find((c) => c.url === '/auth/register')?.body.jerseyNumber).toBe('0'),
+    );
   });
 
   // The welcome panel is raised through the prompt queue, so it lives above the
@@ -221,9 +218,6 @@ describe('Create account', () => {
     startPress(await sendOtpButton());
     await verifyCodeInSheet();
     await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
-    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
     await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
 
     expect(await screen.findByText('Welcome to KhelScore!')).toBeTruthy();
@@ -284,91 +278,5 @@ describe('Create account', () => {
         params: { phone: '+919876543210' },
       }),
     );
-  });
-});
-
-// The show/hide button is in <TextField>, so every password field in the app
-// has it; it is drawn whether the field is empty or full and never depends on
-// the value, the focus or the error state.
-describe('show/hide password', () => {
-  it('stays on the field whether it is empty or filled, and reveals without changing the value', async () => {
-    api = authApi();
-    await renderWithQuery(<Login />);
-
-    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
-    // There before a single character is typed.
-    expect(screen.getByRole('button', { name: 'Show password' })).toBeTruthy();
-
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-
-    // And still there with the field filled.
-    await fireEvent.press(screen.getByRole('button', { name: 'Show password' }));
-    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(false);
-    expect(screen.getByLabelText('Password').props.value).toBe('Kabaddi123');
-    expect(screen.getByTestId('ionicon-eye-off-outline')).toBeTruthy();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Hide password' }));
-    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
-    expect(screen.getByLabelText('Password').props.value).toBe('Kabaddi123');
-    expect(screen.getByTestId('ionicon-eye-outline')).toBeTruthy();
-  });
-
-  it('gives the sign-up password and its confirmation a button each, and signing up still works', async () => {
-    api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
-    await renderWithQuery(<Register />);
-
-    await fireEvent.changeText(await screen.findByLabelText('Phone number'), '9876543210');
-    startPress(await sendOtpButton());
-    await verifyCodeInSheet();
-
-    await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
-    await fireEvent.changeText(screen.getByLabelText('Jersey number'), '12');
-    await fireEvent.changeText(screen.getByLabelText('Password'), 'Kabaddi123');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi123');
-
-    const [reveal, revealConfirm] = screen.getAllByRole('button', { name: 'Show password' });
-    expect(revealConfirm).toBeTruthy();
-    await fireEvent.press(reveal);
-
-    // One revealed, the other left hidden, and neither value touched.
-    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(false);
-    expect(screen.getByLabelText('Confirm password').props.secureTextEntry).toBe(true);
-    expect(screen.getByLabelText('Confirm password').props.value).toBe('Kabaddi123');
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
-    await waitFor(() =>
-      expect(api.calls.find((c) => c.url === '/auth/register')?.body.password).toBe('Kabaddi123'),
-    );
-  });
-
-  it('leaves the number and the code fields without one', async () => {
-    api = authApi();
-    await renderWithQuery(<Login />);
-
-    expect(screen.getAllByRole('button', { name: /password/i })).toHaveLength(1);
-    expect(screen.getByLabelText('Email or phone number').props.secureTextEntry).toBe(false);
-  });
-});
-
-describe('Forgot password', () => {
-  it('resets by phone code and offers the way back to sign in', async () => {
-    api = authApi();
-    await renderWithQuery(<ForgotPassword />);
-
-    await fireEvent.press(await screen.findByRole('radio', { name: 'Phone' }));
-    await fireEvent.changeText(screen.getByLabelText('Phone number'), '9876543210');
-    await fireEvent.changeText(screen.getByLabelText('New password'), 'Kabaddi456');
-    await fireEvent.changeText(screen.getByLabelText('Confirm password'), 'Kabaddi456');
-    startPress(screen.getByRole('button', { name: 'Verify and update password' }));
-    await verifyCodeInSheet();
-
-    expect(
-      await screen.findByText('Password updated. Sign in with your new password.'),
-    ).toBeTruthy();
-    expect(api.calls.find((c) => c.url === '/auth/otp/reset-password').body).toEqual({
-      phone: '+919876543210',
-      otpToken: 'proof-1',
-      password: 'Kabaddi456',
-    });
   });
 });
