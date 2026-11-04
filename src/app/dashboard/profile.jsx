@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Redirect, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
@@ -531,33 +531,56 @@ function NotificationPreferences({ profile }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const applyProfile = useApplyProfile();
-  const save = useMutation({
-    mutationFn: usersApi.updatePreferences,
-    onSuccess: (updated) => {
-      applyProfile(updated);
-      notify.success(t('profile.preferencesSaved'));
-    },
-    onError: (error) => notify.error(apiErrorText(t, error)),
-  });
+  const optimistic = useRef({});
+  const [, bump] = useState(0);
+  const pending = useRef(new Set());
 
-  return PREFERENCES.map(({ key, label, hint }) => (
-    <View key={key} style={styles.switchRow}>
-      <View style={styles.flex}>
-        <AppText weight="semibold">{t(label)}</AppText>
-        <AppText variant="small" tone="muted">
-          {t(hint)}
-        </AppText>
-        {key === 'push' ? <PushState /> : null}
+  const toggle = useCallback(
+    (key, checked) => {
+      optimistic.current[key] = checked;
+      pending.current.add(key);
+      bump((n) => n + 1);
+      usersApi
+        .updatePreferences({ [key]: checked })
+        .then((updated) => {
+          applyProfile(updated);
+        })
+        .catch((error) => {
+          delete optimistic.current[key];
+          notify.error(apiErrorText(t, error));
+        })
+        .finally(() => {
+          pending.current.delete(key);
+          bump((n) => n + 1);
+        });
+    },
+    [applyProfile, t],
+  );
+
+  return PREFERENCES.map(({ key, label, hint }) => {
+    const value =
+      key in optimistic.current
+        ? optimistic.current[key]
+        : Boolean(profile.notificationPreferences[key]);
+    return (
+      <View key={key} style={styles.switchRow}>
+        <View style={styles.flex}>
+          <AppText weight="semibold">{t(label)}</AppText>
+          <AppText variant="small" tone="muted">
+            {t(hint)}
+          </AppText>
+          {key === 'push' ? <PushState /> : null}
+        </View>
+        <Switch
+          accessibilityLabel={t(label)}
+          value={value}
+          disabled={pending.current.has(key)}
+          onValueChange={(checked) => toggle(key, checked)}
+          trackColor={{ true: colors.brand, false: colors.border }}
+        />
       </View>
-      <Switch
-        accessibilityLabel={t(label)}
-        value={Boolean(profile.notificationPreferences[key])}
-        disabled={save.isPending}
-        onValueChange={(checked) => save.mutate({ [key]: checked })}
-        trackColor={{ true: colors.brand, false: colors.border }}
-      />
-    </View>
-  ));
+    );
+  });
 }
 
 // Wanting notifications is not enough: the phone has to allow them, and the

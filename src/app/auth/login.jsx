@@ -116,7 +116,7 @@ export default function Login() {
   // there is a fallback — password sign-in has been removed from mobile.
   if (!phoneVerification.isAvailable && !phoneVerification.isChecking) {
     return (
-      <Screen title={t('auth.loginTitle')}>
+      <Screen title={t('auth.loginTitle')} hideBack>
         <View style={styles.brand}>
           <Logo height={44} title={t('nav.brand')} />
         </View>
@@ -126,7 +126,7 @@ export default function Login() {
   }
 
   return (
-    <Screen title={t('auth.loginTitle')} subtitle={t('app.whatsappSubtitle')}>
+    <Screen title={t('auth.loginTitle')} subtitle={t('app.whatsappSubtitle')} hideBack>
       <View style={styles.brand}>
         <Logo height={44} title={t('nav.brand')} />
       </View>
