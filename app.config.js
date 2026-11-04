@@ -80,7 +80,7 @@ module.exports = () => {
     // explicitly because this login also has a personal `hemnarayan` account,
     // and without it a build can resolve against the wrong one.
     owner: 'khelscore',
-    version: '1.8.0',
+    version: '1.8.1',
     scheme,
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
