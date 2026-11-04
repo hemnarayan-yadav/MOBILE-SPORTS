@@ -10,6 +10,7 @@ import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { useAccountPrompts } from '../hooks/useAccountPrompts.js';
 import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
+import { useInAppUpdate } from '../hooks/useInAppUpdate.js';
 import { useLoginGate } from '../hooks/useLoginGate.js';
 import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
@@ -45,6 +46,7 @@ startAnalytics();
 function SessionBootstrap() {
   useAuthBootstrap();
   useLoginGate();
+  useInAppUpdate();
   useAccountPrompts();
   usePushRegistration();
   useNotificationTaps();
