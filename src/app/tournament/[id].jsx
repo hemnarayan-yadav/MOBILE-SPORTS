@@ -64,6 +64,7 @@ function Overview({ tournament }) {
         <StatTile label={t('stats.totalPoints')} value={value((d) => d.totals.totalPoints)} />
         <StatTile label={t('stats.allOuts')} value={value((d) => d.totals.allOuts)} />
       </TileGrid>
+      <TournamentLeaders tournamentId={tournament.id} />
       {stats.data?.topScorers.length > 0 ? (
         <Section title={t('tournament.topScorers')}>
           <Card>
@@ -172,6 +173,41 @@ function Teams({ tournamentId }) {
         ))
       }
     </QueryBlock>
+  );
+}
+
+// The best raider, defender and all-rounder of this competition, one name
+// each, on the tab the tournament opens on rather than only behind Leaders.
+// Ported in spirit from the web's TournamentLeaders; the full boards stay on
+// the Leaders tab.
+function TournamentLeaders({ tournamentId }) {
+  const { t } = useTranslation();
+  const params = { tournament_id: tournamentId, limit: 1 };
+  const query = useQuery({
+    queryKey: qk.rankings.overview(params),
+    queryFn: () => rankingsApi.overview(params),
+  });
+  const data = query.data;
+  // Nobody is ranked until a ranked match has been finished, and three empty
+  // cards say less than nothing: the section waits for a name.
+  if (!data || LEADERBOARD_CATEGORIES.every((category) => !data[category]?.entries.length)) {
+    return null;
+  }
+  return (
+    <Section title={t('tournament.tab.leaders')}>
+      {LEADERBOARD_CATEGORIES.map((category) => {
+        const top = data[category]?.entries?.[0];
+        if (!top) return null;
+        return (
+          <View key={category} style={styles.block}>
+            <AppText variant="label" tone="muted">
+              {t(`rankings.category.${category}`)}
+            </AppText>
+            <LeaderboardList entries={[top]} category={category} compact />
+          </View>
+        );
+      })}
+    </Section>
   );
 }
 

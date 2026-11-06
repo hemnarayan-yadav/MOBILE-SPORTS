@@ -102,7 +102,7 @@ export default function DateField({
       </Pressable>
       <FieldMessages hint={hint} error={error} />
 
-      <Sheet open={open} onClose={close} title={label}>
+      <Sheet open={open} onClose={close} title={label} scroll={false}>
         <View style={styles.header}>
           <Pressable
             onPress={() => step(-1)}

@@ -83,53 +83,33 @@ function OnboardingPrompt({ prompt, onClose }) {
   );
 }
 
-// What the account still owes, after signing in. Both reasons are shown
-// together when both apply, each with the thing it is asking for.
+// What the account still owes, after signing in — on mobile that is only the
+// profile fields the player is missing. Password reminders don't apply here:
+// mobile is OTP-only and has no password screen.
 function RemindersPrompt({ prompt, onClose }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
   const fields = prompt.missingFields ?? [];
-  const go = (params) => {
+  if (fields.length === 0) return null;
+  const openProfile = () => {
     onClose();
-    router.push({ pathname: '/dashboard/profile', params });
+    router.push('/dashboard/profile');
   };
   return (
     <View style={styles.stack}>
-      {fields.length > 0 ? (
-        <View style={[styles.reason, { backgroundColor: colors.surface2 }]}>
-          <AppText weight="semibold">{t('notice.profileTitle')}</AppText>
-          <AppText variant="small" tone="muted">
-            {t('notice.profileText')}
-          </AppText>
-          <AppText variant="small" tone="muted">
-            {t('notice.profileMissing', {
-              fields: fields.map((field) => t(`profile.field.${field}`)).join(', '),
-            })}
-          </AppText>
-        </View>
-      ) : null}
-      {prompt.mustChangePassword ? (
-        <View style={[styles.reason, { backgroundColor: colors.surface2 }]}>
-          <AppText weight="semibold" tone="warning">
-            {t('notice.passwordTitle')}
-          </AppText>
-          <AppText variant="small" tone="muted">
-            {t('notice.passwordText')}
-          </AppText>
-        </View>
-      ) : null}
-      {fields.length > 0 ? (
-        <Button onPress={() => go(undefined)}>{t('notice.openProfile')}</Button>
-      ) : null}
-      {prompt.mustChangePassword ? (
-        <Button
-          variant={fields.length > 0 ? 'secondary' : 'primary'}
-          onPress={() => go({ changePassword: '1' })}
-        >
-          {t('profile.changePassword')}
-        </Button>
-      ) : null}
+      <View style={[styles.reason, { backgroundColor: colors.surface2 }]}>
+        <AppText weight="semibold">{t('notice.profileTitle')}</AppText>
+        <AppText variant="small" tone="muted">
+          {t('notice.profileText')}
+        </AppText>
+        <AppText variant="small" tone="muted">
+          {t('notice.profileMissing', {
+            fields: fields.map((field) => t(`profile.field.${field}`)).join(', '),
+          })}
+        </AppText>
+      </View>
+      <Button onPress={openProfile}>{t('notice.openProfile')}</Button>
       <Button variant="ghost" onPress={onClose}>
         {t('notice.later')}
       </Button>
@@ -152,8 +132,8 @@ function AccountPrompt() {
   }, [satisfied, prompt, dismissPrompt]);
 
   if (!prompt || satisfied) return null;
-  const onboarding = prompt.kind === PROMPTS.ONBOARDING;
   const close = () => dismissPrompt(prompt.id);
+  const onboarding = prompt.kind === PROMPTS.ONBOARDING;
   return (
     <Sheet
       open

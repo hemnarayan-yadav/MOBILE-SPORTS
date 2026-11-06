@@ -20,7 +20,7 @@ import { FieldFocusContext, liftFieldAboveKeyboard } from './fieldFocus.js';
 // the fold. `onKeyboardDidShow` and the focus reports above scroll it into
 // view: the first covers opening the keyboard, the second moving from field to
 // field while it is already up (no keyboard event is sent for that).
-export default function Screen({ title, subtitle, children, onBack }) {
+export default function Screen({ title, subtitle, children, onBack, hideBack = false }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
@@ -49,16 +49,18 @@ export default function Screen({ title, subtitle, children, onBack }) {
           keyboardShouldPersistTaps="handled"
           onKeyboardDidShow={liftFocusedField}
         >
-          <Pressable
-            onPress={goBack}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.back')}
-            style={styles.back}
-          >
-            <AppText weight="semibold" tone="muted">
-              {`‹ ${t('common.back')}`}
-            </AppText>
-          </Pressable>
+          {hideBack ? null : (
+            <Pressable
+              onPress={goBack}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+              style={styles.back}
+            >
+              <AppText weight="semibold" tone="muted">
+                {`‹ ${t('common.back')}`}
+              </AppText>
+            </Pressable>
+          )}
           <View style={styles.heading}>
             <AppText variant="title" accessibilityRole="header">
               {title}

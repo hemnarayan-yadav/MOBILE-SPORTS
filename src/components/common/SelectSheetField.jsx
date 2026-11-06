@@ -72,7 +72,7 @@ export default function SelectSheetField({
       </Pressable>
       <FieldMessages hint={hint} error={error} />
 
-      <Sheet open={open} onClose={close} title={label}>
+      <Sheet open={open} onClose={close} title={label} scroll={false}>
         {searchable && (
           <SearchField value={search} onChange={setSearch} placeholder={t('app.searchLabel')} />
         )}

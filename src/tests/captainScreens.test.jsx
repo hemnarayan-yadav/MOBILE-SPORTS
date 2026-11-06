@@ -86,10 +86,9 @@ const imageUris = (node) => {
   return [...here, ...[].concat(node.children ?? []).flatMap(imageUris)];
 };
 
-// Searching for somebody who does not exist, up to the direct-add form.
+// Opens the add sheet (default direct-add tab) and fills name + phone.
 const openDirectAddFor = async (name) => {
   await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-  await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), name);
   await fireEvent.changeText(await screen.findByLabelText('Full name'), name);
   await fireEvent.changeText(screen.getByLabelText('Phone number'), '9812345611');
 };
@@ -224,10 +223,26 @@ describe('The squad', () => {
     expect(screen.getByText('2 of 25 players')).toBeTruthy();
   });
 
-  // Adding a player starts with a search by name or number: an account that
-  // already exists is added, never registered a second time. The row shows the
-  // picture, the name and the jersey number, and never a full phone number.
-  it('finds an account by name and adds it to the squad by its id', async () => {
+  // Adding a player: the add sheet opens straight into the direct-add form.
+  // A "Search KhelScore" tab remains for captains who only know the name.
+  it('opens into the direct-add form by default, with the search tab in reach', async () => {
+    api = captainApi({});
+    await renderWithQuery(<SquadManagement />);
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+
+    // Direct-add form is on screen immediately.
+    expect(await screen.findByLabelText('Full name')).toBeTruthy();
+    expect(screen.getByLabelText('Phone number')).toBeTruthy();
+    // The segmented control offers both paths.
+    expect(screen.getByRole('radio', { name: 'Add player' })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Search KhelScore' })).toBeTruthy();
+    // No profile form until the search tab is open.
+    expect(screen.queryByLabelText('Name or mobile number')).toBeNull();
+  });
+
+  // Switching to the Search tab exposes the same lookup the old flow had.
+  it('finds an account by name on the Search tab and adds it to the squad by its id', async () => {
     api = captainApi({
       'post /users/search': () => ok({ items: [FOUND] }),
       'post /teams/t1/players/existing': () => ok({ player: { id: 'p3', name: 'Suresh' } }, 201),
@@ -235,13 +250,13 @@ describe('The squad', () => {
     const view = await renderWithQuery(withNotices(<SquadManagement />));
 
     await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Search KhelScore' }));
     await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), 'Suresh');
 
     const row = await screen.findByLabelText('Suresh Jersey #9');
     expect(screen.getByText(MASKED_PHONE)).toBeTruthy();
     expect(screen.getByText('#9')).toBeTruthy();
     expect(imageUris(view.toJSON())).toContain(FOUND.avatarUrl);
-    // Only the masked number is ever rendered.
     expect(screen.queryByText(/9876543210/)).toBeNull();
 
     await fireEvent.press(row);
@@ -255,50 +270,14 @@ describe('The squad', () => {
         playingRole: 'raider',
       }),
     );
-    // Nothing in the squad flow sends an invitation any more.
     expect(api.calls.some((c) => c.method === 'post' && c.url.endsWith('/invitations'))).toBe(
       false,
     );
   });
 
-  // Finding the player is the only way in: the obsolete "Without a phone" tab,
-  // which made a squad place with no account behind it, is gone.
-  it('opens the add sheet straight into the search, with no tab to choose', async () => {
-    api = captainApi({});
-    await renderWithQuery(<SquadManagement />);
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-
-    expect(await screen.findByLabelText('Name or mobile number')).toBeTruthy();
-    expect(screen.queryByText('Without a phone')).toBeNull();
-    expect(screen.queryByText('Find the player')).toBeNull();
-    // No profile form until the search has found nobody.
-    expect(screen.queryByLabelText('Full name')).toBeNull();
-  });
-
-  // A matching name is no proof it is the same person, so the captain is always
-  // offered a new member — but only on request, so the results are seen first.
-  it('offers a new member alongside the results, and opens the form on request', async () => {
-    api = captainApi({ 'post /users/search': () => ok({ items: [FOUND] }) });
-    await renderWithQuery(<SquadManagement />);
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-    await fireEvent.changeText(await screen.findByLabelText('Name or mobile number'), 'Suresh');
-
-    await screen.findByLabelText('Suresh Jersey #9');
-    expect(screen.queryByLabelText('Full name')).toBeNull();
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Add new member' }));
-
-    // The name that was searched for carries into the form, and nothing has
-    // been created: the account from the results was not touched.
-    expect((await screen.findByLabelText('Full name')).props.value).toBe('Suresh');
-    expect(api.calls.some((c) => c.url.includes('/players/'))).toBe(false);
-  });
-
-  // Finding nobody opens the direct-add form by itself, and it creates the
-  // account and the squad place together — no invitation, no link.
-  it('opens the direct-add form when nothing is found, and creates the player', async () => {
+  // The direct-add form creates the account and the squad place together — no
+  // invitation, no link.
+  it('creates the player straight from the direct-add form', async () => {
     api = captainApi({
       'post /users/search': () => ok({ items: [] }),
       'post /teams/t1/players/direct': () =>
@@ -343,21 +322,21 @@ describe('The squad', () => {
     expect(await screen.findByText(/already had a KhelScore account/)).toBeTruthy();
   });
 
-  // Searching by number and finding nobody carries the number into the form,
-  // so the captain never types it twice.
-  it('carries a searched mobile number into the direct-add form', async () => {
-    api = captainApi({ 'post /users/search': () => ok({ items: [] }) });
+  // Typing a complete number that already belongs to a KhelScore account opens
+  // the dedupe sheet, which can hand control over to the add-existing view.
+  it('shows the existing-account sheet when the typed number matches an account', async () => {
+    api = captainApi({
+      'post /users/search': () => ok({ items: [FOUND] }),
+    });
     await renderWithQuery(<SquadManagement />);
 
     await fireEvent.press(await screen.findByRole('button', { name: 'Add player' }));
-    await fireEvent.changeText(
-      await screen.findByLabelText('Name or mobile number'),
-      '9812345611',
-    );
+    await fireEvent.changeText(await screen.findByLabelText('Full name'), 'Suresh');
+    await fireEvent.changeText(screen.getByLabelText('Phone number'), '9876543210');
 
-    expect((await screen.findByLabelText('Phone number')).props.value).toBe('9812345611');
-    // A number is not a name, so the name is left for the captain to type.
-    expect(screen.getByLabelText('Full name').props.value).toBe('');
+    expect(
+      await screen.findByText('This number is already on KhelScore'),
+    ).toBeTruthy();
   });
 
   // Two players may wear the same number, so the only thing the API still

@@ -10,6 +10,8 @@ import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { useAccountPrompts } from '../hooks/useAccountPrompts.js';
 import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
+import { useInAppUpdate } from '../hooks/useInAppUpdate.js';
+import { useLoginGate } from '../hooks/useLoginGate.js';
 import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
 import i18n from '../i18n/index.js';
@@ -35,12 +37,16 @@ initMonitoring();
 // (lib/analytics.js).
 startAnalytics();
 
-// The session is restored from the keystore in the background: public screens
-// do not wait for it. Push hangs off the session: this device is registered
-// while somebody is signed in, a tapped notification opens what it is about,
-// and one that arrives while the app is open is shown as a notice.
+// The session is restored from the keystore in the background: the login gate
+// waits for that before sending a signed-out visitor to /auth/login, so a
+// restored session never flashes the login screen on its way through. Push
+// hangs off the session: this device is registered while somebody is signed
+// in, a tapped notification opens what it is about, and one that arrives while
+// the app is open is shown as a notice.
 function SessionBootstrap() {
   useAuthBootstrap();
+  useLoginGate();
+  useInAppUpdate();
   useAccountPrompts();
   usePushRegistration();
   useNotificationTaps();

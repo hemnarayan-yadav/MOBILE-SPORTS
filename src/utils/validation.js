@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { ORGANISER_ROLES } from './constants.js';
 import { isKnownDistrict, isKnownState } from './india.js';
 
-const PASSWORD_MIN_LENGTH = 6;
 const NAME_MIN_LENGTH = 2;
 const NAME_MAX_LENGTH = 100;
 const PHONE_PATTERN = /^\+[1-9]\d{7,14}$/;
@@ -28,9 +27,6 @@ const phoneField = z
   .trim()
   .transform(normalizePhone)
   .refine((value) => PHONE_PATTERN.test(value), 'validation.phoneInvalid');
-
-// Length only, mirroring the API: no letter-and-digit rule.
-const passwordField = z.string().min(PASSWORD_MIN_LENGTH, 'validation.passwordMin');
 
 const urlField = z
   .string()
@@ -137,14 +133,6 @@ const sportsFields = {
   ),
 };
 
-const passwordsMatch = (values) => values.password === values.confirmPassword;
-const passwordMismatch = { path: ['confirmPassword'], message: 'validation.passwordMismatch' };
-
-export const loginSchema = z.object({
-  identifier: z.string().trim().min(1, 'validation.required'),
-  password: z.string().min(1, 'validation.required'),
-});
-
 export const otpLoginSchema = z.object({ phone: indianMobileField });
 
 // Signing up happens in two steps: the number alone (an Indian mobile, proved
@@ -152,30 +140,12 @@ export const otpLoginSchema = z.object({ phone: indianMobileField });
 // genuinely optional.
 export const registerPhoneSchema = z.object({ phone: indianMobileField });
 
-// The jersey number is part of who a player is on a kabaddi team, so signing up
-// asks for it (API auth.validation.registerSchema). Birthday, height and weight
-// are not sign-up fields — they are filled in later, on the profile.
-export const registerProfileSchema = withLocation(
-  z
-    .object({
-      name: nameField,
-      jerseyNumber: jerseyField,
-      email: optionalField(emailField),
-      password: passwordField,
-      confirmPassword: z.string(),
-      ...locationFields,
-    })
-    .refine(passwordsMatch, passwordMismatch),
-);
-
-// Resetting by email: the address, then the code, then the new password.
-export const emailResetSchema = z
-  .object({ email: emailField, password: passwordField, confirmPassword: z.string() })
-  .refine(passwordsMatch, passwordMismatch);
-
-export const phoneResetSchema = z
-  .object({ phone: indianMobileField, password: passwordField, confirmPassword: z.string() })
-  .refine(passwordsMatch, passwordMismatch);
+// Sign-up on mobile asks for one thing: the account's name. The WhatsApp number
+// is already proved in step one, the password is a throwaway placeholder, and
+// the shirt number / email / state / district are picked later on the profile.
+// (API auth.validation.registerSchema still requires `jerseyNumber`, which
+// register.jsx fills from an invitation or a "0" default.)
+export const registerProfileSchema = z.object({ name: nameField });
 
 export const changePhoneSchema = z.object({ phone: indianMobileField });
 
@@ -206,17 +176,6 @@ export function profileSchemaFor(role, { hasPhone = false, hasEmail = false } = 
     })
     .superRefine(checkLocation);
 }
-
-// Replacing your own password: the current one is always required, including
-// for an account still holding the temporary password it was created with
-// (API POST /users/me/password).
-export const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, 'validation.required'),
-    password: passwordField,
-    confirmPassword: z.string(),
-  })
-  .refine(passwordsMatch, passwordMismatch);
 
 export const teamSchema = withLocation(
   z.object({

@@ -14,9 +14,9 @@ import { startSession } from '../../api/client.js';
 import { invitationsApi } from '../../api/invitations.api.js';
 import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
+import Logo from '../../components/common/Logo.jsx';
 import PhoneField from '../../components/common/PhoneField.jsx';
 import Screen from '../../components/common/Screen.jsx';
-import StateDistrictFields from '../../components/common/StateDistrictFields.jsx';
 import TextField from '../../components/common/TextField.jsx';
 import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
@@ -25,13 +25,8 @@ import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { EVENTS, track } from '../../lib/analytics.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
-import { JERSEY_MAX_LENGTH } from '../../utils/constants.js';
 import { formatPhone } from '../../utils/countries.js';
-import {
-  registerPhoneSchema,
-  registerProfileSchema,
-  toLocationPayload,
-} from '../../utils/validation.js';
+import { registerPhoneSchema, registerProfileSchema } from '../../utils/validation.js';
 
 const STEPS = Object.freeze({ PHONE: 'phone', PROFILE: 'profile' });
 
@@ -101,6 +96,7 @@ function PhoneStep({ verification, verified, onVerified, onContinue }) {
           <PhoneField
             label={t('auth.phone')}
             hint={t('auth.registerOtpHint', { context: verification.channel })}
+            channel={verification.channel}
             value={field.value}
             onChange={(value) => {
               if (takenPhone) setTakenPhone(null);
@@ -184,6 +180,14 @@ function ProfileStep({ verified, onChangeNumber }) {
     invited?.jerseyNumber === null || invited?.jerseyNumber === undefined
       ? ''
       : String(invited.jerseyNumber);
+  // The mobile app is OTP-only — the account's identity is the proved number
+  // and the user is never asked for a password. The server still stores a
+  // password hash (API users.model), so sign-up sends a random throwaway string
+  // nobody will ever use: resets go through the OTP flow and no password screen
+  // exists on mobile.
+  const makePlaceholderPassword = () =>
+    `otp-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+
   const registerAccount = useMutation({
     mutationFn: authApi.register,
     onSuccess: async ({ joinedTeams, ...session }) => {
@@ -208,35 +212,26 @@ function ProfileStep({ verified, onChangeNumber }) {
   const {
     control,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerProfileSchema),
-    defaultValues: {
-      name: invitedName,
-      jerseyNumber: invitedJersey,
-      email: '',
-      password: '',
-      confirmPassword: '',
-      state: '',
-      district: '',
-    },
+    defaultValues: { name: invitedName },
   });
 
-  // The two pickers are driven together: picking a state clears the district.
-  const setLocation = ({ state, district }) => {
-    setValue('state', state);
-    setValue('district', district);
-  };
-
-  const onSubmit = ({ confirmPassword: _confirmPassword, state, district, ...profile }) => {
+  const onSubmit = ({ name }) => {
     registerAccount.mutate(
       {
-        ...profile,
+        name,
         phone: verified.phone,
         otpToken: verified.otpToken,
-        location: toLocationPayload({ state, district }),
+        // Throwaway placeholder — the account signs in by OTP from here on.
+        password: makePlaceholderPassword(),
+        // The jersey number is required by the API but no longer asked for at
+        // sign-up (owner's decision, 2026-11-03: the account's identity is the
+        // WhatsApp number and nothing else). An invitation's shirt number is
+        // kept when there is one; otherwise a default "0" placeholder goes in
+        // and the user picks a real shirt number later on the profile.
+        jerseyNumber: invitedJersey || '0',
       },
       {
         onError: (error) => {
@@ -284,44 +279,6 @@ function ProfileStep({ verified, onChangeNumber }) {
         hint: invitedName ? t('auth.invitedNameHint') : undefined,
         autoComplete: 'name',
         textContentType: 'name',
-      })}
-      {/* Required: the shirt number a player is known by is part of who they
-          are on a kabaddi team, so sign-up asks for it. Birthday, height and
-          weight are not asked here — they belong on the profile. */}
-      {field('jerseyNumber', {
-        label: t('player.jerseyNumber'),
-        hint: t('auth.jerseyHint'),
-        keyboardType: 'number-pad',
-        maxLength: JERSEY_MAX_LENGTH,
-      })}
-      {field('email', {
-        label: t('auth.emailOptional'),
-        hint: t('auth.emailOptionalHint'),
-        keyboardType: 'email-address',
-        autoCapitalize: 'none',
-        autoComplete: 'email',
-      })}
-      {/* Optional: the account is created whether or not these are filled in.
-          They are what the player and team location filters read. */}
-      <StateDistrictFields
-        state={watch('state')}
-        district={watch('district')}
-        onChange={setLocation}
-        errors={{ state: errors.state, district: errors.district }}
-      />
-      {field('password', {
-        label: t('auth.password'),
-        secureTextEntry: true,
-        autoCapitalize: 'none',
-        autoComplete: 'new-password',
-        textContentType: 'newPassword',
-      })}
-      {field('confirmPassword', {
-        label: t('auth.confirmPassword'),
-        secureTextEntry: true,
-        autoCapitalize: 'none',
-        autoComplete: 'new-password',
-        textContentType: 'newPassword',
       })}
       <Button onPress={handleSubmit(onSubmit)} loading={registerAccount.isPending}>
         {t('auth.registerSubmit')}
@@ -374,6 +331,9 @@ export default function Register() {
       // Step two steps back to step one, keeping the proof and what was typed.
       onBack={step === STEPS.PROFILE ? () => setStep(STEPS.PHONE) : undefined}
     >
+      <View style={styles.brand}>
+        <Logo height={44} title={t('nav.brand')} />
+      </View>
       {step === STEPS.PHONE ? (
         <PhoneStep
           verification={verification}
@@ -404,6 +364,7 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   form: { gap: SPACING.lg },
+  brand: { alignItems: 'center', marginBottom: SPACING.lg },
   banner: { borderRadius: RADII.md, padding: SPACING.md, gap: SPACING.xs },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
   flex: { flex: 1 },

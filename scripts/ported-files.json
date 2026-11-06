@@ -49,7 +49,7 @@
   },
   "src/api/tournaments.api.js": {
     "source": "src/api/tournaments.api.js",
-    "sha256": "6abc99b72f894f3733af370424aa82ac655a57b74e0aa93afe24c93854622eca"
+    "sha256": "b5ab1ac9951d897199279fbd0eac5c51db2044d2d36d423a1520ea9c7c7399b8"
   },
   "src/api/users.api.js": {
     "source": "src/api/users.api.js",
@@ -70,10 +70,6 @@
   "src/app/(tabs)/tournaments.jsx": {
     "source": "src/pages/public/Tournaments.jsx",
     "sha256": "3107ad8dffc809530801376559254c40fd036eb0df9b0e857790e18faa047fa0"
-  },
-  "src/app/auth/forgot-password.jsx": {
-    "source": "src/pages/auth/ForgotPassword.jsx",
-    "sha256": "922658024b41b0880591a5716c00f6299cf17d6e03b8a74e193b4c33d1d61bc8"
   },
   "src/app/auth/login.jsx": {
     "source": "src/pages/auth/Login.jsx",
@@ -109,7 +105,7 @@
   },
   "src/app/dashboard/notifications.jsx": {
     "source": "src/pages/dashboard/Notifications.jsx",
-    "sha256": "dd40272d5781e798b2031139d313dccbe3e498f6a9293258144c24e325399375"
+    "sha256": "2b69ffe79fac1e8decb8f501affde15b3a4bfcb8ab9f79d6d411b2b92adfb751"
   },
   "src/app/dashboard/profile.jsx": {
     "source": "src/pages/dashboard/Profile.jsx",
@@ -157,7 +153,7 @@
   },
   "src/app/tournament/[id].jsx": {
     "source": "src/pages/public/TournamentDetails.jsx",
-    "sha256": "688aafcd9c34a4c692aceab8aad8cbe5ed51cdd36405e6f919d819d3ff9f9d68"
+    "sha256": "0da44f8d532c7219d2aa67f4a33f4fe5503f4ab6236c73f3a57cb35a1a872cee"
   },
   "src/app/user/create-team.jsx": {
     "source": "src/pages/dashboard/user/CreateTeam.jsx",
@@ -437,6 +433,6 @@
   },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
-    "sha256": "b51602815cad66523613322e056e66ec05e10606ee502ee3f3aada2dc90e20cd"
+    "sha256": "add6ec91b08388f649207b2de6b1d7d30a278e1a936a921b49a2f8bfd8858bf3"
   }
 }

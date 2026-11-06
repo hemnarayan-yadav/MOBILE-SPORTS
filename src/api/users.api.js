@@ -12,15 +12,10 @@ export const usersApi = {
   sendEmailCode: () => apiClient.post('/users/me/email/send-code').then(unwrap),
   verifyEmail: (otpToken) => apiClient.post('/users/me/email/verify', { otpToken }).then(unwrap),
   // Deleting your own account. Irreversible, so it carries a fresh proof of
-  // ownership — the password, or an OTP proof of the number on the account.
+  // ownership — an OTP proof of the number on the account.
   deleteAccount: (proof) => apiClient.post('/users/me/delete', proof).then(unwrap),
   updatePreferences: (changes) =>
     apiClient.patch('/users/me/notification-preferences', changes).then(unwrap),
-  // Replacing your own password, proving the current one. This is also how an
-  // account created with a temporary password gets a real one. It signs the
-  // account out everywhere, so the caller must re-authenticate afterwards.
-  changePassword: ({ currentPassword, password }) =>
-    apiClient.post('/users/me/password', { currentPassword, password }).then(unwrap),
   // Finding a player who already has an account, by name or mobile number, so
   // a captain adds that account instead of creating a second one for the same
   // person. A POST body, so numbers stay out of request logs; the answer never
