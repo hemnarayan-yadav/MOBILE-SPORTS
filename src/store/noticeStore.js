@@ -6,10 +6,12 @@ import { create } from 'zustand';
 export const NOTICE_DURATION_MS = 3500;
 
 // Prompts are the other half of this store: a panel the account is meant to
-// read and act on, rather than a message that fades. Two of them exist —
-// the welcome after signing up and the reminders after signing in — and both
-// are shown by components/common/NoticeHost.jsx.
-export const PROMPTS = Object.freeze({ ONBOARDING: 'onboarding', REMINDERS: 'reminders' });
+// read and act on, rather than a message that fades. One exists — the
+// reminders after signing in — and it is shown by
+// components/common/NoticeHost.jsx. A welcome panel after signing up used to
+// be the other; the owner asked for it to go, so signing up now raises
+// nothing and the home screen's own banner asks for what is missing.
+export const PROMPTS = Object.freeze({ REMINDERS: 'reminders' });
 
 let nextId = 0;
 

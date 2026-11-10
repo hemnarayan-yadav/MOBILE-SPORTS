@@ -77,7 +77,7 @@
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "04fea1d8f9e99d231841043f5d9453e6343df15f736043de4f42aedc6e9573e0"
+    "sha256": "4d866f3216d7df693623d8398c963edb022526ef5856d18ce297515ffecc8f19"
   },
   "src/app/captain/index.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
@@ -121,7 +121,7 @@
   },
   "src/app/match/[id].jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "0991c76ac8558fe7f5f2bf9a3eaf10cde8481a084350dab28f63e970447a6cb2"
+    "sha256": "3755d524c4b3cf9d6809435b4d851437ccc04eddbbf76ec582b68e7c281ec3e5"
   },
   "src/app/news/[slug].jsx": {
     "source": "src/pages/public/News.jsx",
@@ -217,7 +217,7 @@
   },
   "src/components/match/MatchSections.jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "0991c76ac8558fe7f5f2bf9a3eaf10cde8481a084350dab28f63e970447a6cb2"
+    "sha256": "3755d524c4b3cf9d6809435b4d851437ccc04eddbbf76ec582b68e7c281ec3e5"
   },
   "src/components/match/ScoreBoard.jsx": {
     "source": "src/components/match/ScoreBoard.jsx",
@@ -361,7 +361,7 @@
   },
   "src/sports/kabaddi/commentary.js": {
     "source": "src/sports/kabaddi/commentary.js",
-    "sha256": "98844bb225e48cb6277bd9d941195b40d78249c1b84c443c6a9ab73350c7fa4f"
+    "sha256": "c7f105a96fbcc318b2b74373cdbf0d9d295308081cb0d520de95d726fddf345e"
   },
   "src/store/authStore.js": {
     "source": "src/store/authStore.js",
@@ -381,7 +381,7 @@
   },
   "src/theme/tokens.js": {
     "source": "src/index.css",
-    "sha256": "8adc82d98dc12a236cd72a0ea8a900d32d23029ef67d97cd08c443159200fd50"
+    "sha256": "e67df1ac0c4684a252f7a1415b5cf3e418f31422e89359361a9d183b779ef070"
   },
   "src/theme/useTheme.js": {
     "source": "src/hooks/useTheme.js",

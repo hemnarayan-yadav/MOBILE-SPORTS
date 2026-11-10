@@ -8,6 +8,7 @@ import {
   describeEvent,
   describeRaid,
   matchDirectory,
+  matchScorers,
   raidPointsBySide,
 } from './commentary.js';
 
@@ -34,6 +35,7 @@ export const kabaddiUI = Object.freeze({
   describeEvent,
   describeRaid,
   matchDirectory,
+  matchScorers,
   raidPointsBySide,
   playerStatLine,
   teamStatRows: TEAM_STAT_ROWS,

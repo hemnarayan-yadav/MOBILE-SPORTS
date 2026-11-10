@@ -45,44 +45,6 @@ function Notice() {
   );
 }
 
-// The welcome panel after signing up: what to do next, and nothing it insists
-// on — the scrim, the system back gesture and Close all dismiss it, and the
-// store makes sure it is never raised a second time.
-function OnboardingPrompt({ prompt, onClose }) {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const { colors } = useTheme();
-  const teamCount = prompt.teamCount || 1;
-  const go = (path) => {
-    onClose();
-    router.push(path);
-  };
-  return (
-    <View style={styles.stack}>
-      <AppText>{t('notice.welcomeText')}</AppText>
-      <View style={[styles.reason, { backgroundColor: colors.surface2 }]}>
-        <AppText weight="semibold">{t('notice.welcomeProfile')}</AppText>
-        <AppText variant="small" tone="muted">
-          {t('notice.welcomeProfileText')}
-        </AppText>
-      </View>
-      <View style={[styles.reason, { backgroundColor: colors.surface2 }]}>
-        <AppText weight="semibold">{t('notice.welcomeTeams', { count: teamCount })}</AppText>
-        <AppText variant="small" tone="muted">
-          {t('notice.welcomeTeamsText')}
-        </AppText>
-      </View>
-      <Button onPress={() => go('/dashboard/profile')}>{t('notice.completeProfile')}</Button>
-      <Button variant="secondary" onPress={() => go(prompt.teamPath ?? '/teams')}>
-        {t('notice.viewTeams', { count: teamCount })}
-      </Button>
-      <Button variant="ghost" onPress={onClose}>
-        {t('notice.later')}
-      </Button>
-    </View>
-  );
-}
-
 // What the account still owes, after signing in — on mobile that is only the
 // profile fields the player is missing. Password reminders don't apply here:
 // mobile is OTP-only and has no password screen.
@@ -133,18 +95,9 @@ function AccountPrompt() {
 
   if (!prompt || satisfied) return null;
   const close = () => dismissPrompt(prompt.id);
-  const onboarding = prompt.kind === PROMPTS.ONBOARDING;
   return (
-    <Sheet
-      open
-      onClose={close}
-      title={t(onboarding ? 'notice.welcomeTitle' : 'notice.reminderTitle')}
-    >
-      {onboarding ? (
-        <OnboardingPrompt prompt={prompt} onClose={close} />
-      ) : (
-        <RemindersPrompt prompt={prompt} onClose={close} />
-      )}
+    <Sheet open onClose={close} title={t('notice.reminderTitle')}>
+      <RemindersPrompt prompt={prompt} onClose={close} />
     </Sheet>
   );
 }

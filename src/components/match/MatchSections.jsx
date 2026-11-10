@@ -21,7 +21,6 @@ import { PlayingRoleBadge } from '../player/PlayerBits.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 import MatchCard from './MatchCard.jsx';
 
-const TOP_PERFORMERS = 3;
 const SIDES = ['A', 'B'];
 const teamOf = (match, side) => (side === 'A' ? match.teamA : match.teamB);
 
@@ -216,25 +215,23 @@ export function Squads({ match }) {
   return SIDES.map((side) => <SquadPreview key={side} teamId={teamOf(match, side)?.id} />);
 }
 
-export function TopPerformers({ match, directory }) {
+// Both teams in full — see matchScorers: everybody who was named for the match
+// is here, whether they scored or not.
+export function TeamScorers({ match, directory }) {
   const { t } = useTranslation();
   const sport = getSportUI(match.sport);
-  const stats = match.live?.playerStats ?? {};
   return SIDES.map((side) => {
-    const top = Object.entries(stats)
-      .filter(([, s]) => s.team === side && s.totalPoints > 0)
-      .sort(([, a], [, b]) => b.totalPoints - a.totalPoints)
-      .slice(0, TOP_PERFORMERS);
+    const rows = sport.matchScorers(match, side);
     return (
       <Card key={side}>
         <View style={styles.teamTitle}>
           <TeamCrest team={teamOf(match, side)} size="xs" />
           <AppText weight="bold">{directory.teamName(side)}</AppText>
         </View>
-        {top.length === 0 ? (
+        {rows.length === 0 ? (
           <AppText tone="muted">{t('match.noPointsYet')}</AppText>
         ) : (
-          top.map(([playerId, s]) => (
+          rows.map(({ playerId, stats: s }) => (
             <PlayerLink key={playerId} id={playerId} style={styles.lineupRow}>
               <Avatar name={directory.playerName(playerId)} size="sm" />
               <View style={styles.flex}>

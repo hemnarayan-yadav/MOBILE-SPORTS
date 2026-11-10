@@ -80,7 +80,7 @@ module.exports = () => {
     // explicitly because this login also has a personal `hemnarayan` account,
     // and without it a build can resolve against the wrong one.
     owner: 'khelscore',
-    version: '1.8.2',
+    version: '1.8.3',
     scheme,
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
@@ -145,6 +145,14 @@ module.exports = () => {
       ['expo-secure-store', { configureAndroidBackup: true }],
       // Profile photos come from the photo library only: no camera or microphone.
       ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
+      // The scoreboard's siren, do-or-die cue and ten-second raid countdown.
+      // Playback only: no recording, so no microphone permission is added.
+      ['expo-audio', { microphonePermission: false }],
+      // The scoreboard's full-time card is handed to the system share sheet.
+      // Sharing a file this way needs no storage permission: the image is
+      // written to the app's own cache and passed out through a FileProvider,
+      // so nothing is added to the Play data-safety form.
+      'expo-sharing',
       [
         'expo-splash-screen',
         {
