@@ -34,6 +34,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import Button from '../components/common/Button.jsx';
@@ -60,6 +61,9 @@ const KEEP_AWAKE_TAG = 'khelscore-board';
 const CUE_MS = 1600;
 // One point a tap, on the owner's decision.
 const STEP = 1;
+// What one tap of the clock's own +/- is worth. A minute was too coarse for a
+// half that is ten; thirty seconds can be tapped twice to make the same minute.
+const CLOCK_STEP_SECONDS = 30;
 
 export default function ScoreboardScreen() {
   const { t } = useTranslation();
@@ -224,15 +228,28 @@ export default function ScoreboardScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: palette.page }]} edges={['top', 'bottom', 'left', 'right']}>
+    <SafeAreaView
+      style={[styles.root, { backgroundColor: palette.page }]}
+      edges={['top', 'bottom', 'left', 'right']}
+    >
       <View style={styles.root}>
-        <View style={[styles.board, { padding: scale.gutter, gap: scale.gutter }]}>
+        <View
+          style={[
+            styles.board,
+            { paddingHorizontal: scale.gutter, paddingVertical: scale.gutterV, gap: scale.gutter },
+          ]}
+        >
           <BoardSide {...sideProps('A')} />
 
           {/* The middle: who made this, which half, the clock, the raid, and
               the operator's row — in that order, top to bottom. */}
           <View style={[styles.centre, { gap: scale.gutter * 0.4 }]}>
-            <Logo height={scale.logo} color={palette.text} background={palette.page} title="KhelScore" />
+            <Logo
+              height={scale.logo}
+              color={palette.text}
+              background={palette.page}
+              title="KhelScore"
+            />
             <Text
               style={{
                 fontFamily: 'BarlowCondensed_700Bold',
@@ -341,7 +358,11 @@ export default function ScoreboardScreen() {
         </View>
       </Modal>
 
-      <Sheet open={Boolean(renaming)} onClose={() => setRenaming(null)} title={t('app.board.teamName')}>
+      <Sheet
+        open={Boolean(renaming)}
+        onClose={() => setRenaming(null)}
+        title={t('app.board.teamName')}
+      >
         <TextField
           label={t('app.board.teamName')}
           value={draftName}
@@ -354,35 +375,49 @@ export default function ScoreboardScreen() {
         <Button onPress={commitName}>{t('common.done')}</Button>
       </Sheet>
 
-      {/* Three short rows rather than a column of buttons: the board is
-          landscape, and a tall sheet would cover the match. */}
+      {/* Two rows, and the first of them is icons.
+          The board is landscape, so every row the sheet grows covers more of
+          the match than it would in portrait. The five settings that are a
+          choice rather than a sentence — the two looks, the sound, and a
+          minute either way — say it in a glyph, which fits them all on one
+          line and leaves the second row to the things that need words. Each
+          one still carries its full name as its accessibility label. */}
       <Sheet open={menuOpen} onClose={() => setMenuOpen(false)} title={t('app.board.settings')}>
-        <View style={styles.menuRow}>
+        <View style={styles.menuIcons}>
           {BOARD_THEME_LIST.map((name) => (
-            <Button
+            <IconButton
               key={name}
-              variant={theme === name ? 'primary' : 'secondary'}
+              icon={THEME_ICON[name]}
+              label={t(`app.board.themeName.${name}`)}
+              active={theme === name}
+              palette={palette}
               onPress={() => setTheme(name)}
-              style={styles.cell}
-            >
-              {t(`app.board.themeName.${name}`)}
-            </Button>
+            />
           ))}
-          <Button variant="secondary" onPress={() => setSound(!sound)} style={styles.cell}>
-            {t(sound ? 'app.board.soundOn' : 'app.board.soundOff')}
-          </Button>
-          {phaseAction ? (
-            <Button
-              onPress={() => {
-                setMenuOpen(false);
-                phaseAction.onPress();
-              }}
-              testID="board-phase-action"
-              style={styles.cell}
-            >
-              {phaseAction.label}
-            </Button>
-          ) : null}
+          <IconButton
+            icon={sound ? 'volume-high' : 'volume-mute'}
+            label={t(sound ? 'app.board.soundOn' : 'app.board.soundOff')}
+            active={sound}
+            palette={palette}
+            onPress={() => setSound(!sound)}
+          />
+          {/* Thirty seconds a tap, as often as the half needs — the store
+              puts no limit on how many times, and a tap that would take the
+              clock past the end of the half is clamped rather than refused. */}
+          <IconButton
+            icon="add-circle-outline"
+            label={t('app.board.addSeconds')}
+            palette={palette}
+            disabled={!inPlay}
+            onPress={() => shiftMatchClock(CLOCK_STEP_SECONDS)}
+          />
+          <IconButton
+            icon="remove-circle-outline"
+            label={t('app.board.cutSeconds')}
+            palette={palette}
+            disabled={!inPlay}
+            onPress={() => shiftMatchClock(-CLOCK_STEP_SECONDS)}
+          />
         </View>
 
         <View style={styles.menuRow}>
@@ -400,25 +435,32 @@ export default function ScoreboardScreen() {
               onChange={(minutes) => setHalfMinutes(2, minutes)}
             />
           </View>
-          <Button
-            variant="secondary"
-            style={styles.cell}
-            onPress={() => {
-              setMenuOpen(false);
-              setConfirmNew(true);
-            }}
-          >
-            {t('app.board.newMatch')}
-          </Button>
-        </View>
-
-        <View style={styles.menuRow}>
-          <Button variant="secondary" style={styles.cell} onPress={() => shiftMatchClock(60)} disabled={!inPlay}>
-            {t('app.board.addMinute')}
-          </Button>
-          <Button variant="secondary" style={styles.cell} onPress={() => shiftMatchClock(-60)} disabled={!inPlay}>
-            {t('app.board.cutMinute')}
-          </Button>
+          <View style={styles.cell}>
+            <View style={styles.cellSpacer} />
+            <Button
+              variant="secondary"
+              onPress={() => {
+                setMenuOpen(false);
+                setConfirmNew(true);
+              }}
+            >
+              {t('app.board.newMatch')}
+            </Button>
+          </View>
+          {phaseAction ? (
+            <View style={styles.cell}>
+              <View style={styles.cellSpacer} />
+              <Button
+                onPress={() => {
+                  setMenuOpen(false);
+                  phaseAction.onPress();
+                }}
+                testID="board-phase-action"
+              >
+                {phaseAction.label}
+              </Button>
+            </View>
+          ) : null}
         </View>
       </Sheet>
 
@@ -434,6 +476,33 @@ export default function ScoreboardScreen() {
         }}
       />
     </SafeAreaView>
+  );
+}
+
+// Which glyph stands for each look.
+const THEME_ICON = Object.freeze({ light: 'sunny', night: 'moon' });
+
+// One setting, said in a glyph. The name is still there for a screen reader,
+// and for the tests, which reach for these by their labels.
+function IconButton({ icon, label, active, disabled, palette, onPress }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: Boolean(active), disabled: Boolean(disabled) }}
+      style={({ pressed }) => [
+        styles.iconButton,
+        {
+          borderColor: active ? palette.accent : palette.line,
+          backgroundColor: active ? palette.accent : 'transparent',
+          opacity: disabled ? 0.4 : pressed ? 0.7 : 1,
+        },
+      ]}
+    >
+      <Ionicons name={icon} size={22} color={active ? palette.onAccent : palette.text} />
+    </Pressable>
   );
 }
 
@@ -458,8 +527,35 @@ const styles = StyleSheet.create({
   board: { flex: 1, flexDirection: 'row', alignItems: 'stretch' },
   centre: { alignItems: 'center', justifyContent: 'center' },
   resultScrim: { flex: 1 },
-  resultScroll: { alignItems: 'center', justifyContent: 'center', padding: 20, gap: 16, flexGrow: 1 },
+  resultScroll: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    gap: 16,
+    flexGrow: 1,
+  },
   resultActions: { width: '100%', maxWidth: 420, gap: 10 },
-  menuRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  // All four boxes of the second row start on one line. The two half lengths
+  // carry a label above their input and the two buttons do not, so the buttons
+  // are given the label's height back as a spacer and the row aligns to its
+  // top rather than its bottom — a field's hint still hangs below its own box
+  // without dragging the buttons down with it.
+  menuRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  // AppText's `label` line (17) plus the field's own gap above the input (4).
+  cellSpacer: { height: 21 },
+  menuIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  iconButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   cell: { flex: 1 },
 });

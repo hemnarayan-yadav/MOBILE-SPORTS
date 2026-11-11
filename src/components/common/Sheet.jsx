@@ -8,6 +8,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
@@ -16,7 +17,20 @@ import AppText from './AppText.jsx';
 import { FieldFocusContext } from './fieldFocus.js';
 
 // A bottom sheet over the current screen, the app's counterpart of the web's
-// <Sheet>. The system back gesture and the scrim close it (`onClose`).
+// <Sheet>. **Three things close it**: the cross, the system back gesture, and
+// a tap on the dimmed page above it.
+//
+// That last one is why the scrim is a `flex: 1` row above the panel rather
+// than the absolutely-positioned overlay it used to be. Absolutely filling the
+// window put the scrim *underneath* the panel and left it to the platform to
+// decide which of two overlapping views a touch belonged to; the panel won,
+// often enough that tapping outside did nothing. As a sibling that simply
+// takes the space the panel does not, there is no overlap to arbitrate: the
+// dimmed area is exactly the area that closes the sheet.
+//
+// The cross is a glyph rather than the word "Close": it is the one control in
+// the header, it reads the same in every language, and a word there competed
+// with the title beside it.
 //
 // The panel is capped at 90% of the screen height and its body scrolls by
 // default, so a long form (Add player, Delete account) never pushes its submit
@@ -46,6 +60,7 @@ export default function Sheet({ open, onClose, title, children, scroll = true })
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={t('common.close')}
+          testID="sheet-scrim"
         />
         <SafeAreaView
           edges={['bottom']}
@@ -60,11 +75,10 @@ export default function Sheet({ open, onClose, title, children, scroll = true })
               onPress={onClose}
               accessibilityRole="button"
               accessibilityLabel={t('common.close')}
+              hitSlop={8}
               style={styles.close}
             >
-              <AppText weight="semibold" tone="muted">
-                {t('common.close')}
-              </AppText>
+              <Ionicons name="close" size={24} color={colors.muted} />
             </Pressable>
           </View>
           {/* A field in here belongs to the sheet, not to the form screen
@@ -95,7 +109,9 @@ export default function Sheet({ open, onClose, title, children, scroll = true })
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 0, 0, 0.45)' },
+  // Everything the panel does not occupy, and nothing it does: see the note at
+  // the top of the file.
+  scrim: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.45)' },
   panel: {
     borderTopLeftRadius: RADII.xxl,
     borderTopRightRadius: RADII.xxl,
@@ -109,7 +125,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   title: { flex: 1 },
-  close: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: SPACING.sm },
+  close: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // flexShrink lets the ScrollView fit whatever space is left below the
   // header under the panel's maxHeight, so overflow becomes scrollable.
   bodyFlex: { flexShrink: 1 },

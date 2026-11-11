@@ -105,17 +105,23 @@ export const OVERSCAN = 0.05;
  *
  * The middle column carries the lot — wordmark, half, clock, ring, cues — so
  * these fractions are chosen to **sum under the height available**. Added up
- * with the four gaps between them they come to about 0.82 of the shorter side,
- * against the 0.90 the gutters leave: roughly 8% of headroom on the shortest
- * landscape phone. Making any of them larger means taking it from another, or
- * a small phone clips.
+ * with the four gaps between them they come to about 0.85 of the shorter side,
+ * against the 0.95 the gutters now leave. Making any of them larger means
+ * taking it from another, or a small phone clips.
+ *
+ * **The top and bottom gutters are half the sides'.** The 5% an old television
+ * crops is worth keeping at the edges a mirrored picture loses, but on a phone
+ * held in the hand it was simply a band of empty page above the cards. Halving
+ * it vertically is where the extra room for the score and the wordmark came
+ * from.
  */
 export function boardScale({ width, height }) {
   const short = Math.min(width, height);
   const ring = Math.round(short * 0.38);
   return {
     gutter: Math.round(short * OVERSCAN),
-    logo: Math.round(short * 0.07),
+    gutterV: Math.round(short * OVERSCAN * 0.5),
+    logo: Math.round(short * 0.095),
     pill: Math.round(short * 0.04),
     clock: Math.round(short * 0.15),
     ring,
@@ -124,7 +130,11 @@ export function boardScale({ width, height }) {
     raidNumber: Math.round(ring * 0.42),
     raidLabel: Math.round(short * 0.026),
     teamName: Math.round(short * 0.082),
-    score: Math.round(short * 0.30),
+    // The biggest thing on the board by a distance, because it is the one
+    // thing being read from the far side of a ground. The card lays itself
+    // out name-top / score-middle / buttons-bottom, so this takes the space
+    // the three of them used to share.
+    score: Math.round(short * 0.46),
     label: Math.round(short * 0.026),
     // A tap target never shrinks below what a thumb needs.
     control: Math.max(40, Math.round(short * 0.085)),
