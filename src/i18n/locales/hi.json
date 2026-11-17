@@ -661,7 +661,11 @@
     "noMatches": "कोई नतीजा नहीं",
     "updateAvailableTitle": "KhelScore का नया वर्शन आ गया है",
     "updateAvailableBody": "Play Store पर वर्शन {{version}} मौजूद है। एक मिनट लगेगा, और ऐप में सब कुछ जहाँ है वहीं रहेगा।",
-    "updateLater": "बाद में"
+    "updateLater": "बाद में",
+    "maintenanceTitle": "थोड़ी देर में वापस",
+    "maintenanceBody": "हम अपनी तरफ़ कुछ ठीक कर रहे हैं। थोड़ी देर बाद फिर कोशिश करें।",
+    "maintenanceAuthTitle": "लॉगिन अभी बंद है",
+    "maintenanceAuthBody": "थोड़ी देर के लिए लॉगिन नहीं हो पाएगा। बाक़ी सब चल रहा है, आप मैच देख सकते हैं।"
   },
   "commentary": {
     "raidNumber": "रेड {{number}}",

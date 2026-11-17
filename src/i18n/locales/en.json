@@ -661,7 +661,11 @@
     "noMatches": "No matches",
     "updateAvailableTitle": "A newer KhelScore is out",
     "updateAvailableBody": "Version {{version}} is on the Play Store. It takes a moment, and the app keeps everything where it is.",
-    "updateLater": "Later"
+    "updateLater": "Later",
+    "maintenanceTitle": "Back shortly",
+    "maintenanceBody": "We are fixing something on our side. Please try again in a little while.",
+    "maintenanceAuthTitle": "Sign-in is paused",
+    "maintenanceAuthBody": "Signing in is unavailable for a short while. Everything else works, and you can keep watching matches."
   },
   "commentary": {
     "raidNumber": "Raid {{number}}",
