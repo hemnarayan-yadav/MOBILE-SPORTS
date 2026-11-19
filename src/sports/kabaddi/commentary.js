@@ -7,22 +7,10 @@ const other = (side) => (side === 'A' ? 'B' : 'A');
 
 export function buildTimeline(live) {
   if (!live) return [];
-  const raids = live.raids.map((raid) => ({
-    kind: 'raid',
-    key: `raid-${raid.raidNumber}`,
-    at: raid.at,
-    half: raid.half,
-    raid,
-  }));
+  const raids = live.raids.map((raid) => ({ kind: 'raid', key: `raid-${raid.raidNumber}`, at: raid.at, half: raid.half, raid }));
   const events = live.events
     .filter((event) => event.type !== 'all_out')
-    .map((event, index) => ({
-      kind: 'event',
-      key: `event-${index}-${event.type}`,
-      at: event.at,
-      half: event.half,
-      event,
-    }));
+    .map((event, index) => ({ kind: 'event', key: `event-${index}-${event.type}`, at: event.at, half: event.half, event }));
   return [...raids, ...events].sort((a, b) => new Date(b.at) - new Date(a.at));
 }
 
@@ -40,8 +28,7 @@ function raidSentence(raid, { t, playerName, teamName }) {
     return t('commentary.raiderSelfOut', { raider });
   }
   if (raid.outcome === 'successful') {
-    if (raid.touchPoints > 0 && raid.bonusPoint)
-      return t('commentary.touchBonus', { raider, count: raid.touchPoints });
+    if (raid.touchPoints > 0 && raid.bonusPoint) return t('commentary.touchBonus', { raider, count: raid.touchPoints });
     if (raid.touchPoints > 0) return t('commentary.touch', { raider, count: raid.touchPoints });
     return t('commentary.bonus', { raider });
   }
@@ -70,11 +57,7 @@ export function describeEvent(event, { t, playerName, teamName }) {
     case 'timeout':
       return t('commentary.timeout', { team });
     case 'substitution':
-      return t('commentary.substitution', {
-        team,
-        playerIn: playerName(event.playerIn),
-        playerOut: playerName(event.playerOut),
-      });
+      return t('commentary.substitution', { team, playerIn: playerName(event.playerIn), playerOut: playerName(event.playerOut) });
     case 'injury':
       return t('commentary.injury', { team, player: playerName(event.player) });
     // A player walks out of play outside a raid's own outcome — a defender, or
@@ -92,6 +75,17 @@ export function describeEvent(event, { t, playerName, teamName }) {
       return t('commentary.raidCancelled');
     case 'next_raid_override':
       return t('commentary.nextRaidOverride', { team });
+    // The tie-breaker's own two events. `team` is the side that raids first on
+    // the way in and the side that goes through on the way out; the score is
+    // the tie-breaker's, never the match's.
+    case 'tie_breaker_started':
+      return t('commentary.tieBreakerStarted', { team, count: event.raidsPerTeam ?? 5 });
+    case 'tie_breaker_decided':
+      return t('commentary.tieBreakerDecided', {
+        team,
+        won: event.score?.[event.team] ?? 0,
+        lost: event.score?.[other(event.team)] ?? 0,
+      });
     default:
       return '';
   }

@@ -27,6 +27,17 @@ describe('commentary for a self-out', () => {
     expect(sentence).not.toContain('commentary.empty');
   });
 
+  // The app shows the same feed as the web, so it needs the same two words for
+  // a tie-breaker; without them it printed the raw key.
+  it('describes the tie-breaker being opened and the side it sent through', () => {
+    expect(
+      describeEvent({ type: 'tie_breaker_started', team: 'B', raidsPerTeam: 5 }, context),
+    ).toContain('commentary.tieBreakerStarted');
+    expect(
+      describeEvent({ type: 'tie_breaker_decided', team: 'A', score: { A: 6, B: 4 } }, context),
+    ).toContain('commentary.tieBreakerDecided');
+  });
+
   it('reports somebody walking out while no raid is on, and who takes the point', () => {
     const sentence = describeEvent(
       { type: 'self_out', team: 'A', player: 'p2', pointsTo: 'B', points: 1 },

@@ -696,7 +696,9 @@
     "raidDelayPoint_one": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidDelayPoint_other": "रेड में देरी — {{team}} को {{count}} टेक्निकल पॉइंट।",
     "raidCancelled": "कंट्रोलर ने पिछली रेड रद्द कर दी।",
-    "nextRaidOverride": "कंट्रोलर ने अगली रेड {{team}} को दी।"
+    "nextRaidOverride": "कंट्रोलर ने अगली रेड {{team}} को दी।",
+    "tieBreakerStarted": "स्कोर बराबर — दोनों टीमें {{count}} रेड लेंगी। पहली रेड {{team}} की।",
+    "tieBreakerDecided": "{{team}} ने पाँच रेड {{won}}–{{lost}} से जीतीं।"
   },
   "stats": {
     "matches": "मैच",
@@ -1078,7 +1080,12 @@
       "technical_point": "टेक्निकल पॉइंट",
       "timeout": "टाइम-आउट",
       "substitution": "खिलाड़ी बदलाव",
-      "injury": "चोट"
+      "injury": "चोट",
+      "self_out": "ख़ुद बाहर",
+      "raid_cancelled": "रेड रद्द",
+      "next_raid_override": "अगली रेड बदली",
+      "tie_breaker_started": "टाई-ब्रेकर",
+      "tie_breaker_decided": "टाई-ब्रेकर तय हुआ"
     }
   },
   "legal": {

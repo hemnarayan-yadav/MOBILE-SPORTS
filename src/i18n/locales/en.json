@@ -696,7 +696,9 @@
     "raidDelayPoint_one": "Raid delay — {{count}} technical point to {{team}}.",
     "raidDelayPoint_other": "Raid delay — {{count}} technical points to {{team}}.",
     "raidCancelled": "Last raid cancelled by controller.",
-    "nextRaidOverride": "The controller gave the next raid to {{team}}."
+    "nextRaidOverride": "The controller gave the next raid to {{team}}.",
+    "tieBreakerStarted": "Scores level — {{count}} raids each. {{team}} raid first.",
+    "tieBreakerDecided": "{{team}} win the five raids {{won}}–{{lost}}."
   },
   "stats": {
     "matches": "Matches",
@@ -1078,7 +1080,12 @@
       "technical_point": "Technical point",
       "timeout": "Timeout",
       "substitution": "Substitution",
-      "injury": "Injury"
+      "injury": "Injury",
+      "self_out": "Self-out",
+      "raid_cancelled": "Raid cancelled",
+      "next_raid_override": "Next raid changed",
+      "tie_breaker_started": "Tie-breaker",
+      "tie_breaker_decided": "Tie-breaker decided"
     }
   },
   "legal": {
