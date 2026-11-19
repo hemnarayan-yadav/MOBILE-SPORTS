@@ -22,7 +22,7 @@ import {
   RaidFeed,
   Squads,
   TeamStatsCompare,
-  TopPerformers,
+  TeamScorers,
 } from '../../components/match/MatchSections.jsx';
 import ScoreBoard from '../../components/match/ScoreBoard.jsx';
 import { useMatchSocket } from '../../hooks/useMatchSocket.js';
@@ -67,13 +67,13 @@ function MatchView({ match, connected }) {
       {tab === 'stats' ? (
         <>
           <TeamStatsCompare match={match} />
-          <TopPerformers match={match} directory={directory} />
+          <TeamScorers match={match} directory={directory} />
         </>
       ) : null}
       {tab === 'summary' ? (
         <>
           <MvpCard match={match} />
-          <TopPerformers match={match} directory={directory} />
+          <TeamScorers match={match} directory={directory} />
           <RaidFeed
             match={match}
             timeline={timeline}

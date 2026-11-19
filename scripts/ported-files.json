@@ -77,7 +77,7 @@
   },
   "src/app/auth/register.jsx": {
     "source": "src/pages/auth/Register.jsx",
-    "sha256": "04fea1d8f9e99d231841043f5d9453e6343df15f736043de4f42aedc6e9573e0"
+    "sha256": "4d866f3216d7df693623d8398c963edb022526ef5856d18ce297515ffecc8f19"
   },
   "src/app/captain/index.jsx": {
     "source": "src/pages/dashboard/captain/CaptainPages.jsx",
@@ -121,7 +121,7 @@
   },
   "src/app/match/[id].jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "0991c76ac8558fe7f5f2bf9a3eaf10cde8481a084350dab28f63e970447a6cb2"
+    "sha256": "3755d524c4b3cf9d6809435b4d851437ccc04eddbbf76ec582b68e7c281ec3e5"
   },
   "src/app/news/[slug].jsx": {
     "source": "src/pages/public/News.jsx",
@@ -209,19 +209,19 @@
   },
   "src/components/match/MatchCard.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "8e0a42004c7a93964a17d87e743bc242ff4ba5cea0b41a666c3995e3c211d5c1"
+    "sha256": "47806bda09023fd80dbea21ca9b56175867a81bdeecc6d7eb830c360c55f0c6d"
   },
   "src/components/match/MatchClock.jsx": {
     "source": "src/components/match/MatchBits.jsx",
-    "sha256": "8e0a42004c7a93964a17d87e743bc242ff4ba5cea0b41a666c3995e3c211d5c1"
+    "sha256": "47806bda09023fd80dbea21ca9b56175867a81bdeecc6d7eb830c360c55f0c6d"
   },
   "src/components/match/MatchSections.jsx": {
     "source": "src/pages/public/MatchDetails.jsx",
-    "sha256": "0991c76ac8558fe7f5f2bf9a3eaf10cde8481a084350dab28f63e970447a6cb2"
+    "sha256": "3755d524c4b3cf9d6809435b4d851437ccc04eddbbf76ec582b68e7c281ec3e5"
   },
   "src/components/match/ScoreBoard.jsx": {
     "source": "src/components/match/ScoreBoard.jsx",
-    "sha256": "a07cd1dc54f27eec7e7d370a5e4c8122a2f055e4bd715eaa12609e6203810514"
+    "sha256": "6436b916fdf7d91039d3e22c7892fc792dccf8d60ce98f31f562b2cacc902156"
   },
   "src/components/otp/OtpCodeSheet.jsx": {
     "source": "src/components/otp/OtpCodeSheet.jsx",
@@ -361,7 +361,7 @@
   },
   "src/sports/kabaddi/commentary.js": {
     "source": "src/sports/kabaddi/commentary.js",
-    "sha256": "98844bb225e48cb6277bd9d941195b40d78249c1b84c443c6a9ab73350c7fa4f"
+    "sha256": "c7f105a96fbcc318b2b74373cdbf0d9d295308081cb0d520de95d726fddf345e"
   },
   "src/store/authStore.js": {
     "source": "src/store/authStore.js",
@@ -381,7 +381,7 @@
   },
   "src/theme/tokens.js": {
     "source": "src/index.css",
-    "sha256": "8adc82d98dc12a236cd72a0ea8a900d32d23029ef67d97cd08c443159200fd50"
+    "sha256": "e67df1ac0c4684a252f7a1415b5cf3e418f31422e89359361a9d183b779ef070"
   },
   "src/theme/useTheme.js": {
     "source": "src/hooks/useTheme.js",
@@ -431,8 +431,12 @@
     "source": "src/utils/rounds.js",
     "sha256": "18ed661ac14437f500a7ebf48a6f3a736468759fde7e8cc507b2033a14a0edf2"
   },
+  "src/utils/tieBreak.js": {
+    "source": "src/utils/tieBreak.js",
+    "sha256": "a7d117c46e5209ee89dd24f0b31f697613a377aa954b6c757862846382152402"
+  },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
-    "sha256": "add6ec91b08388f649207b2de6b1d7d30a278e1a936a921b49a2f8bfd8858bf3"
+    "sha256": "c735ce8e4ffcf876fc65d19456f0024783252fb5981383d8ec67878fe0bfdaee"
   }
 }

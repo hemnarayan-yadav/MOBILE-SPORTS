@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
+import MaintenanceGate from '../components/common/MaintenanceGate.jsx';
 import NoticeHost from '../components/common/NoticeHost.jsx';
 import UpdateGate from '../components/common/UpdateGate.jsx';
 import { useAccountPrompts } from '../hooks/useAccountPrompts.js';
@@ -13,6 +14,7 @@ import { useAuthBootstrap } from '../hooks/useAuthBootstrap.js';
 import { useInAppUpdate } from '../hooks/useInAppUpdate.js';
 import { useLoginGate } from '../hooks/useLoginGate.js';
 import { useNotificationSocket } from '../hooks/useNotificationSocket.js';
+import { useOtaUpdate } from '../hooks/useOtaUpdate.js';
 import { useNotificationTaps, usePushRegistration } from '../hooks/usePush.js';
 import i18n from '../i18n/index.js';
 import { startAppLifecycle } from '../lib/appLifecycle.js';
@@ -47,6 +49,7 @@ function SessionBootstrap() {
   useAuthBootstrap();
   useLoginGate();
   useInAppUpdate();
+  useOtaUpdate();
   useAccountPrompts();
   usePushRegistration();
   useNotificationTaps();
@@ -88,10 +91,14 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <SessionBootstrap />
+        {/* The update floor comes first: an app too old to be trusted is sent
+            to the store whether or not maintenance is on. */}
         <UpdateGate>
-          <Stack
-            screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
-          />
+          <MaintenanceGate>
+            <Stack
+              screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}
+            />
+          </MaintenanceGate>
         </UpdateGate>
         <NoticeHost />
       </QueryClientProvider>

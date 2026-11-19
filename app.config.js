@@ -80,7 +80,36 @@ module.exports = () => {
     // explicitly because this login also has a personal `hemnarayan` account,
     // and without it a build can resolve against the wrong one.
     owner: 'khelscore',
-    version: '1.8.2',
+    version: '1.8.7',
+    // Over-the-air updates (hooks/useOtaUpdate.js). A JavaScript change is
+    // published with `eas update` and the app downloads it by itself; only a
+    // change to the native project still needs a Play Store release.
+    //
+    // `version` above is also the runtime version: an update only reaches a
+    // build whose version name matches, so JavaScript that expects a native
+    // module can never land on a build that does not have it.
+    //
+    // `fingerprint` would be the finer tool — it reads the native project
+    // instead of a number, so a release that only bumps the version name keeps
+    // receiving updates. It was tried first and does not survive this setup:
+    // the fingerprint is computed here and again on the builder, and it hashes
+    // `node_modules` directories, which a Windows checkout and the builder's
+    // Linux `npm ci` do not produce byte for byte. Build f7db7298 failed in
+    // "Configure expo-updates" on exactly that, two packages apart
+    // (@react-native-masked-view, @sentry/react-native). A version name is
+    // the same everywhere.
+    //
+    // What this costs: an update published after the version is bumped reaches
+    // only the new version. That is the right default anyway — a version is
+    // bumped for a store release, and a store release is what carries native
+    // changes an old update should not meet.
+    runtimeVersion: { policy: 'appVersion' },
+    updates: {
+      url: 'https://u.expo.dev/8bbc3694-92f8-48c7-97e5-f65c72352c81',
+      // The app never waits on the network to start: whatever is already on
+      // the phone runs now, and anything newer applies at the next start.
+      fallbackToCacheTimeout: 0,
+    },
     scheme,
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
@@ -145,6 +174,14 @@ module.exports = () => {
       ['expo-secure-store', { configureAndroidBackup: true }],
       // Profile photos come from the photo library only: no camera or microphone.
       ['expo-image-picker', { cameraPermission: false, microphonePermission: false }],
+      // The scoreboard's siren, do-or-die cue and ten-second raid countdown.
+      // Playback only: no recording, so no microphone permission is added.
+      ['expo-audio', { microphonePermission: false }],
+      // The scoreboard's full-time card is handed to the system share sheet.
+      // Sharing a file this way needs no storage permission: the image is
+      // written to the app's own cache and passed out through a FileProvider,
+      // so nothing is added to the Play data-safety form.
+      'expo-sharing',
       [
         'expo-splash-screen',
         {

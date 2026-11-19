@@ -20,7 +20,7 @@ import Screen from '../../components/common/Screen.jsx';
 import TextField from '../../components/common/TextField.jsx';
 import { useGuestScreen } from '../../hooks/useGuestScreen.js';
 import { usePhoneVerification } from '../../hooks/usePhoneVerification.js';
-import { PROMPTS, notify, useNoticeStore } from '../../store/noticeStore.js';
+import { notify } from '../../store/noticeStore.js';
 import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { EVENTS, track } from '../../lib/analytics.js';
@@ -171,7 +171,6 @@ function InvitationSummary({ invitations }) {
 function ProfileStep({ verified, onChangeNumber }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const showPrompt = useNoticeStore((s) => s.showPrompt);
   const invited = verified.invitations[0];
   const invitedName = invited?.playerName ?? '';
   // An invitation from before the change already names a shirt number; it is
@@ -193,20 +192,10 @@ function ProfileStep({ verified, onChangeNumber }) {
     onSuccess: async ({ joinedTeams, ...session }) => {
       track(EVENTS.SIGNED_UP, { joinedTeams: joinedTeams?.length ?? 0 });
       await startSession(session);
-      // The team the server says the account joined (newest invitation first);
-      // nothing joined is the normal case now that invitations are retired.
-      const team = joinedTeams?.[0];
+      // A new account is met by no welcome panel: it was removed at the
+      // owner's request. What the profile still needs is asked by the home
+      // screen's own banner, and by the sign-in reminder.
       notify.success(t('auth.registerSuccess'));
-      // The welcome panel, raised through the prompt queue so it lives above
-      // the whole app: this screen closes itself as soon as the session exists
-      // (useGuestScreen), and the store sees to it that the panel is never put
-      // up twice (store/noticeStore.js).
-      showPrompt({
-        accountId: session.user.id,
-        kind: PROMPTS.ONBOARDING,
-        teamCount: joinedTeams?.length ?? 0,
-        teamPath: team?.id ? `/team/${team.id}` : null,
-      });
     },
   });
   const {

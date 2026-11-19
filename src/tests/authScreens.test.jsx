@@ -208,9 +208,9 @@ describe('Create account', () => {
     );
   });
 
-  // The welcome panel is raised through the prompt queue, so it lives above the
-  // whole app and is never put up a second time.
-  it('welcomes the new account once, with both next steps, and stays dismissed', async () => {
+  // The welcome panel was removed at the owner's request, so signing up now
+  // raises no panel of any kind — only the toast.
+  it('raises no welcome panel after signing up', async () => {
     api = authApi({ '/invitations/lookup': () => ok({ invitations: [] }) });
     await renderWithQuery(withNotices(<Register />));
 
@@ -220,19 +220,9 @@ describe('Create account', () => {
     await fireEvent.changeText(await screen.findByLabelText('Name'), 'Asha Devi');
     await fireEvent.press(screen.getByRole('button', { name: 'Create account' }));
 
-    expect(await screen.findByText('Welcome to KhelScore!')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Complete profile' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'View my team' })).toBeTruthy();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Complete profile' }));
-    expect(router.push).toHaveBeenCalledWith('/dashboard/profile');
-    await waitFor(() => expect(screen.queryByText('Welcome to KhelScore!')).toBeNull());
-
-    // Whatever asks for it again — a rerender, coming back to this screen, a
-    // token refresh — the store refuses to raise the same prompt twice.
-    useNoticeStore.getState().showPrompt({ accountId: 'u1', kind: 'onboarding' });
-    expect(useNoticeStore.getState().prompts).toEqual([]);
+    await waitFor(() => expect(api.calls.some((c) => c.url === '/auth/register')).toBe(true));
     expect(screen.queryByText('Welcome to KhelScore!')).toBeNull();
+    expect(useNoticeStore.getState().prompts).toEqual([]);
   });
 
   it('refuses a number that is not an Indian mobile before sending anything', async () => {

@@ -67,6 +67,8 @@ export default function More() {
         : [];
 
   const appRows = [
+    // Offline, and open to everybody: no account, no signal, no server.
+    ['/scoreboard', 'app.board.title'],
     ['/ranked-matches', 'nav.rankedMatches'],
     ['/teams', 'nav.teams'],
     ['/players', 'nav.players'],

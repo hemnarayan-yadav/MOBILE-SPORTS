@@ -109,6 +109,61 @@ export function raidPointsBySide(raid) {
 }
 
 // Resolves player ids to names and team sides to team names from a match detail.
+// A player who has not scored still played, so their line reads as zeros
+// rather than being missing. Every counter the engine keeps is here, so a stat
+// line can read any of them without guarding for undefined.
+const NO_POINTS = Object.freeze({
+  raids: 0,
+  successfulRaids: 0,
+  unsuccessfulRaids: 0,
+  emptyRaids: 0,
+  doOrDieRaids: 0,
+  raidPoints: 0,
+  touchPoints: 0,
+  bonusPoints: 0,
+  superRaids: 0,
+  tacklePoints: 0,
+  successfulTackles: 0,
+  superTackles: 0,
+  timesTouchedOut: 0,
+  totalPoints: 0,
+});
+
+/**
+ * One side's whole team, with what each player scored.
+ *
+ * **Everybody in the lineup is listed, scorers and non-scorers alike** — a
+ * summary that shows only the players who scored reads as though the rest did
+ * not play, which is not what a team sheet is for.
+ *
+ * Ordered by points, then by jersey number: the scorers come first, and the
+ * rest keep the order a reader already knows from the lineup rather than
+ * shuffling between visits.
+ *
+ * A player with points but no lineup entry is kept, at the end. The lineup is a
+ * snapshot taken at setup, so it can disagree with a match that has already
+ * been played; dropping somebody who actually scored would be the worse of the
+ * two mistakes.
+ */
+export function matchScorers(match, side) {
+  const stats = match?.live?.playerStats ?? {};
+  const teamId = (side === 'A' ? match?.teamA : match?.teamB)?.id;
+  const lineup = (match?.lineups ?? []).filter((entry) => entry.team === teamId);
+  const listed = new Set(lineup.map((entry) => entry.player.id));
+  const rows = lineup.map((entry) => ({
+    playerId: entry.player.id,
+    jersey: Number(entry.jerseyNumber) || 0,
+    stats: stats[entry.player.id] ?? NO_POINTS,
+  }));
+  for (const [playerId, playerStats] of Object.entries(stats)) {
+    if (playerStats.team === side && !listed.has(playerId)) {
+      rows.push({ playerId, jersey: Number.MAX_SAFE_INTEGER, stats: playerStats });
+    }
+  }
+  rows.sort((a, b) => b.stats.totalPoints - a.stats.totalPoints || a.jersey - b.jersey);
+  return rows;
+}
+
 export function matchDirectory(match) {
   const players = new Map((match?.lineups ?? []).map((entry) => [entry.player.id, entry]));
   const sideTeam = { A: match?.teamA, B: match?.teamB };
