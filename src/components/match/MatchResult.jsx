@@ -12,6 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { matchResult } from '../../utils/matchResult.js';
+import { tieBreakResult } from '../../utils/tieBreak.js';
 import AppText from '../common/AppText.jsx';
 import TeamCrest from '../team/TeamCrest.jsx';
 
@@ -43,13 +44,39 @@ export function MatchResultBand({ match }) {
   if (!result) return null;
 
   if (result.isTie) {
+    // A tied match may still have been decided by five raids each. The tie is
+    // what the match was played to and is said first; the tie-breaker names the
+    // side that goes through, exactly as the web and the ground display do.
+    const tieBreak = tieBreakResult(match);
     return (
       <Animated.View
-        style={[styles.band, { backgroundColor: colors.surface, borderColor: colors.border }, settle]}
+        style={[
+          styles.band,
+          styles.tieBand,
+          { backgroundColor: colors.surface, borderColor: tieBreak ? colors.gold : colors.border },
+          settle,
+        ]}
       >
         <AppText variant="title" display>
           {t('match.tie')}
         </AppText>
+        {tieBreak ? (
+          <View style={styles.line}>
+            <Ionicons name="trophy" size={14} color={colors.goldStrong} />
+            <AppText
+              variant="small"
+              weight="semibold"
+              numberOfLines={2}
+              style={{ color: colors.goldStrong }}
+            >
+              {t('match.tieBreakWonBy', {
+                team: tieBreak.winner.name,
+                won: tieBreak.won,
+                lost: tieBreak.lost,
+              })}
+            </AppText>
+          </View>
+        ) : null}
       </Animated.View>
     );
   }
@@ -77,18 +104,29 @@ export function MatchResultBand({ match }) {
   );
 }
 
-// The margin, for a card or a row in a list: the winner's name is already the
-// bold one beside it, so this only has to say by how much.
+// The gold line for a card or a row in a list: the margin for a match that was
+// won, and the five raids for a tie they decided. A won match has the winner's
+// name in bold beside it, so this only has to say by how much; a tie has no
+// bold name, so the tie-breaker names the side that goes through itself.
 export function WinMargin({ match }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const result = matchResult(match);
-  if (!result || result.isTie) return null;
+  if (!result) return null;
+  const tieBreak = result.isTie ? tieBreakResult(match) : null;
+  if (result.isTie && !tieBreak) return null;
   return (
     <View style={styles.line}>
       <Ionicons name="trophy" size={13} color={colors.goldStrong} />
-      <AppText variant="small" weight="semibold" numberOfLines={1} style={{ color: colors.goldStrong }}>
-        {t('match.wonByMargin', { count: result.margin })}
+      <AppText
+        variant="small"
+        weight="semibold"
+        numberOfLines={2}
+        style={[styles.flex, { color: colors.goldStrong }]}
+      >
+        {tieBreak
+          ? t('match.tieBreakWonBy', { team: tieBreak.winner.name, won: tieBreak.won, lost: tieBreak.lost })
+          : t('match.wonByMargin', { count: result.margin })}
       </AppText>
     </View>
   );
@@ -103,6 +141,9 @@ const styles = StyleSheet.create({
     borderRadius: RADII.xxl,
     padding: SPACING.md,
   },
+  // The tie band stacks rather than sitting in a row: the tie is the headline
+  // and the five raids are the line under it.
+  tieBand: { flexDirection: 'column', alignItems: 'center', gap: SPACING.xs },
   cup: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: 2 },
   line: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },

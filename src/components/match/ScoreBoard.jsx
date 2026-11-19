@@ -17,6 +17,32 @@ import { MatchStatusBadge, halfSecondsOf, phaseKey } from './MatchCard.jsx';
 import { MatchResultBand } from './MatchResult.jsx';
 import MatchClock from './MatchClock.jsx';
 
+// The five-raid tie-breaker, while one is being played: its own score and which
+// raid of the set is next. The match score above it is the one the match was
+// played to and does not move — the tie-breaker's points are kept apart from it
+// everywhere (backend sports/kabaddi/engine.js).
+function TieBreakStrip({ tieBreak }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const { score, raidsTaken, raidsPerTeam, suddenDeath } = tieBreak;
+  const next = Math.min(Math.min(raidsTaken.A, raidsTaken.B) + 1, raidsPerTeam);
+  return (
+    <View style={[styles.tieBreak, { backgroundColor: colors.ink2 }]}>
+      <AppText variant="label" style={{ color: colors.brand }}>
+        {t('match.fiveRaids')}
+      </AppText>
+      <AppText variant="score" display tone="onInk">
+        {`${score.A} – ${score.B}`}
+      </AppText>
+      <AppText variant="small" weight="semibold" tone="onInk">
+        {suddenDeath
+          ? t('match.tieBreakSuddenDeath')
+          : t('match.tieBreakRaidOf', { number: next, total: raidsPerTeam })}
+      </AppText>
+    </View>
+  );
+}
+
 function TeamColumn({ team }) {
   const router = useRouter();
   const content = (
@@ -114,6 +140,8 @@ export default function ScoreBoard({ match, directory }) {
         <TeamColumn team={match.teamB} />
       </View>
 
+      {isLive && live.tieBreak ? <TieBreakStrip tieBreak={live.tieBreak} /> : null}
+
       <MatchResultBand match={match} />
 
       {isLive ? <LivePanel match={match} live={live} directory={directory} /> : null}
@@ -146,6 +174,7 @@ const styles = StyleSheet.create({
   score: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   colon: { opacity: 0.5 },
   vs: { opacity: 0.7, marginTop: SPACING.md },
+  tieBreak: { alignItems: 'center', gap: 2, padding: SPACING.md, borderRadius: RADII.md },
   upcoming: { gap: SPACING.sm },
   centerText: { textAlign: 'center' },
 });

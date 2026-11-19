@@ -30,7 +30,8 @@
   "phase": {
     "half": "हाफ़ {{half}}",
     "half_time": "हाफ़-टाइम",
-    "full_time": "मैच खत्म"
+    "full_time": "मैच खत्म",
+    "tie_breaker": "टाई-ब्रेकर"
   },
   "home": {
     "heroEyebrow": "हर रेड, हर टैकल — लाइव।",
@@ -224,7 +225,11 @@
     },
     "heading": "{{teamA}} बनाम {{teamB}} — कबड्डी मैच",
     "headingTournament": "{{teamA}} बनाम {{teamB}} — {{tournament}}",
-    "shareLabel": "{{name}} शेयर करें"
+    "shareLabel": "{{name}} शेयर करें",
+    "fiveRaids": "पाँच रेड",
+    "tieBreakWonBy": "{{team}} ने पाँच रेड {{won}}–{{lost}} से जीता",
+    "tieBreakRaidOf": "रेड {{number}} / {{total}}",
+    "tieBreakSuddenDeath": "सडन डेथ"
   },
   "errors": {
     "notFound": "पेज नहीं मिला",

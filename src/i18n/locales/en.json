@@ -30,7 +30,8 @@
   "phase": {
     "half": "Half {{half}}",
     "half_time": "Half-time",
-    "full_time": "Full time"
+    "full_time": "Full time",
+    "tie_breaker": "Tie-breaker"
   },
   "home": {
     "heroEyebrow": "Every raid. Every tackle. Live.",
@@ -224,7 +225,11 @@
     },
     "heading": "{{teamA}} vs {{teamB}} — kabaddi match",
     "headingTournament": "{{teamA}} vs {{teamB}} — {{tournament}}",
-    "shareLabel": "Share {{name}}"
+    "shareLabel": "Share {{name}}",
+    "fiveRaids": "Five raids",
+    "tieBreakWonBy": "{{team}} wins Five Raids {{won}}–{{lost}}",
+    "tieBreakRaidOf": "Raid {{number}} of {{total}}",
+    "tieBreakSuddenDeath": "Sudden death"
   },
   "errors": {
     "notFound": "Page not found",
