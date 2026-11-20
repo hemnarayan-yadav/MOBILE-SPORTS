@@ -80,7 +80,7 @@ module.exports = () => {
     // explicitly because this login also has a personal `hemnarayan` account,
     // and without it a build can resolve against the wrong one.
     owner: 'khelscore',
-    version: '1.8.8',
+    version: '1.8.9',
     // Over-the-air updates (hooks/useOtaUpdate.js). A JavaScript change is
     // published with `eas update` and the app downloads it by itself; only a
     // change to the native project still needs a Play Store release.
@@ -155,6 +155,9 @@ module.exports = () => {
     },
     plugins: [
       'expo-router',
+      // Marks screen.portrait and wifi as optional hardware (see the plugin's
+      // own comment) so Play does not lock the app out of devices lacking them.
+      './plugins/withOptionalHardwareFeatures.js',
       // minSdk 26 (Android 8.0), raised from the Expo default of 24.
       // api.khelscore.in presents Let's Encrypt's current chain, which a client
       // can only validate through ISRG Root X1 — present in Android's trust
