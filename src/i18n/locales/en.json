@@ -18,7 +18,9 @@
     "done": "Done",
     "missing": "Missing",
     "saveChanges": "Save changes",
-    "share": "Share"
+    "share": "Share",
+    "shareImage": "Share a picture of {{name}}",
+    "imageShareFailed": "Couldn't share the picture. Try again."
   },
   "theme": {
     "label": "Theme",
@@ -406,7 +408,7 @@
     "otpPhoneHint_sms": "We'll send a one-time code by SMS to this Indian mobile number.",
     "sendOtp": "Send OTP",
     "noAccountSoSignUp": "That number has no account yet — let’s create one. Your number is already verified.",
-    "otpUnavailable": "OTP sign-in isn't available right now. Please use your password.",
+    "otpUnavailable": "OTP sign-in isn't available right now. Please try again in a few minutes.",
     "registerOtpHint": "We'll send a one-time code to verify this number before creating your account.",
     "registerOtpHint_whatsapp": "We'll send a one-time code on WhatsApp to verify this number before creating your account.",
     "registerOtpHint_sms": "We'll text a one-time code to verify this number before creating your account.",
@@ -511,6 +513,7 @@
     "pickStateFirst": "Choose a state first"
   },
   "validation": {
+    "accentColor": "Pick a colour",
     "required": "This field is required",
     "emailInvalid": "Enter a valid email address",
     "phoneInvalid": "Enter a valid number with country code, e.g. +919876543210",
@@ -874,6 +877,10 @@
     "shareLabel": "Share {{name}}"
   },
   "team": {
+    "accentColor": "Team colour",
+    "accentColorHint": "Taken from your logo when you upload it. Change it to match your jersey.",
+    "accentColorReset": "Use default",
+    "accentColorNone": "Default",
     "pageTitle": "Teams",
     "pageSubtitle": "Every team on the platform, from local clubs to league sides.",
     "searchPlaceholder": "Search teams by name or city",

@@ -18,7 +18,9 @@
     "done": "हो गया",
     "missing": "बाकी है",
     "saveChanges": "सेव करें",
-    "share": "शेयर करें"
+    "share": "शेयर करें",
+    "shareImage": "{{name}} की तस्वीर शेयर करें",
+    "imageShareFailed": "तस्वीर शेयर नहीं हो सकी। फिर कोशिश करें।"
   },
   "theme": {
     "label": "थीम",
@@ -406,7 +408,7 @@
     "otpPhoneHint_sms": "इस भारतीय मोबाइल नंबर पर SMS से एक OTP आएगा।",
     "sendOtp": "OTP भेजें",
     "noAccountSoSignUp": "इस नंबर का अकाउंट नहीं है — बना लेते हैं। आपका नंबर वेरिफाई हो चुका है।",
-    "otpUnavailable": "अभी OTP से साइन इन नहीं हो पा रहा। कृपया पासवर्ड से साइन इन करें।",
+    "otpUnavailable": "अभी OTP से लॉग इन नहीं हो पा रहा। थोड़ी देर बाद कोशिश करें।",
     "registerOtpHint": "अकाउंट बनाने से पहले इस नंबर पर OTP भेजकर इसकी जाँच होगी।",
     "registerOtpHint_whatsapp": "अकाउंट बनाने से पहले इस नंबर पर WhatsApp से OTP भेजकर इसकी जाँच होगी।",
     "registerOtpHint_sms": "अकाउंट बनाने से पहले इस नंबर पर SMS से OTP भेजकर इसकी जाँच होगी।",
@@ -511,6 +513,7 @@
     "pickStateFirst": "पहले राज्य चुनें"
   },
   "validation": {
+    "accentColor": "कोई रंग चुनें",
     "required": "यह भरना ज़रूरी है",
     "emailInvalid": "सही ईमेल डालें",
     "phoneInvalid": "कंट्री कोड के साथ सही नंबर डालें, जैसे +919876543210",
@@ -874,6 +877,10 @@
     "shareLabel": "{{name}} शेयर करें"
   },
   "team": {
+    "accentColor": "टीम का रंग",
+    "accentColorHint": "लोगो अपलोड करने पर उसी से लिया जाता है। अपनी जर्सी के रंग से मिलाने के लिए बदलें।",
+    "accentColorReset": "डिफ़ॉल्ट रखें",
+    "accentColorNone": "डिफ़ॉल्ट",
     "pageTitle": "टीमें",
     "pageSubtitle": "प्लेटफ़ॉर्म की सारी टीमें — लोकल क्लब से लीग तक।",
     "searchPlaceholder": "नाम या शहर से टीम खोजें",

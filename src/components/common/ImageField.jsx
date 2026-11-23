@@ -44,6 +44,7 @@ export default function ImageField({
   name,
   value,
   onChange,
+  onUploaded,
   error,
 }) {
   const { t } = useTranslation();
@@ -58,6 +59,9 @@ export default function ImageField({
     mutationFn: (file) => mediaApi.upload(kind, file),
     onSuccess: (asset) => {
       onChange(asset.optimized?.url ?? asset.url);
+      // The whole asset, for a caller that wants more than the URL (a team
+      // logo's suggested accent colour), as on the web.
+      onUploaded?.(asset);
       notify.success(t('media.uploaded'));
     },
     onError: (failure) => notify.error(apiErrorText(t, failure)),

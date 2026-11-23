@@ -13,6 +13,7 @@ import Avatar from '../../components/common/Avatar.jsx';
 import Badge from '../../components/common/Badge.jsx';
 import { BackHeader, Card, Section, StatTile, TileGrid } from '../../components/common/Layout.jsx';
 import ShareButton from '../../components/common/ShareButton.jsx';
+import ShareImageButton from '../../components/common/ShareImageButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import { WinMargin } from '../../components/match/MatchResult.jsx';
 import { CareerStats, PlayingRoleBadge, PointsBars } from '../../components/player/PlayerBits.jsx';
@@ -144,11 +145,14 @@ export default function PlayerScreen() {
         <View style={styles.topBar}>
           <BackHeader />
           {p ? (
-            <ShareButton
-              path={`/player/${p.id}`}
-              title={p.name}
-              label={t('player.shareLabel', { name: p.name })}
-            />
+            <View style={styles.shareActions}>
+              <ShareButton
+                path={`/player/${p.id}`}
+                title={p.name}
+                label={t('player.shareLabel', { name: p.name })}
+              />
+              <ShareImageButton kind="player" id={p.id} name={p.name} />
+            </View>
           ) : null}
         </View>
         {player.isPending ? <LoadingState /> : null}
@@ -200,6 +204,7 @@ export default function PlayerScreen() {
 
 const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  shareActions: { flexDirection: 'row', gap: SPACING.sm },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },

@@ -22,6 +22,7 @@ import {
   TileGrid,
 } from '../../components/common/Layout.jsx';
 import ShareButton from '../../components/common/ShareButton.jsx';
+import ShareImageButton from '../../components/common/ShareImageButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import { SquadBoard, TeamHero } from '../../components/team/TeamBits.jsx';
@@ -228,11 +229,14 @@ export default function TeamScreen() {
         <View style={styles.topBar}>
           <BackHeader />
           {team ? (
-            <ShareButton
-              path={`/team/${team.id}`}
-              title={team.name}
-              label={t('team.shareLabel', { name: team.name })}
-            />
+            <View style={styles.shareActions}>
+              <ShareButton
+                path={`/team/${team.id}`}
+                title={team.name}
+                label={t('team.shareLabel', { name: team.name })}
+              />
+              <ShareImageButton kind="team" id={team.id} name={team.name} />
+            </View>
           ) : null}
         </View>
         {query.isPending ? <LoadingState /> : null}
@@ -269,6 +273,7 @@ export default function TeamScreen() {
 
 const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  shareActions: { flexDirection: 'row', gap: SPACING.sm },
   about: { gap: SPACING.sm },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
