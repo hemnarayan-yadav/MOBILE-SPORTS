@@ -13,6 +13,7 @@ import ImageField from '../common/ImageField.jsx';
 import PhoneField from '../common/PhoneField.jsx';
 import StateDistrictFields from '../common/StateDistrictFields.jsx';
 import TextField from '../common/TextField.jsx';
+import TeamColorField from './TeamColorField.jsx';
 
 export const EMPTY_TEAM_VALUES = Object.freeze({
   name: '',
@@ -25,6 +26,7 @@ export const EMPTY_TEAM_VALUES = Object.freeze({
   description: '',
   logoUrl: '',
   bannerUrl: '',
+  accentColor: '',
   coachName: '',
   coachPhone: '',
   teamManagerName: '',
@@ -145,6 +147,11 @@ export default function TeamForm({
             name={watch('shortName')}
             value={field.value}
             onChange={field.onChange}
+            // A new logo brings its own colour (or none); a swatch can still
+            // change it afterwards to match the jersey.
+            onUploaded={(asset) =>
+              setValue('accentColor', asset.accentColor ?? '', { shouldDirty: true })
+            }
             error={errors.logoUrl}
           />
         )}
@@ -160,6 +167,13 @@ export default function TeamForm({
             onChange={field.onChange}
             error={errors.bannerUrl}
           />
+        )}
+      />
+      <Controller
+        control={control}
+        name="accentColor"
+        render={({ field }) => (
+          <TeamColorField value={field.value} onChange={field.onChange} error={errors.accentColor} />
         )}
       />
 

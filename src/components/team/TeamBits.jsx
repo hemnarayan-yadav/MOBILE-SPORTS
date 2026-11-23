@@ -14,17 +14,27 @@ import { EmptyState } from '../common/States.jsx';
 import { PlayerCard } from '../player/PlayerBits.jsx';
 import TeamCrest from './TeamCrest.jsx';
 
+// The team's accent colour (`#rrggbb`, suggested from its logo at upload), or
+// null when it has none or the value is not one.
+const ACCENT = /^#[0-9a-f]{6}$/i;
+const accentOf = (team) => (ACCENT.test(team?.accentColor ?? '') ? team.accentColor : null);
+// How far the ink scrim darkens an accent-coloured hero, so the white text
+// reads on any colour a team picks.
+const HERO_SCRIM_OPACITY = 0.45;
+const ACCENT_STRIPE = 4;
+
 export function TeamCard({ team }) {
   const { t } = useTranslation();
   const router = useRouter();
   const place = [team.homeGround, team.city].filter(Boolean).join(', ');
+  const accent = accentOf(team);
   return (
     <Pressable
       onPress={() => router.push(`/team/${team.id}`)}
       accessibilityRole="button"
       style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}
     >
-      <Card style={styles.teamCard}>
+      <Card style={[styles.teamCard, accent ? { borderLeftWidth: ACCENT_STRIPE, borderLeftColor: accent } : null]}>
         <TeamCrest team={team} size="md" />
         <View style={styles.flex}>
           <AppText variant="title" display numberOfLines={1}>
@@ -48,8 +58,14 @@ export function TeamHero({ team, actions }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const place = [team.homeGround, team.city].filter(Boolean).join(', ');
+  // Without a banner, the team's accent colour fills the hero under an ink
+  // scrim; with one, the banner shows as before.
+  const accent = team.bannerUrl ? null : accentOf(team);
   return (
-    <View style={[styles.hero, { backgroundColor: colors.ink }]}>
+    <View style={[styles.hero, { backgroundColor: accent ?? colors.ink }]}>
+      {accent ? (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.ink, opacity: HERO_SCRIM_OPACITY }]} />
+      ) : null}
       {team.bannerUrl ? (
         <Image
           source={{ uri: sizedImage(team.bannerUrl, { width: IMAGE_WIDTH.hero }) }}

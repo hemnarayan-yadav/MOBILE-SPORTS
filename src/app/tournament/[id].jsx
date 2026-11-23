@@ -21,6 +21,7 @@ import {
   TileGrid,
 } from '../../components/common/Layout.jsx';
 import ShareButton from '../../components/common/ShareButton.jsx';
+import ShareImageButton from '../../components/common/ShareImageButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import MatchCard from '../../components/match/MatchCard.jsx';
 import TeamCrest from '../../components/team/TeamCrest.jsx';
@@ -259,11 +260,14 @@ export default function TournamentScreen() {
         <View style={styles.topBar}>
           <BackHeader />
           {tournament ? (
-            <ShareButton
-              path={`/tournament/${tournament.id}`}
-              title={tournament.name}
-              label={t('tournament.shareLabel', { name: tournament.name })}
-            />
+            <View style={styles.shareActions}>
+              <ShareButton
+                path={`/tournament/${tournament.id}`}
+                title={tournament.name}
+                label={t('tournament.shareLabel', { name: tournament.name })}
+              />
+              <ShareImageButton kind="tournament" id={tournament.id} name={tournament.name} />
+            </View>
           ) : null}
         </View>
         {query.isPending ? <LoadingState /> : null}
@@ -295,6 +299,7 @@ export default function TournamentScreen() {
 
 const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  shareActions: { flexDirection: 'row', gap: SPACING.sm },
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },
