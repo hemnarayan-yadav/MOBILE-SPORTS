@@ -197,6 +197,10 @@ export const teamSchema = withLocation(
     description: text(1000),
     logoUrl: optionalUrl,
     bannerUrl: optionalUrl,
+    // `#rrggbb` from the logo or a swatch; empty draws the default band.
+    accentColor: z
+      .union([z.literal(''), z.string().regex(/^#[0-9a-fA-F]{6}$/, 'validation.accentColor')])
+      .optional(),
     // The coach and the team's own manager. Both are optional, and so is each
     // half of them. `.optional()` as well as empty-allowed, so a form that
     // does not offer these fields still validates.

@@ -166,7 +166,10 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   backHeader: { gap: SPACING.xs },
   back: { minHeight: MIN_TOUCH, justifyContent: 'center' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  // The gap keeps Back and Home apart when the header sits in a row of its own
+  // (a detail screen's top bar beside its share buttons), where it shrinks to
+  // its content and `space-between` has no room to work.
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.lg },
   tabs: { gap: SPACING.sm, paddingVertical: SPACING.xs },
   tab: {
     minHeight: MIN_TOUCH - 4,
