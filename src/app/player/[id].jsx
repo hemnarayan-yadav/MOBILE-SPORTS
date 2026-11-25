@@ -17,6 +17,7 @@ import ShareImageButton from '../../components/common/ShareImageButton.jsx';
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/States.jsx';
 import { WinMargin } from '../../components/match/MatchResult.jsx';
 import { CareerStats, PlayingRoleBadge, PointsBars } from '../../components/player/PlayerBits.jsx';
+import { accentOf, HERO_SCRIM_OPACITY } from '../../components/team/TeamBits.jsx';
 import TeamCrest from '../../components/team/TeamCrest.jsx';
 import { RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
@@ -37,8 +38,14 @@ function Header({ player }) {
     ['weight', player.weightKg ? `${player.weightKg} kg` : null],
     ['hometown', player.hometown],
   ].filter(([, value]) => value);
+  // The colour read from the player's photo fills the header under an ink
+  // scrim, as a team's does.
+  const accent = accentOf(player);
   return (
-    <View style={[styles.hero, { backgroundColor: colors.ink }]}>
+    <View style={[styles.hero, { backgroundColor: accent ?? colors.ink }]}>
+      {accent ? (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.ink, opacity: HERO_SCRIM_OPACITY }]} />
+      ) : null}
       <View style={styles.heroRow}>
         <Avatar src={player.photoUrl} name={player.name} size="xl" />
         {player.membership ? (
@@ -208,7 +215,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: SPACING.lg, gap: SPACING.md, paddingBottom: SPACING.xxl },
   flex: { flex: 1 },
-  hero: { borderRadius: RADII.xxl, padding: SPACING.lg, gap: SPACING.sm },
+  hero: { borderRadius: RADII.xxl, padding: SPACING.lg, gap: SPACING.sm, overflow: 'hidden' },
   heroRow: { flexDirection: 'row', alignItems: 'flex-end', gap: SPACING.sm },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.xs },
   teamLink: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, minHeight: 44 },
