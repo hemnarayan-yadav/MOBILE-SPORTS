@@ -277,7 +277,8 @@ describe('Forced update (GET /mobile/config)', () => {
     await renderWithQuery(<UpdateGate>{app}</UpdateGate>);
 
     expect(await screen.findByText('Update KhelScore')).toBeTruthy();
-    expect(screen.queryByText('the app')).toBeNull();
+    // Covered, not unmounted: the navigator must stay mounted (UpdateGate.jsx).
+    expect(screen.getByText('the app')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Update now' }));
     expect(openURL).toHaveBeenCalledWith('market://details?id=in.khelscore.app.dev');
   });
