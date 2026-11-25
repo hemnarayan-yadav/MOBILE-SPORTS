@@ -57,7 +57,9 @@ describe('the maintenance gate', () => {
     await show({ enabled: true, scope: 'app' });
 
     expect(await screen.findByText('Back shortly')).toBeTruthy();
-    expect(screen.queryByText('the app')).toBeNull();
+    // Covered, not unmounted: the app is the navigator, and navigating with no
+    // navigator mounted crashed the app a second after the switch landed.
+    expect(screen.getByText('the app')).toBeTruthy();
   });
 
   it('on the `auth` scope stops only the screens that spend an OTP', async () => {
@@ -65,7 +67,7 @@ describe('the maintenance gate', () => {
     await show({ enabled: true, scope: 'auth' });
 
     expect(await screen.findByText('Sign-in is paused')).toBeTruthy();
-    expect(screen.queryByText('the app')).toBeNull();
+    expect(screen.getByText('the app')).toBeTruthy();
   });
 
   it('leaves the rest of the app — and a live match — alone on the `auth` scope', async () => {

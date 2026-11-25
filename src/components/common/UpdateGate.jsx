@@ -48,12 +48,23 @@ export function useUpdateRequired() {
   return Boolean(minimum) && isVersionOlder(APP_VERSION, minimum);
 }
 
+// Covers the navigator rather than replacing it, for the reason given in
+// MaintenanceGate.jsx: navigating with no navigator mounted crashes the app.
 export default function UpdateGate({ children }) {
+  const updateRequired = useUpdateRequired();
+  return (
+    <>
+      {children}
+      {updateRequired ? <UpdateNotice /> : null}
+    </>
+  );
+}
+
+function UpdateNotice() {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  if (!useUpdateRequired()) return children;
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]}>
+    <SafeAreaView style={[StyleSheet.absoluteFill, { backgroundColor: colors.bg }]}>
       <View style={styles.content}>
         <View style={styles.logo}>
           <Logo height={36} title={t('nav.brand')} />
@@ -71,7 +82,6 @@ export default function UpdateGate({ children }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
   content: {
     flex: 1,
     justifyContent: 'center',
