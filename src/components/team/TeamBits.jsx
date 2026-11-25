@@ -14,13 +14,14 @@ import { EmptyState } from '../common/States.jsx';
 import { PlayerCard } from '../player/PlayerBits.jsx';
 import TeamCrest from './TeamCrest.jsx';
 
-// The team's accent colour (`#rrggbb`, suggested from its logo at upload), or
-// null when it has none or the value is not one.
+// The accent colour (`#rrggbb`) of a team — suggested from its logo at upload —
+// or of a player, read from their photo; null when it has none or the value is
+// not one. A player's profile header wears it the way a team's does.
 const ACCENT = /^#[0-9a-f]{6}$/i;
-const accentOf = (team) => (ACCENT.test(team?.accentColor ?? '') ? team.accentColor : null);
+export const accentOf = (owner) => (ACCENT.test(owner?.accentColor ?? '') ? owner.accentColor : null);
 // How far the ink scrim darkens an accent-coloured hero, so the white text
-// reads on any colour a team picks.
-const HERO_SCRIM_OPACITY = 0.45;
+// reads on any colour.
+export const HERO_SCRIM_OPACITY = 0.45;
 const ACCENT_STRIPE = 4;
 
 export function TeamCard({ team }) {

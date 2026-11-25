@@ -80,7 +80,7 @@ module.exports = () => {
     // explicitly because this login also has a personal `hemnarayan` account,
     // and without it a build can resolve against the wrong one.
     owner: 'khelscore',
-    version: '1.9.0',
+    version: '1.9.1',
     // Over-the-air updates (hooks/useOtaUpdate.js). A JavaScript change is
     // published with `eas update` and the app downloads it by itself; only a
     // change to the native project still needs a Play Store release.

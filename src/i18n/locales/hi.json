@@ -710,6 +710,8 @@
     "tacklePoints": "टैकल पॉइंट",
     "superRaids": "सुपर रेड",
     "superTackles": "सुपर टैकल",
+    "super10s": "सुपर 10",
+    "high5s": "हाई 5",
     "allOutPoints": "ऑल-आउट पॉइंट",
     "technicalPoints": "टेक्निकल पॉइंट",
     "points": "पॉइंट",
@@ -734,6 +736,8 @@
     "tied": "टाई",
     "scoreDiff": "स्कोर अंतर",
     "points": "पॉइंट",
+    "form": "फ़ॉर्म",
+    "formLabel": "पिछले नतीजे, सबसे नया पहले: {{results}}",
     "empty": "पहला मैच पूरा होने के बाद पॉइंट्स टेबल दिखेगी।"
   },
   "rankings": {

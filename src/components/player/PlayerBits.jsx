@@ -76,6 +76,8 @@ export function CareerStats({ stats = {} }) {
     'tacklePoints',
     'superRaids',
     'superTackles',
+    'super10s',
+    'high5s',
   ];
   return (
     <TileGrid>
