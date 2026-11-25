@@ -133,8 +133,36 @@ export function RankBadge({ rank }) {
   );
 }
 
-// Points table: # · team · P W L · points (ties and score difference are in
-// each row's accessible description, as the web hides them on phones).
+// A team's latest results as small coloured circles, newest first — the web
+// table's Form column, set under the team's name because a phone has no room
+// for a column of its own. Read out as part of the row's description.
+const FORM_TONES = Object.freeze({ win: 'success', loss: 'live', tie: 'surface2' });
+
+function FormChips({ form }) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  if (!form?.length) return null;
+  return (
+    <View style={styles.form} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+      {form.map((result, index) => (
+        <View key={index} style={[styles.formChip, { backgroundColor: colors[FORM_TONES[result] ?? 'surface2'] }]}>
+          <AppText style={styles.formLetter} tone={result === 'win' || result === 'loss' ? 'onLive' : 'muted'}>
+            {t(`team.formLetter.${result}`)}
+          </AppText>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const formDescription = (t, form) =>
+  form?.length
+    ? `, ${t('standings.formLabel', { results: form.map((result) => t(`team.formLetter.${result}`)).join(', ') })}`
+    : '';
+
+// Points table: # · team (with its form under the name) · P W L · points (ties
+// and score difference are in each row's accessible description, as the web
+// hides them on phones).
 export function StandingsTable({ rows }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -173,7 +201,7 @@ export function StandingsTable({ rows }) {
           key={row.team.id}
           onPress={() => router.push(`/team/${row.team.id}`)}
           accessibilityRole="button"
-          accessibilityLabel={`${row.rank}. ${row.team.name}: ${t('standings.played')} ${row.played}, ${t('standings.won')} ${row.won}, ${t('standings.lost')} ${row.lost}, ${t('standings.tied')} ${row.tied}, ${t('standings.scoreDiff')} ${row.scoreDiff}, ${t('stats.points')} ${row.points}`}
+          accessibilityLabel={`${row.rank}. ${row.team.name}: ${t('standings.played')} ${row.played}, ${t('standings.won')} ${row.won}, ${t('standings.lost')} ${row.lost}, ${t('standings.tied')} ${row.tied}, ${t('standings.scoreDiff')} ${row.scoreDiff}, ${t('stats.points')} ${row.points}${formDescription(t, row.form)}`}
           style={[
             styles.tr,
             { borderTopColor: colors.border, backgroundColor: rankTone(row.rank, colors).row },
@@ -194,9 +222,12 @@ export function StandingsTable({ rows }) {
             ) : (
               <TeamCrest team={row.team} size="xs" />
             )}
-            <AppText weight="semibold" numberOfLines={1} style={styles.flex}>
-              {row.team.shortName ?? row.team.name}
-            </AppText>
+            <View style={styles.flex}>
+              <AppText weight="bold" numberOfLines={1}>
+                {row.team.shortName ?? row.team.name}
+              </AppText>
+              <FormChips form={row.form} />
+            </View>
           </View>
           {cols.map(([key]) => (
             <AppText key={key} style={styles.num}>
@@ -303,15 +334,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.md,
     gap: SPACING.sm,
-    minHeight: 44,
+    minHeight: 52,
   },
   rowBorder: { borderTopWidth: StyleSheet.hairlineWidth },
   rankCol: { width: 34 },
   teamCell: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   num: { width: 24, textAlign: 'center' },
   pts: { width: 44, textAlign: 'right' },
+  form: { flexDirection: 'row', gap: 3, marginTop: 4 },
+  formChip: { width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  formLetter: { fontSize: 9, lineHeight: 11, fontWeight: '700' },
   leader: {
     flexDirection: 'row',
     alignItems: 'center',

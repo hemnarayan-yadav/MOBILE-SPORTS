@@ -133,7 +133,7 @@
   },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
-    "sha256": "55e5b6985b2b6135bbc1baa7058b0843944ac826095481f929e4973ab06be72a"
+    "sha256": "05f8206438717c0168182838f32d421726e8832faf2140fdf58a416d6f957ee8"
   },
   "src/app/players.jsx": {
     "source": "src/pages/public/Players.jsx",
@@ -229,7 +229,7 @@
   },
   "src/components/player/PlayerBits.jsx": {
     "source": "src/components/player/PlayerBits.jsx",
-    "sha256": "4f36d36ac639f328549ee2faa3fe1d3f8e2aef3d12ffe579fd1156496576caf9"
+    "sha256": "14cb64090a39a42f90439e216af3dd34d05df3c3640c93abb1ed5ce320a2e5e0"
   },
   "src/components/player/PlayerForm.jsx": {
     "source": "src/components/player/PlayerForm.jsx",
@@ -281,7 +281,7 @@
   },
   "src/components/tournament/TournamentBits.jsx": {
     "source": "src/components/tournament/TournamentBits.jsx",
-    "sha256": "f982fc28c80efd46a849384f0b70a19930d2b0b88ab7f18fbb68b392fe32ff52"
+    "sha256": "226af40fbeb51eca7b6d0f09eb40df4dff0cd44e48cf29d9c4dbeea34e106741"
   },
   "src/hooks/useAuth.js": {
     "source": "src/hooks/useAuth.js",

@@ -710,6 +710,8 @@
     "tacklePoints": "Tackle points",
     "superRaids": "Super raids",
     "superTackles": "Super tackles",
+    "super10s": "Super 10s",
+    "high5s": "High 5s",
     "allOutPoints": "All-out points",
     "technicalPoints": "Technical points",
     "points": "Points",
@@ -734,6 +736,8 @@
     "tied": "Tied",
     "scoreDiff": "Score difference",
     "points": "Pts",
+    "form": "Form",
+    "formLabel": "Latest results, newest first: {{results}}",
     "empty": "The points table appears after the first completed match."
   },
   "rankings": {
