@@ -70,19 +70,33 @@ function maintenanceText(maintenance, language, t) {
   };
 }
 
+function isBlocked(maintenance, role, segments) {
+  if (!maintenance?.enabled || !maintenance.onApp || role === SUPER_ADMIN) return false;
+  return maintenance.scope !== 'auth' || AUTH_SEGMENTS.includes(segments[0]);
+}
+
+// The navigator stays mounted underneath and the notice covers it. Swapping the
+// navigator out for the notice crashed the app: the login gate still navigates,
+// and expo-router throws when no navigator is mounted to receive it.
 export default function MaintenanceGate({ children }) {
-  const { t, i18n } = useTranslation();
-  const { colors } = useTheme();
   const segments = useSegments();
   const role = useAuthStore((state) => state.user?.role);
   const maintenance = useMaintenanceConfig();
 
-  if (!maintenance?.enabled || !maintenance.onApp || role === SUPER_ADMIN) return children;
-  if (maintenance.scope === 'auth' && !AUTH_SEGMENTS.includes(segments[0])) return children;
+  return (
+    <>
+      {children}
+      {isBlocked(maintenance, role, segments) ? <MaintenanceNotice maintenance={maintenance} /> : null}
+    </>
+  );
+}
 
+function MaintenanceNotice({ maintenance }) {
+  const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
   const { title, body } = maintenanceText(maintenance, i18n.language, t);
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.bg }]}>
+    <SafeAreaView style={[StyleSheet.absoluteFill, { backgroundColor: colors.bg }]}>
       <View style={styles.content}>
         <View style={styles.logo}>
           <Logo height={36} title={t('nav.brand')} />
@@ -99,7 +113,6 @@ export default function MaintenanceGate({ children }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
   content: {
     flex: 1,
     justifyContent: 'center',
