@@ -370,7 +370,16 @@
     "adminInviteNotFound": "इस ईमेल के लिए कोई एडमिन न्योता खुला नहीं है।",
     "adminInviteAlreadyAccepted": "यह एडमिन अकाउंट पहले से तैयार है। सीधे साइन इन करें।",
     "captainTeamActive": "अकाउंट डिलीट करने से पहले टीम किसी और कैप्टन को दें या टीम बंद करें",
-    "passwordConfirmationRequired": "अपने पासवर्ड से पुष्टि करें"
+    "passwordConfirmationRequired": "अपने पासवर्ड से पुष्टि करें",
+    "noticePosterAlreadyAnnounced": "यह पोस्टर KhelScore पर पहले से घोषित है।",
+    "noticeSimilarExists": "इस नाम का टूर्नामेंट उस दिन के लिए पहले से घोषित है।",
+    "posterAiUnavailable": "अभी पोस्टर पढ़ने की सुविधा उपलब्ध नहीं है। कृपया फ़ॉर्म खुद भरें।",
+    "posterAiRateLimited": "अभी बहुत सारे पोस्टर पढ़े जा रहे हैं। कुछ मिनट बाद फिर कोशिश करें, या फ़ॉर्म खुद भरें।",
+    "posterAiUnreadable": "यह पोस्टर पढ़ा नहीं जा सका। कृपया फ़ॉर्म खुद भरें।",
+    "posterImageTooLarge": "यह पोस्टर पढ़ने के लिए बहुत बड़ा है। छोटी फ़ोटो से कोशिश करें।",
+    "posterImageUnavailable": "पोस्टर खुल नहीं पाया। कृपया फिर से कोशिश करें।",
+    "posterImageUnreadable": "यह फ़ाइल पढ़ने लायक फ़ोटो नहीं है। पोस्टर को फ़ोटो के रूप में अपलोड करें।",
+    "mediaAssetNotFound": "अपलोड की गई फ़ाइल नहीं मिली। कृपया पोस्टर फिर से अपलोड करें।"
   },
   "auth": {
     "loginTitle": "लॉग इन करें",
@@ -537,7 +546,10 @@
     "stateUnknown": "सूची में से राज्य चुनें",
     "districtNeedsState": "पहले राज्य चुनें",
     "districtNotInState": "यह ज़िला चुने गए राज्य में नहीं है",
-    "searchMin": "कम से कम 2 अक्षर डालें"
+    "searchMin": "कम से कम 2 अक्षर डालें",
+    "endBeforeStart": "खत्म होने की तारीख शुरुआत के बाद की होनी चाहिए",
+    "startTime": "24 घंटे का समय लिखें, जैसे 20:30",
+    "noticeTitleMin": "टूर्नामेंट का नाम कम से कम 5 अक्षर का होना चाहिए"
   },
   "roles": {
     "super_admin": "सुपर एडमिन",
@@ -1315,6 +1327,33 @@
     "reportReasonLabel": "क्या ग़लत है?",
     "reportNoteLabel": "और जानकारी (ज़रूरी नहीं)",
     "yearLabel": "साल",
-    "awardsLabel": "खिलाड़ी के इनाम"
+    "awardsLabel": "खिलाड़ी के इनाम",
+    "awardsHint": "पोज़िशन से नहीं, एक खिलाड़ी को मिलने वाले इनाम — बेस्ट रेडर, मैन ऑफ द सीरीज।",
+    "fieldEndDate": "आख़िरी दिन",
+    "fieldAwardTitle": "इनाम का नाम",
+    "fieldAwardPrize": "कितना मिलेगा",
+    "fieldContactName": "नाम",
+    "fieldDescription": "और कुछ बताना हो",
+    "fillFromPoster": "पोस्टर से भरें",
+    "fillFromPosterHint": "KhelScore पोस्टर पढ़कर यह फ़ॉर्म भर देगा। भेजने से पहले सब जाँच लें।",
+    "posterRead_one": "पोस्टर से 1 जानकारी भरी — जाँच लें।",
+    "posterRead_other": "पोस्टर से {{count}} जानकारियाँ भरीं — जाँच लें।",
+    "posterDropped_one": "पोस्टर की 1 और लाइन इस फ़ॉर्म में नहीं समाई।",
+    "posterDropped_other": "पोस्टर की {{count}} और लाइनें इस फ़ॉर्म में नहीं समाईं।",
+    "posterWarning": {
+      "dateMissing": "पोस्टर पर तारीख़ नहीं मिली — खुद चुनें।",
+      "dateAmbiguous": "तारीख़ दिन-पहले (भारतीय तरीक़े से) पढ़ी गई है। दिन और महीना जाँच लें।",
+      "dateOrderCorrected": "पोस्टर पर लिखे वार से मिलाने के लिए दिन और महीना बदला गया है।",
+      "dateWeekdayMismatch": "पोस्टर की तारीख़ और वार आपस में मेल नहीं खा रहे — दोनों जाँचें।",
+      "dateOutOfOrder": "ख़त्म होने की तारीख़ शुरू होने से पहले आ रही है।",
+      "stateUnknown": "राज्य पहचान में नहीं आया — खुद चुनें।",
+      "districtUnknown": "ज़िला पहचान में नहीं आया — खुद चुनें।",
+      "phoneUnreadable": "एक फ़ोन नंबर पढ़ा नहीं गया, छोड़ दिया है।",
+      "other": "पोस्टर पर कुछ जाँचने लायक़ है।"
+    },
+    "duplicateTitle": "यह पहले से घोषित जैसा लग रहा है",
+    "duplicateMessage": "“{{title}}” {{date}} को पहले से घोषित है। क्या यह भी भेजना है?",
+    "duplicateMessageShort": "इस नाम का टूर्नामेंट उस दिन के लिए पहले से घोषित है। क्या यह भी भेजना है?",
+    "duplicateConfirm": "फिर भी भेजें"
   }
 }

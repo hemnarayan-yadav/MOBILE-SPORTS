@@ -131,6 +131,10 @@
     "source": "src/pages/public/News.jsx",
     "sha256": "1083af4055a283225d3bc194a914cd110fa4130e513e467668124ada880dcf56"
   },
+  "src/app/notice/new.jsx": {
+    "source": "src/pages/dashboard/AnnounceNotice.jsx",
+    "sha256": "6aaa0a378ee8ed1df2d071604b8bcf9a04e6dfd92058de82ed38ecdf05698818"
+  },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
     "sha256": "05f8206438717c0168182838f32d421726e8832faf2140fdf58a416d6f957ee8"
@@ -197,7 +201,7 @@
   },
   "src/components/common/ImageField.jsx": {
     "source": "src/components/common/ImageField.jsx",
-    "sha256": "5f17694c78ef5ad7877d36d17b4c4f449f0f1d2d190b5b76ff690f9233edaa3d"
+    "sha256": "21ca5aba8bc7df3f0db82bbaa7fbd577b656136f3307f0e53264b14c44cda3a2"
   },
   "src/components/common/Layout.jsx": {
     "source": "src/components/common/Layout.jsx",
@@ -427,6 +431,10 @@
     "source": "src/utils/mediaFile.js",
     "sha256": "7f2baa194165e437278f808f08fdd9995958db5478193abb42bcf2a63a142a92"
   },
+  "src/utils/noticeDraft.js": {
+    "source": "src/utils/noticeDraft.js",
+    "sha256": "8383806331bd87329b704ed8d2f2cf391487874059feea82754d09dd3e7df746"
+  },
   "src/utils/rounds.js": {
     "source": "src/utils/rounds.js",
     "sha256": "18ed661ac14437f500a7ebf48a6f3a736468759fde7e8cc507b2033a14a0edf2"
@@ -437,6 +445,6 @@
   },
   "src/utils/validation.js": {
     "source": "src/utils/validation.js",
-    "sha256": "409ede269df9e9aa3783b680693948b5e31d68ed021e3aa6fb707928dbf5483d"
+    "sha256": "eec27d4c05361783a64f0b97a0aaf1fcd56afeee5a6e5adbcfa8b70a478fe93f"
   }
 }

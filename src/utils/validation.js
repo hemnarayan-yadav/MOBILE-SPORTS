@@ -1,7 +1,7 @@
 // Ported from frontend/src/utils/validation.js — the account, team and squad
-// schemas the app uses (unchanged). Client-side mirrors of the API's validation
-// rules; messages are i18n keys, translated where the error is rendered. The
-// API remains the authority.
+// schemas the app uses, and the announce-a-tournament form's (unchanged).
+// Client-side mirrors of the API's validation rules; messages are i18n keys,
+// translated where the error is rendered. The API remains the authority.
 import { z } from 'zod';
 import { ORGANISER_ROLES } from './constants.js';
 import { isKnownDistrict, isKnownState } from './india.js';
@@ -254,3 +254,63 @@ export function blankToNull(values, keys) {
   });
   return result;
 }
+
+// Announcing a tournament somebody else is running. Mirrors the API
+// (modules/tournament-notices): the name and the start date are all that is
+// required, because a village poster is often the whole announcement and an
+// organiser who only has the graphic must still be able to post it.
+const NOTICE_TITLE_MIN_LENGTH = 5;
+const START_TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+// What a poster prints. More rows than this is not an announcement any more.
+const MAX_AWARDS = 4;
+const MAX_CONTACTS = 3;
+
+// The form holds a fixed number of rows, most of them blank; only the filled
+// ones are sent. A half-filled row is an error rather than a silent drop,
+// because the person typed it meaning to announce it.
+const awardRow = z.object({ title: text(60), prize: text(80) });
+const contactRow = z.object({ name: text(60), phone: text(20) });
+
+const noticeFields = {
+  title: z
+    .string()
+    .trim()
+    .min(NOTICE_TITLE_MIN_LENGTH, 'validation.noticeTitleMin')
+    .max(160, 'validation.tooLong'),
+  posterUrl: optionalUrl,
+  description: text(2000),
+  startDate: z.string().min(1, 'validation.required'),
+  endDate: z.string().default(''),
+  startTime: optionalField(z.string().trim().regex(START_TIME_PATTERN, 'validation.startTime')).default(''),
+  venue: text(160),
+  entryFee: text(40),
+  rules: text(500),
+  organiserName: text(120),
+  // One free-text prize per placing, in poster order.
+  prizes: z.array(text(80)),
+  awards: z.array(awardRow).max(MAX_AWARDS),
+  contacts: z.array(contactRow).max(MAX_CONTACTS),
+  ...locationFields,
+};
+
+export const noticeSchema = withLocation(z.object(noticeFields))
+  .refine((v) => !v.endDate || v.endDate >= v.startDate, {
+    path: ['endDate'],
+    message: 'validation.endBeforeStart',
+  })
+  .superRefine((values, ctx) => {
+    values.awards.forEach((award, index) => {
+      if (Boolean(award.title) !== Boolean(award.prize)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['awards', index, award.title ? 'prize' : 'title'],
+          message: 'validation.required',
+        });
+      }
+    });
+    values.contacts.forEach((contact, index) => {
+      if (contact.name && !contact.phone) {
+        ctx.addIssue({ code: 'custom', path: ['contacts', index, 'phone'], message: 'validation.required' });
+      }
+    });
+  });
