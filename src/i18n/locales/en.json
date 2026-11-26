@@ -1354,6 +1354,9 @@
     "duplicateTitle": "This looks like one already announced",
     "duplicateMessage": "\"{{title}}\" is already announced for {{date}}. Announce this one as well?",
     "duplicateMessageShort": "A tournament with this name is already announced for that day. Announce this one as well?",
-    "duplicateConfirm": "Announce anyway"
+    "duplicateConfirm": "Announce anyway",
+    "posterAlreadyAnnounced": "This poster is already on KhelScore: \"{{title}}\", {{date}}.",
+    "similarFound": "A tournament with this name is already announced for {{date}}: \"{{title}}\". Check it before announcing again.",
+    "viewExisting": "See it"
   }
 }

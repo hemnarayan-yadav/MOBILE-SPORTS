@@ -29,7 +29,8 @@ import StateDistrictFields from '../../components/common/StateDistrictFields.jsx
 import TextField from '../../components/common/TextField.jsx';
 import { AUTH_STATUS, useAuthStore } from '../../store/authStore.js';
 import { notify } from '../../store/noticeStore.js';
-import { SPACING } from '../../theme/tokens.js';
+import { RADII, SPACING } from '../../theme/tokens.js';
+import { useTheme } from '../../theme/useTheme.js';
 import { apiErrorText } from '../../utils/apiErrors.js';
 import { formatDate } from '../../utils/format.js';
 import {
@@ -100,6 +101,28 @@ function ReadingSummary({ review }) {
   );
 }
 
+// A tournament KhelScore already has, named and linked, said where the poster
+// is rather than in a notice that disappears: the organiser's next step is to
+// look at it, not to type the poster in again.
+function KnownNotice({ messageKey, notice }) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { colors } = useTheme();
+  return (
+    <View
+      accessibilityRole="alert"
+      style={[styles.known, { borderColor: colors.warning, backgroundColor: colors.surface2 }]}
+    >
+      <AppText variant="small">
+        {t(messageKey, { title: notice.title, date: formatDate(notice.startDate) })}
+      </AppText>
+      <Button variant="ghost" onPress={() => router.push(`/notice/${notice.id}`)}>
+        {t('notices.viewExisting')}
+      </Button>
+    </View>
+  );
+}
+
 export default function AnnounceTournament() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -118,6 +141,9 @@ export default function AnnounceTournament() {
   // has an id to name it by.
   const [posterAsset, setPosterAsset] = useState(null);
   const [review, setReview] = useState(null);
+  // The notice this exact image is already on, when the server says so. It is
+  // checked before any model is asked, so it is known at once.
+  const [alreadyAnnounced, setAlreadyAnnounced] = useState(null);
 
   // Only where the server has a reader behind it. Staging has none, and an
   // offer that always fails is worse than no offer.
@@ -147,8 +173,15 @@ export default function AnnounceTournament() {
 
   const read = useMutation({
     mutationFn: () => noticesApi.extractPoster(posterAsset.id),
-    onSuccess: ({ draft, warnings }) => setReview({ ...applyDraft(draft), warnings }),
-    onError: (error) => notify.error(apiErrorText(t, error)),
+    onSuccess: ({ draft, warnings, similar }) =>
+      setReview({ ...applyDraft(draft), warnings, similar: similar ?? null }),
+    onError: (error) => {
+      if (error?.code === 'NOTICE_POSTER_ALREADY_ANNOUNCED' && error.details?.id) {
+        setAlreadyAnnounced(error.details);
+        return;
+      }
+      notify.error(apiErrorText(t, error));
+    },
   });
 
   // The note a field carries after a reading, where the reader was unsure.
@@ -206,6 +239,7 @@ export default function AnnounceTournament() {
                 setPosterAsset(asset);
                 // A new poster makes the last reading meaningless.
                 setReview(null);
+                setAlreadyAnnounced(null);
               }}
               error={errors.posterUrl}
             />
@@ -222,6 +256,12 @@ export default function AnnounceTournament() {
             <AppText variant="small" tone="muted">
               {t('notices.fillFromPosterHint')}
             </AppText>
+            {alreadyAnnounced ? (
+              <KnownNotice messageKey="notices.posterAlreadyAnnounced" notice={alreadyAnnounced} />
+            ) : null}
+            {review?.similar ? (
+              <KnownNotice messageKey="notices.similarFound" notice={review.similar} />
+            ) : null}
             {review ? <ReadingSummary review={review} /> : null}
           </Card>
         ) : null}
@@ -395,4 +435,5 @@ const styles = StyleSheet.create({
   block: { gap: SPACING.sm },
   row: { gap: SPACING.sm },
   summary: { gap: SPACING.xs, paddingTop: SPACING.sm },
+  known: { gap: SPACING.xs, padding: SPACING.md, borderWidth: 1, borderRadius: RADII.md },
 });

@@ -133,7 +133,7 @@
   },
   "src/app/notice/new.jsx": {
     "source": "src/pages/dashboard/AnnounceNotice.jsx",
-    "sha256": "6aaa0a378ee8ed1df2d071604b8bcf9a04e6dfd92058de82ed38ecdf05698818"
+    "sha256": "c7458fcfa00c94aebe8041e48dec68ce17c8ed4e1b6a12317fdf1d261cf95213"
   },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
