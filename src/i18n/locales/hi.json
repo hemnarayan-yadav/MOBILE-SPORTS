@@ -1354,6 +1354,9 @@
     "duplicateTitle": "यह पहले से घोषित जैसा लग रहा है",
     "duplicateMessage": "“{{title}}” {{date}} को पहले से घोषित है। क्या यह भी भेजना है?",
     "duplicateMessageShort": "इस नाम का टूर्नामेंट उस दिन के लिए पहले से घोषित है। क्या यह भी भेजना है?",
-    "duplicateConfirm": "फिर भी भेजें"
+    "duplicateConfirm": "फिर भी भेजें",
+    "posterAlreadyAnnounced": "यह पोस्टर KhelScore पर पहले से है: \"{{title}}\", {{date}}।",
+    "similarFound": "इस नाम का टूर्नामेंट {{date}} के लिए पहले से घोषित है: \"{{title}}\"। दोबारा घोषित करने से पहले देख लें।",
+    "viewExisting": "देखें"
   }
 }

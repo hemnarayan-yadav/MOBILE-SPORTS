@@ -37,8 +37,9 @@ jest.mock('../components/common/ImageField.jsx', () => {
 });
 
 const mockBack = jest.fn();
+const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), back: mockBack }),
+  useRouter: () => ({ push: mockPush, back: mockBack }),
   useLocalSearchParams: () => ({}),
   Redirect: () => null,
   Link: ({ children }) => children,
@@ -100,6 +101,7 @@ const announce = async () =>
 beforeEach(async () => {
   resetSession();
   mockBack.mockClear();
+  mockPush.mockClear();
   Object.values(noticesApi).forEach((fn) => fn.mockReset());
   // A server with a poster reader behind it; staging's case has its own test.
   noticesApi.config.mockResolvedValue({ posterReader: true });
@@ -187,14 +189,38 @@ describe('filling the form from the poster', () => {
     expect(screen.getByLabelText('Tournament name').props.editable).not.toBe(false);
   });
 
-  it('says so when the poster is already announced, and fills nothing', async () => {
-    noticesApi.extractPoster.mockRejectedValue({ code: 'NOTICE_POSTER_ALREADY_ANNOUNCED' });
+  it('names the tournament the poster is already on, opens it, and fills nothing', async () => {
+    noticesApi.extractPoster.mockRejectedValue({
+      code: 'NOTICE_POSTER_ALREADY_ANNOUNCED',
+      details: { id: 'n9', title: 'Gram Eramsahi Kabaddi', startDate: '2026-12-05T00:00:00.000Z' },
+    });
     await renderForm();
 
     await readPoster();
 
-    await screen.findByText('This poster has already been announced on KhelScore.');
+    await screen.findByText(/This poster is already on KhelScore: "Gram Eramsahi Kabaddi"/);
     expect(screen.getByLabelText('Tournament name').props.value).toBe('');
+    fireEvent.press(screen.getByRole('button', { name: 'See it' }));
+    expect(mockPush).toHaveBeenCalledWith('/notice/n9');
+  });
+
+  // A WhatsApp forward of the poster has different bytes, so only its reading
+  // can tell it is a repeat — and the organiser hears it with the reading.
+  it('says straight after reading when the same tournament is already announced', async () => {
+    noticesApi.extractPoster.mockResolvedValue({
+      ...READING,
+      similar: { id: 'n9', title: READING.draft.title, startDate: '2026-12-05T00:00:00.000Z' },
+    });
+    await renderForm();
+
+    await readPoster();
+
+    await screen.findByText(/A tournament with this name is already announced for/);
+    // Still a suggestion: the form is filled and nothing is sent.
+    expect(screen.getByLabelText('Tournament name').props.value).toBe(READING.draft.title);
+    expect(noticesApi.submit).not.toHaveBeenCalled();
+    fireEvent.press(screen.getByRole('button', { name: 'See it' }));
+    expect(mockPush).toHaveBeenCalledWith('/notice/n9');
   });
 
   // Staging has no key. An offer that always fails is worse than no offer.
