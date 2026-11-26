@@ -10,6 +10,7 @@ import { qk } from '../../api/queryKeys.js';
 import { playersApi } from '../../api/teams.api.js';
 import AppText from '../../components/common/AppText.jsx';
 import Avatar from '../../components/common/Avatar.jsx';
+import PhotoZoom from '../../components/common/PhotoZoom.jsx';
 import Badge from '../../components/common/Badge.jsx';
 import { BackHeader, Card, Section, StatTile, TileGrid } from '../../components/common/Layout.jsx';
 import ShareButton from '../../components/common/ShareButton.jsx';
@@ -47,7 +48,9 @@ function Header({ player }) {
         <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.ink, opacity: HERO_SCRIM_OPACITY }]} />
       ) : null}
       <View style={styles.heroRow}>
-        <Avatar src={player.photoUrl} name={player.name} size="xl" />
+        <PhotoZoom src={player.photoUrl} name={player.name}>
+          <Avatar src={player.photoUrl} name={player.name} size="xl" />
+        </PhotoZoom>
         {player.membership ? (
           <Badge tone="brand">{`#${player.membership.jerseyNumber}`}</Badge>
         ) : null}

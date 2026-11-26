@@ -137,7 +137,7 @@
   },
   "src/app/player/[id].jsx": {
     "source": "src/pages/public/PlayerProfile.jsx",
-    "sha256": "05f8206438717c0168182838f32d421726e8832faf2140fdf58a416d6f957ee8"
+    "sha256": "c3db7bac606cd8930f990bbbdc60b939fb459a18dca1f54f68d932454277b0ca"
   },
   "src/app/players.jsx": {
     "source": "src/pages/public/Players.jsx",

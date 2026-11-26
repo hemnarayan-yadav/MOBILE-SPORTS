@@ -18,6 +18,7 @@ jest.mock('expo-router', () => {
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Share } from 'react-native';
 import { newsFeedApi } from '../api/newsFeed.api.js';
 import { noticesApi } from '../api/notices.api.js';
 import NoticeDetail from '../app/notice/[id].jsx';
@@ -114,6 +115,20 @@ describe('the tournaments and news screen', () => {
     );
   });
 
+  // Village Kabaddi is local: most people look for what is on near them.
+  it('narrows the list to a state', async () => {
+    await renderScreen(<Notices />);
+    await screen.findByText(NOTICE.title);
+
+    fireEvent.press(screen.getByLabelText('State'));
+    fireEvent.changeText(await screen.findByLabelText('Search'), 'Chhattisgarh');
+    fireEvent.press(await screen.findByLabelText('Chhattisgarh'));
+
+    await waitFor(() =>
+      expect(noticesApi.list).toHaveBeenCalledWith(expect.objectContaining({ state: 'CG' })),
+    );
+  });
+
   it('offers to announce a tournament only to someone signed in', async () => {
     await renderScreen(<Notices />);
     await screen.findByText(NOTICE.title);
@@ -147,6 +162,23 @@ describe('one tournament in full', () => {
     expect(screen.getByText('₹300')).toBeTruthy();
     expect(screen.getByText('₹7000')).toBeTruthy();
     expect(screen.getByText('एक गांव एक क्लब')).toBeTruthy();
+  });
+
+  // A poster travels by WhatsApp: the link opens the notice's page, whose
+  // preview shows the poster.
+  it('shares the notice by its link, with the name and the date', async () => {
+    const share = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' });
+    await renderScreen(<NoticeDetail />);
+    await screen.findByText('₹300');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Share' }));
+
+    expect(share).toHaveBeenCalled();
+    const [content] = share.mock.calls[0];
+    const text = `${content.message ?? ''} ${content.url ?? ''}`;
+    expect(text).toContain('/notice/n1');
+    expect(text).toContain(NOTICE.title);
+    share.mockRestore();
   });
 
   it('offers reporting to a signed-in reader and nobody else', async () => {

@@ -2,9 +2,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Platform, Pressable, Share } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { env } from '../../config/env.js';
-import { MIN_TOUCH, RADII } from '../../theme/tokens.js';
+import { MIN_TOUCH, RADII, SPACING } from '../../theme/tokens.js';
 import { useTheme } from '../../theme/useTheme.js';
 import { EVENTS, track } from '../../lib/analytics.js';
+import AppText from './AppText.jsx';
 
 /**
  * Shares a page of the website.
@@ -21,7 +22,9 @@ import { EVENTS, track } from '../../lib/analytics.js';
  * photo rather than a bare link. Anyone who does have the app installed opens
  * it there anyway — App Links already claim these paths.
  */
-export default function ShareButton({ path, title, label }) {
+// `showLabel` writes the word beside the icon, for a page where sharing is the
+// main thing to do with it (a tournament poster) rather than a corner action.
+export default function ShareButton({ path, title, label, showLabel = false }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const url = `${env.SITE_URL}${path}`;
@@ -51,6 +54,9 @@ export default function ShareButton({ path, title, label }) {
         {
           minHeight: MIN_TOUCH,
           minWidth: MIN_TOUCH,
+          flexDirection: 'row',
+          gap: SPACING.sm,
+          paddingHorizontal: showLabel ? SPACING.lg : 0,
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: RADII.md,
@@ -60,6 +66,7 @@ export default function ShareButton({ path, title, label }) {
       ]}
     >
       <Ionicons name="share-social-outline" size={20} color={colors.text} />
+      {showLabel ? <AppText weight="semibold">{label ?? t('common.share')}</AppText> : null}
     </Pressable>
   );
 }
