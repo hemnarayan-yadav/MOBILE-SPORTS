@@ -28,20 +28,16 @@ beforeEach(() => {
 });
 
 describe('measuring the five steps', () => {
-  it('starts once, with session replay on but text inputs masked', () => {
+  it('starts once, recording no screen', () => {
     startAnalytics();
     startAnalytics();
 
     expect(PostHog).toHaveBeenCalledTimes(1);
     const options = PostHog.mock.calls[0][1];
-    // Owner's decision while the product is new: see who hit a problem and
-    // what was on their screen.
-    expect(options).toMatchObject({ enableSessionReplay: true });
-    // Screens visible, typed values not — which is what keeps the password out.
-    expect(options.sessionReplayConfig).toMatchObject({
-      maskAllImages: false,
-      maskAllTextInputs: true,
-    });
+    // Owner's decision, 26 Nov: basic measurement only. A recording could show
+    // a real name, number or typed code, so no screen is recorded at all.
+    expect(options).toMatchObject({ enableSessionReplay: false, captureAppLifecycleEvents: true });
+    expect(options.sessionReplayConfig).toBeUndefined();
   });
 
   it('names a person by account, role and district — and nothing else', () => {
