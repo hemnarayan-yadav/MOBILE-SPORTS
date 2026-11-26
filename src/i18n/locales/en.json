@@ -370,7 +370,16 @@
     "adminInviteNotFound": "No admin invitation is open for this email address.",
     "adminInviteAlreadyAccepted": "This admin account is already set up. Sign in instead.",
     "captainTeamActive": "Hand your team to another captain or deactivate it before deleting your account",
-    "passwordConfirmationRequired": "Confirm with your password"
+    "passwordConfirmationRequired": "Confirm with your password",
+    "noticePosterAlreadyAnnounced": "This poster has already been announced on KhelScore.",
+    "noticeSimilarExists": "A tournament with this name is already announced for that day.",
+    "posterAiUnavailable": "Reading posters is not available right now. Please fill the form in yourself.",
+    "posterAiRateLimited": "Too many posters are being read just now. Try again in a few minutes, or fill the form in yourself.",
+    "posterAiUnreadable": "This poster could not be read. Please fill the form in yourself.",
+    "posterImageTooLarge": "This poster is too large to read. Try a smaller picture.",
+    "posterImageUnavailable": "The poster could not be opened. Please try again.",
+    "posterImageUnreadable": "This file is not a picture that can be read. Upload the poster as a photo.",
+    "mediaAssetNotFound": "That upload could not be found. Please upload the poster again."
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -537,7 +546,10 @@
     "stateUnknown": "Choose a state from the list",
     "districtNeedsState": "Choose the state first",
     "districtNotInState": "That district is not in the selected state",
-    "searchMin": "Enter at least 2 characters"
+    "searchMin": "Enter at least 2 characters",
+    "endBeforeStart": "End date must be on or after the start date",
+    "startTime": "Use a 24-hour time such as 20:30",
+    "noticeTitleMin": "Tournament name must be at least 5 characters"
   },
   "roles": {
     "super_admin": "Super Admin",
@@ -1315,6 +1327,33 @@
     "reportReasonLabel": "What is wrong?",
     "reportNoteLabel": "More detail (optional)",
     "yearLabel": "Year",
-    "awardsLabel": "Player awards"
+    "awardsLabel": "Player awards",
+    "awardsHint": "Won by one player, not by placing — best raider, man of the series.",
+    "fieldEndDate": "Last day",
+    "fieldAwardTitle": "Award",
+    "fieldAwardPrize": "What it pays",
+    "fieldContactName": "Name",
+    "fieldDescription": "Anything else",
+    "fillFromPoster": "Fill from poster",
+    "fillFromPosterHint": "KhelScore reads the poster and fills this form in. Check everything before you send it.",
+    "posterRead_one": "Filled 1 field from the poster — please check it.",
+    "posterRead_other": "Filled {{count}} fields from the poster — please check them.",
+    "posterDropped_one": "1 more line on the poster did not fit this form.",
+    "posterDropped_other": "{{count}} more lines on the poster did not fit this form.",
+    "posterWarning": {
+      "dateMissing": "No date could be read from the poster — please pick it.",
+      "dateAmbiguous": "The date was read day-first, the Indian way. Check the day and the month.",
+      "dateOrderCorrected": "The day and month were swapped to match the weekday printed on the poster.",
+      "dateWeekdayMismatch": "The date and the weekday on the poster do not agree — check both.",
+      "dateOutOfOrder": "The end date came out before the start date.",
+      "stateUnknown": "The state could not be matched — please pick it.",
+      "districtUnknown": "The district could not be matched — please pick it.",
+      "phoneUnreadable": "A phone number could not be read and was left out.",
+      "other": "Something on the poster needs checking."
+    },
+    "duplicateTitle": "This looks like one already announced",
+    "duplicateMessage": "\"{{title}}\" is already announced for {{date}}. Announce this one as well?",
+    "duplicateMessageShort": "A tournament with this name is already announced for that day. Announce this one as well?",
+    "duplicateConfirm": "Announce anyway"
   }
 }
