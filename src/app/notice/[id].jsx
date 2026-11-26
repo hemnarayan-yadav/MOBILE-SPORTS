@@ -13,6 +13,7 @@ import AppText from '../../components/common/AppText.jsx';
 import Button from '../../components/common/Button.jsx';
 import Screen from '../../components/common/Screen.jsx';
 import SelectSheetField from '../../components/common/SelectSheetField.jsx';
+import ShareButton from '../../components/common/ShareButton.jsx';
 import Sheet from '../../components/common/Sheet.jsx';
 import { ErrorState, LoadingState } from '../../components/common/States.jsx';
 import TextField from '../../components/common/TextField.jsx';
@@ -97,6 +98,14 @@ export default function NoticeDetail() {
               accessibilityIgnoresInvertColors
             />
           ) : null}
+
+          {/* A poster travels by WhatsApp; the link opens this page, and its
+              preview shows the poster. */}
+          <ShareButton
+            path={`/notice/${notice.id}`}
+            title={`${notice.title} · ${formatDate(notice.startDate)}`}
+            showLabel
+          />
 
           <Detail
             icon="calendar-outline"

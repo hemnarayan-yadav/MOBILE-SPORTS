@@ -14,6 +14,7 @@ import Button from '../components/common/Button.jsx';
 import { TabStrip } from '../components/common/Layout.jsx';
 import PagedList from '../components/common/PagedList.jsx';
 import SelectSheetField from '../components/common/SelectSheetField.jsx';
+import StateDistrictFields from '../components/common/StateDistrictFields.jsx';
 import { NewsCard, NoticeCard } from '../components/notice/NoticeBits.jsx';
 import { usePagedQuery } from '../hooks/usePagedQuery.js';
 import { AUTH_STATUS, useAuthStore } from '../store/authStore.js';
@@ -38,9 +39,9 @@ function yearOptions(label) {
   ];
 }
 
-function TournamentsTab({ phase, year }) {
+function TournamentsTab({ phase, year, location }) {
   const { t } = useTranslation();
-  const params = { phase, year };
+  const params = { phase, year, state: location.state, district: location.district };
   const query = usePagedQuery({
     queryKey: qk.notices.list({ ...params, limit: PAGE_SIZE, paged: true }),
     fetchPage: ({ page }) => noticesApi.list({ ...params, page, limit: PAGE_SIZE }),
@@ -81,6 +82,7 @@ export default function Notices() {
   const [tab, setTab] = useState(TAB.TOURNAMENTS);
   const [phase, setPhase] = useState('upcoming');
   const [year, setYear] = useState('');
+  const [location, setLocation] = useState({ state: '', district: '' });
 
   const tournaments = tab === TAB.TOURNAMENTS;
 
@@ -120,6 +122,13 @@ export default function Notices() {
               onChange={setYear}
               options={yearOptions(t('notices.allYears'))}
             />
+            {/* Village Kabaddi is local: most people look for what is on near them. */}
+            <StateDistrictFields
+              variant="filter"
+              state={location.state}
+              district={location.district}
+              onChange={setLocation}
+            />
             {status === AUTH_STATUS.AUTHENTICATED ? (
               <Button variant="secondary" onPress={() => router.push('/notice/new')}>
                 {t('notices.announce')}
@@ -131,7 +140,7 @@ export default function Notices() {
 
       {/* Each tab owns its own query, so switching does not refetch the other
           and the lists keep their place. */}
-      {tournaments ? <TournamentsTab phase={phase} year={year} /> : <NewsTab />}
+      {tournaments ? <TournamentsTab phase={phase} year={year} location={location} /> : <NewsTab />}
     </SafeAreaView>
   );
 }
