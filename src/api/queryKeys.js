@@ -62,6 +62,7 @@ export const qk = Object.freeze({
   },
   notices: {
     all: ['notices'],
+    config: ['notices', 'config'],
     list: (params) => ['notices', 'list', params],
     item: (id) => ['notices', 'item', id],
     mine: (params) => ['notices', 'mine', params],
