@@ -2,6 +2,11 @@
 // the same poster reading. The poster is usually the whole announcement, so
 // reading it is the point — it fills the form and leaves the organiser to check
 // and send it.
+// A whole form screen rendered per test, with a reading and a submit in most:
+// slower than the 5 s default on a cold or busy run, like the other screen
+// suites here.
+jest.setTimeout(20_000);
+
 jest.mock('../api/notices.api.js', () => ({
   noticesApi: { config: jest.fn(), submit: jest.fn(), extractPoster: jest.fn() },
 }));
