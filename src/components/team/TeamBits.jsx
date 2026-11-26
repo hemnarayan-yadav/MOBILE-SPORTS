@@ -13,6 +13,7 @@ import { Card } from '../common/Layout.jsx';
 import { EmptyState } from '../common/States.jsx';
 import { PlayerCard } from '../player/PlayerBits.jsx';
 import TeamCrest from './TeamCrest.jsx';
+import PhotoZoom from '../common/PhotoZoom.jsx';
 
 // The accent colour (`#rrggbb`) of a team — suggested from its logo at upload —
 // or of a player, read from their photo; null when it has none or the value is
@@ -75,7 +76,9 @@ export function TeamHero({ team, actions }) {
           accessibilityIgnoresInvertColors
         />
       ) : null}
-      <TeamCrest team={team} size="xl" />
+      <PhotoZoom src={team.logoUrl} name={team.name}>
+        <TeamCrest team={team} size="xl" />
+      </PhotoZoom>
       <View style={styles.badges}>
         <Badge tone="ink">{team.shortName}</Badge>
         <StatusBadge status={team.status} />
