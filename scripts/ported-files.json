@@ -41,7 +41,7 @@
   },
   "src/api/queryKeys.js": {
     "source": "src/api/queryKeys.js",
-    "sha256": "61c09a1d0eb43ad9ae8e185b24c1e64ab23bde4db630fb71863a05d90e47bc3c"
+    "sha256": "d58f24112c0cc032d6548af5fd31780f0f59e1f81824ca571976a504c7f529e6"
   },
   "src/api/teams.api.js": {
     "source": "src/api/teams.api.js",
