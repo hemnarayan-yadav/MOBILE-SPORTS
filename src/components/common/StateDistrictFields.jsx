@@ -28,7 +28,6 @@ export default function StateDistrictFields({
   return (
     <View style={[styles.row, style]}>
       <SelectSheetField
-        style={styles.field}
         label={t('location.state')}
         value={state}
         onChange={(next) => onChange({ state: next, district: '' })}
@@ -37,7 +36,6 @@ export default function StateDistrictFields({
         error={errors.state}
       />
       <SelectSheetField
-        style={styles.field}
         label={t('location.district')}
         value={district}
         disabled={!state}
@@ -51,7 +49,9 @@ export default function StateDistrictFields({
   );
 }
 
+// The two pickers stack, each as tall as its own content. They used to carry
+// `flex: 1`, which in a header sized by its content (the pamphlet list's)
+// shrank them to no height at all, so they slid under the button below.
 const styles = StyleSheet.create({
   row: { gap: SPACING.md },
-  field: { flex: 1 },
 });

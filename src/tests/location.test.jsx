@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import StateDistrictFields from '../components/common/StateDistrictFields.jsx';
 import { LeaderboardList } from '../components/tournament/TournamentBits.jsx';
 import Players from '../app/players.jsx';
@@ -55,6 +56,19 @@ describe('the state and district pickers', () => {
     expect(screen.getByLabelText('State')).toBeTruthy();
     expect(screen.getByLabelText('District').props.accessibilityState.disabled).toBe(true);
     expect(INDIA_STATES).toHaveLength(36);
+  });
+
+  // On the pamphlet list the pickers sit in a header sized by its content.
+  // With `flex: 1` they shrank to no height there and slid under the Announce
+  // button (owner, 26 Nov), so nothing between them and the screen may flex.
+  it('keeps both pickers their own height, so a content-sized header cannot hide them', async () => {
+    await renderWithQuery(<Fields variant="filter" />);
+
+    for (const label of ['State', 'District']) {
+      for (let node = screen.getByLabelText(label); node; node = node.parent) {
+        expect(StyleSheet.flatten(node.props.style)?.flex).not.toBe(1);
+      }
+    }
   });
 
   it('offers the districts of the chosen state', async () => {
