@@ -6,17 +6,11 @@ import { env } from '../config/env.js';
 //
 //   signed up → made a team → filled the squad → scored a match → shared it
 //
-// **This file now collects personal data, on purpose** — the owner's decision
-// of 16 Nov 2026, while the product is new, matching the web app. Session
-// replay and the lifecycle events are on and the replay is **not** masked,
-// because the question is "which person hit this, and what was on their
-// screen". A recording can therefore show a real name, number or typed code.
-// Text inputs are masked by default on React Native and that default is kept:
-// it is what covers the password field, and `maskAllTextInputs: false` below
-// is the switch if a typed value is ever needed.
-//
-// See frontend/src/lib/analytics.js for what this costs and when to put the
-// masking back.
+// **Basic measurement only** — the owner's decision of 26 Nov 2026, matching
+// the web app: the five steps above, the app's lifecycle events and who took
+// them (by account id). Session replay is off, so no screen is recorded; it was
+// on and unmasked from 16 Nov. PostHog's project setting ("Record user
+// sessions") is the second lock and should stay off too.
 //
 // Without a key (every development build, and every test) all of it is a
 // no-op.
@@ -38,16 +32,9 @@ export function startAnalytics() {
   try {
     client = new PostHog(env.POSTHOG_KEY, {
       host: env.POSTHOG_HOST ?? DEFAULT_HOST,
-      enableSessionReplay: true,
+      // No screen recording of any kind.
+      enableSessionReplay: false,
       captureAppLifecycleEvents: true,
-      sessionReplayConfig: {
-        // Screens are left visible: seeing the squad or the OTP screen as the
-        // person saw it is the whole point.
-        maskAllImages: false,
-        maskAllSandboxedViews: false,
-        // Text inputs stay masked, which is what keeps the password out.
-        maskAllTextInputs: true,
-      },
     });
   } catch {
     // Analytics may never stop the app from starting.
